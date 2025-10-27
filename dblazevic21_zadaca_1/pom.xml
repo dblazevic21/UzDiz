@@ -4,4 +4,14 @@
   <artifactId>dblazevic21_zadaca_1</artifactId>
   <version>1.0.0</version>
   <name>dblazevic21_zadaca_1</name>
+  
+  <properties>
+		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+		<java.version>21</java.version>
+		<maven.compiler.source>${java.version}</maven.compiler.source>
+		<maven.compiler.target>${java.version}</maven.compiler.target>
+		<maven.compiler.release>${java.version}</maven.compiler.release>
+		<maven.jar>3.4.2</maven.jar>
+  </properties>
+  
 </project>
