@@ -3,6 +3,7 @@
   <groupId>edu.unizg.foi.uzdiz.dblazevic21</groupId>
   <artifactId>dblazevic21_zadaca_1</artifactId>
   <version>1.0.0</version>
+  <packaging>jar</packaging>
   <name>dblazevic21_zadaca_1</name>
   <description>Turistička agencija - Zadaća 1</description>
   
@@ -16,8 +17,12 @@
         <maven.clean.version>3.4.1</maven.clean.version>
         <maven.compiler.version>3.14.0</maven.compiler.version>
     </properties>
-  
+    
+    
   	<build>
+  	
+  		<finalName>${project.artifactId}</finalName>
+  	
         <plugins>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>

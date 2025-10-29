@@ -1,7 +1,7 @@
 package edu.unizg.foi.uzdiz.dblazevic21;
 
 import edu.unizg.foi.uzdiz.dblazevic21.handleri.CsvUcitajSingleton;
-//import edu.unizg.foi.uzdiz.dblazevic21.modeli.rezervacije.Rezervacije;
+import edu.unizg.foi.uzdiz.dblazevic21.modeli.rezervacije.Rezervacije;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -35,19 +35,27 @@ public class Glavna
         ucitajCsvAranzmana(datotekeAranzmani, csvUcitaj);
         ucitajCsvRezervacija(datotekeRezervacije, csvUcitaj);
         
-        //Rezervacije.getInstance().ispisiRezervacije();
+        Rezervacije.getInstance().ispisiRezervacije();
     }
 
-	public static void provjeriKomandu(String[] args, Map<String, List<String>> argumenti) 
-	{
-		for (int i = 0; i < args.length; i++) 
+    public static void provjeriKomandu(String[] args, Map<String, List<String>> argumenti) 
+    {
+        String currentFlag = null;
+
+        for (String arg : args) 
         {
-            if (args[i].startsWith("--") && i + 1 < args.length) 
+            if (arg.startsWith("--")) 
             {
-                argumenti.computeIfAbsent(args[i], k -> new ArrayList<>()).add(args[i + 1]);
+                currentFlag = arg;
+                argumenti.putIfAbsent(currentFlag, new ArrayList<>());
+            } 
+            else if (currentFlag != null) 
+            {
+                argumenti.get(currentFlag).add(arg);
             }
         }
-	}
+    }
+
 
 	public static void ucitajCsvRezervacija(List<String> datotekeRezervacije, CsvUcitajSingleton csvUcitaj) 
 	{

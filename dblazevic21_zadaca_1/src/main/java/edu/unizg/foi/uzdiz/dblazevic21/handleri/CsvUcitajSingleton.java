@@ -7,7 +7,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
-import java.util.Locale;
 
 public class CsvUcitajSingleton 
 {
@@ -65,14 +64,15 @@ public class CsvUcitajSingleton
                 if (datum != null) 
                 {
                     String formatiraniDatum = datum.format(izlazniFormat);
-                    //System.out.println("✅ Parsiran datum: " + formatiraniDatum + " (" + ime + " " + prezime + ")");
+                    //System.out.println("Parsiran datum: " + formatiraniDatum + " (" + ime + " " + prezime + ")");
                     Rezervacije.getInstance().dodajRezervaciju(ime, prezime, oznakaAranzmana, formatiraniDatum);
                     brojac++;
                 } 
                 else 
                 {
-                    
+                    System.out.println("Neuspjelo parsiranje datuma za: " + ime + " " + prezime + " → " + datumVrijeme);
                 }
+
             }
         } 
         catch (IOException e)
