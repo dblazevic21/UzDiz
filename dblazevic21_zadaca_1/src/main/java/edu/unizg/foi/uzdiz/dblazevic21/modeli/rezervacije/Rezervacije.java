@@ -35,15 +35,28 @@ public class Rezervacije {
 
     public void dodajRezervaciju(String ime, String prezime, int oznakaAranzmana, String datumVrijeme) 
     {
-        LocalDateTime datum = LocalDateTime.parse(datumVrijeme, hrvatskiFormat);
-        rezervacije.add(new Rezervacija(ime, prezime, oznakaAranzmana, datum));
+        if (datumVrijeme == null || datumVrijeme.isEmpty()) 
+        {
+            return;
+        }
+        try 
+        {
+            LocalDateTime datum = LocalDateTime.parse(datumVrijeme, hrvatskiFormat);
+            rezervacije.add(new Rezervacija(ime, prezime, oznakaAranzmana, datum));
+        } 
+        catch (Exception e) 
+        {
+            System.out.println("Greška pri dodavanju rezervacije: " + datumVrijeme);
+        }
     }
+
 
     public void obradiRezervacije(int minPutnika, int maxPutnika) 
     {
         Map<Integer, Integer> brojPrijava = new HashMap<>();
 
-        for (Rezervacija rezervacija : rezervacije) {
+        for (Rezervacija rezervacija : rezervacije) 
+        {
             int oznaka = rezervacija.getOznakaAranzmana();
             brojPrijava.put(oznaka, brojPrijava.getOrDefault(oznaka, 0) + 1);
 
