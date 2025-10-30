@@ -1,0 +1,1 @@
+java -jar target/dblazevic21_zadaca_1.jar --ta DZ_1_aranzmani.csv --rta DZ_1_rezervacije.csv DZ_1_rezervacije_1.csv 

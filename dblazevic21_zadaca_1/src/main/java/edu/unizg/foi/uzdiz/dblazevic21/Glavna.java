@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 
 public class Glavna 
 {
@@ -33,9 +34,12 @@ public class Glavna
         CsvUcitajSingleton csvUcitaj = CsvUcitajSingleton.getInstance();
 
         ucitajCsvAranzmana(datotekeAranzmani, csvUcitaj);
+        
         ucitajCsvRezervacija(datotekeRezervacije, csvUcitaj);
         
-        Rezervacije.getInstance().ispisiRezervacije();
+        Rezervacije rezervacije = Rezervacije.getInstance();
+        
+        pokreniInteraktivniNacin();
     }
 
     public static void provjeriKomandu(String[] args, Map<String, List<String>> argumenti) 
@@ -100,4 +104,33 @@ public class Glavna
             System.out.println("Datoteka \"" + naziv + "\" ne postoji u trenutnom direktoriju!");
         }
     }
+    
+    private static void pokreniInteraktivniNacin()
+    {
+        System.out.println("\nSustav je spreman za interaktivni način rada.");
+        System.out.println("Unesite komande (za izlaz upišite 'Q').");
+
+        try (Scanner scanner = new Scanner(System.in)) 
+        {
+            while (true) 
+            {
+                System.out.print("> ");
+                String komanda = scanner.nextLine().trim();
+
+                if ("Q".equalsIgnoreCase(komanda)) 
+                {
+                    System.out.println("Izlaz iz programa...");
+                    break;
+                }
+
+                obradiKomandu(komanda);
+            }
+        }
+    }
+    
+    private static void obradiKomandu(String komanda)
+    {
+        System.out.println("Izvršavam komandu: " + komanda);
+    }
+    
 }

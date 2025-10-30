@@ -8,7 +8,7 @@ import java.time.LocalTime;
 public interface AranzmaniBuilder
 {
 	public AranzmaniBuilder kreirajAranzmane(
-				String oznaka,
+				int oznaka,
 				String naziv,
 				String program,
 				LocalDate pocetniDatum,

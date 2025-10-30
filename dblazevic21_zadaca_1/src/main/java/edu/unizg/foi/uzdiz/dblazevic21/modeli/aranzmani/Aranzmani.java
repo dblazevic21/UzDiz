@@ -5,7 +5,7 @@ import java.time.LocalTime;
 
 public class Aranzmani 
 {
-	private String oznaka;
+	private int oznaka;
 	private String naziv;
 	private String program;
 	private LocalDate pocetniDatum;
@@ -25,7 +25,7 @@ public class Aranzmani
 	public Aranzmani() {}
 	
 	public Aranzmani(
-			String oznaka,
+			int oznaka,
 			String naziv, 
 			String program, 
 			LocalDate pocetniDatum, 
@@ -61,12 +61,12 @@ public class Aranzmani
 		this.brojVecera = brojVecera;
 	}
 	
-	public String getOznaka() 
+	public int getOznaka() 
 	{
 		return oznaka;
 	}
 	
-	public String setOznaka(String oznaka) 
+	public int setOznaka(int oznaka) 
 	{
 		return this.oznaka = oznaka;
 	}

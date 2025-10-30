@@ -13,9 +13,8 @@ import java.util.Map;
 public class Rezervacije {
 
     private static volatile Rezervacije INSTANCE;
-
     private final List<Rezervacija> rezervacije = new ArrayList<>();
-    private final DateTimeFormatter hrvatskiFormat = DateTimeFormatter.ofPattern("dd.MM.yyyy. HH:mm:ss");
+    DateTimeFormatter hrvatskiFormat = DateTimeFormatter.ofPattern("dd.MM.yyyy. hh:mm:ss a");
 
     private Rezervacije() {}
 
@@ -36,21 +35,38 @@ public class Rezervacije {
 
     public void dodajRezervaciju(String ime, String prezime, int oznakaAranzmana, String datumVrijeme) 
     {
-        if (datumVrijeme == null || datumVrijeme.isEmpty()) 
+        if (datumVrijeme == null || datumVrijeme.isBlank()) 
         {
+            System.out.println("Greška: Datum i vrijeme nisu navedeni.");
             return;
         }
         try 
         {
             LocalDateTime datum = LocalDateTime.parse(datumVrijeme, hrvatskiFormat);
-            rezervacije.add(new Rezervacija(ime, prezime, oznakaAranzmana, datum));
+            boolean ok = dodajRezervaciju(ime, prezime, oznakaAranzmana, datum);
+            if (!ok) 
+            {
+                System.out.println("Greška pri dodavanju rezervacije (nepoznat razlog).");
+            }
         } 
         catch (Exception e) 
         {
-            System.out.println("Greška pri dodavanju rezervacije: " + datumVrijeme);
+            System.out.println("Greška pri dodavanju rezervacije: " + datumVrijeme + ". Očekivani format: " + hrvatskiFormat);
         }
     }
 
+    public boolean dodajRezervaciju(String ime, String prezime, int oznakaAranzmana, LocalDateTime datum)
+    {
+        try
+        {
+            rezervacije.add(new Rezervacija(ime, prezime, oznakaAranzmana, datum));
+            return true;
+        }
+        catch (Exception e)
+        {
+            return false;
+        }
+    }
 
     public void obradiRezervacije(int minPutnika, int maxPutnika) 
     {
@@ -82,7 +98,7 @@ public class Rezervacije {
     {
         for (Rezervacija rezervacija : rezervacije) 
         {
-            System.out.println(rezervacija);
+            System.out.println(rezervacija.datumVrijeme);
         }
     }
     
@@ -151,8 +167,6 @@ public class Rezervacije {
         return false;
     }
 
-
-
     public boolean imaAktivnuRezervaciju(String ime, String prezime) 
     {
         for (Rezervacija rezervacija : rezervacije) 
@@ -165,7 +179,6 @@ public class Rezervacije {
         return false;
     }
 
-
     private static class Rezervacija 
     {
         private final String ime;
@@ -174,7 +187,8 @@ public class Rezervacije {
         private final LocalDateTime datumVrijeme;
         private StatusRezervacije status;
 
-        public Rezervacija(String ime, String prezime, int oznakaAranzmana, LocalDateTime datumVrijeme) {
+        public Rezervacija(String ime, String prezime, int oznakaAranzmana, LocalDateTime datumVrijeme) 
+        {
             this.ime = ime;
             this.prezime = prezime;
             this.oznakaAranzmana = oznakaAranzmana;
@@ -190,7 +204,8 @@ public class Rezervacije {
         }
 
         @Override
-        public String toString() {
+        public String toString() 
+        {
             return String.format("Rezervacija: %s %s, Aranžman: %d, Datum: %s",
                     ime, prezime, oznakaAranzmana, datumVrijeme.format(DateTimeFormatter.ofPattern("dd.MM.yyyy. HH:mm:ss")));
         }

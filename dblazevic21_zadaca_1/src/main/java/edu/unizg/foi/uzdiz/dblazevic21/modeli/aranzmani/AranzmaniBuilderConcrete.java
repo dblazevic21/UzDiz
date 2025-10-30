@@ -12,7 +12,7 @@ public class AranzmaniBuilderConcrete implements AranzmaniBuilder
 	public AranzmaniBuilderConcrete() { }
 	
 	public AranzmaniBuilder kreirajAranzmane(
-			String oznaka,
+			int oznaka,
 			String naziv,
 			String program,
 			LocalDate pocetniDatum,

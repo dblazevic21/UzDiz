@@ -7,10 +7,17 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.temporal.ChronoField;
+import java.util.List;
+import java.util.ArrayList;
 
 public class CsvUcitajSingleton 
 {
     private static volatile CsvUcitajSingleton INSTANCE;
+    
+    private List<LocalDateTime> rezervacijeDatumi = new ArrayList<>();
+    private List<LocalDateTime> aranzmaniDatumi = new ArrayList<>();
 
     private CsvUcitajSingleton() {}
 
@@ -31,26 +38,36 @@ public class CsvUcitajSingleton
 
     public void ucitajRezervacije(String nazivDatoteke)
     {
-        try (BufferedReader br = new BufferedReader(new FileReader(nazivDatoteke))) 
+        int brojUspjesnih = 0;
+
+        try (BufferedReader br = new BufferedReader(new FileReader(nazivDatoteke)))
         {
             String linija;
             boolean prvaLinija = true;
             int brojac = 0;
-            DateTimeFormatter izlazniFormat = DateTimeFormatter.ofPattern("dd.MM.yyyy. hh:mm:ss");
+            Rezervacije rezervacije = Rezervacije.getInstance();
 
             while ((linija = br.readLine()) != null) 
             {
-                if (prvaLinija) 
+                brojac++;
+                if (prvaLinija)
                 {
                     prvaLinija = false;
                     continue;
                 }
 
-                if (linija.trim().isEmpty()) continue;
+                if (linija.trim().isEmpty()) 
+                {
+                    System.out.println("Pogreška u retku " + brojac + ": Prazan redak. Sadržaj: " + linija);
+                    continue;
+                }
 
-                String[] podaci = linija.split(",");
+                List<String> podaciLista = parseCSVLine(linija);
+                String[] podaci = podaciLista.toArray(new String[0]);
+
                 if (podaci.length < 4) 
                 {
+                    System.out.println("Pogreška u retku " + brojac + ": Nedovoljno podataka. Sadržaj: " + linija);
                     continue;
                 }
 
@@ -58,98 +75,188 @@ public class CsvUcitajSingleton
                 String prezime = podaci[1].trim();
                 int oznakaAranzmana = parseIntOrDefault(podaci[2].trim(), -1);
                 String datumVrijeme = podaci[3].trim();
+                
 
-                LocalDateTime datum = parseDatumVrijeme(datumVrijeme);
-
-                if (datum != null) 
+                if (ime.isEmpty() || prezime.isEmpty()) 
                 {
-                    String formatiraniDatum = datum.format(izlazniFormat);
-                    //System.out.println("Parsiran datum: " + formatiraniDatum + " (" + ime + " " + prezime + ")");
-                    Rezervacije.getInstance().dodajRezervaciju(ime, prezime, oznakaAranzmana, formatiraniDatum);
-                    brojac++;
-                } 
-                else 
-                {
-                    System.out.println("Neuspjelo parsiranje datuma za: " + ime + " " + prezime + " → " + datumVrijeme);
+                    System.out.println("Pogreška u retku " + brojac + ": Ime ili prezime je prazno. Sadržaj: " + linija);
+                    continue;
                 }
 
+                if (oznakaAranzmana == -1) 
+                {
+                    System.out.println("Pogreška u retku " + brojac + ": Neispravna oznaka aranžmana. Sadržaj: " + linija);
+                    continue;
+                }
+
+                LocalDateTime datum = parseDatumVrijeme(datumVrijeme);
+                if (datum != null) 
+                {
+                    rezervacijeDatumi.add(datum);
+                }
+                
+                if (datum == null)
+                {
+                    System.out.println("Pogreška u retku " + brojac + ": Neispravan datum i vrijeme. Sadržaj: " + linija);
+                    continue;
+                }
+
+                boolean dodano = rezervacije.dodajRezervaciju(ime, prezime, oznakaAranzmana, datum);
+                if (dodano) brojUspjesnih++;
             }
         } 
-        catch (IOException e)
+        catch (IOException e) 
+        {
+            System.out.println("Greška pri čitanju datoteke: " + nazivDatoteke);
+        }
+
+        System.out.println("Ukupno učitano rezervacija iz " + nazivDatoteke + ": " + brojUspjesnih);
+    }
+    
+    
+    public void ucitajAranzmane(String nazivDatoteke) 
+    {
+        try (BufferedReader br = new BufferedReader(new FileReader(nazivDatoteke)))
+        {
+            StringBuilder sb = new StringBuilder();
+            String linija;
+            boolean prvaLinija = true;
+            int brojac = 0;
+            int brojUspjesnih = 0;
+
+            while ((linija = br.readLine()) != null) 
+            {
+                brojac++;
+
+                if (prvaLinija)
+                {
+                    prvaLinija = false;
+                    continue;
+                }
+
+                sb.append(linija).append("\n");
+
+                brojUspjesnih = provjeraAranzmana(sb, brojac, brojUspjesnih);
+            }
+
+            System.out.println("Ukupno učitano aranžmana: " + brojUspjesnih);
+
+        } 
+        catch (IOException e) 
         {
             System.out.println("Greška pri čitanju datoteke: " + nazivDatoteke);
         }
     }
+
+    public int provjeraAranzmana(StringBuilder sb, int brojac, int brojUspjesnih) 
+    {
+        if (brojNavodnika(sb.toString()) % 2 == 0) 
+        {
+            String cijeliRed = sb.toString().trim();
+            sb.setLength(0); 
+
+            if (cijeliRed.isEmpty())
+                return brojUspjesnih;
+
+            List<String> podaciLista = parseCSVLine(cijeliRed);
+            String[] podaci = podaciLista.toArray(new String[0]);
+
+            if (podaci.length < 5) 
+            {
+                System.out.println("Pogreška u retku " + brojac + ": Nedovoljno podataka. Sadržaj: " + cijeliRed);
+                return brojUspjesnih;
+            }
+
+            try 
+            {
+                int oznaka = Integer.parseInt(podaci[0].trim());
+                String naziv = podaci[1].trim();
+                String program = podaci[2].trim();
+                String pocetniDatum = podaci[3].trim();
+                String zavrsniDatum = podaci[4].trim();
+
+                if (naziv.isEmpty() || program.isEmpty())
+                {
+                    System.out.println("Pogreška u retku " + brojac + ": Naziv ili program je prazan. Sadržaj: " + cijeliRed);
+                    return brojUspjesnih;
+                }
+
+                LocalDateTime pocetak = parseDatumVrijeme(pocetniDatum);
+                LocalDateTime kraj = parseDatumVrijeme(zavrsniDatum);
+
+                if (pocetak != null) 
+                {
+                    aranzmaniDatumi.add(pocetak);
+                }
+                if (kraj != null) 
+                {
+                    aranzmaniDatumi.add(kraj);
+                }
+                
+                if (pocetak == null || kraj == null) 
+                {
+                    System.out.println("Pogreška u retku " + brojac + ": Neispravan datum. Sadržaj: " + cijeliRed);
+                    return brojUspjesnih;
+                }
+
+                brojUspjesnih++;
+            } 
+            catch (NumberFormatException e) 
+            {
+                System.out.println("Pogreška u retku " + brojac + ": Neispravan broj. Sadržaj: " + cijeliRed);
+            }
+        }
+        return brojUspjesnih;
+    }
+    
     
     private LocalDateTime parseDatumVrijeme(String datumVrijeme) 
     {
         if (datumVrijeme == null || datumVrijeme.isBlank()) return null;
 
-        DateTimeFormatter[] formati = formatiDatuma();
+        String s = datumVrijeme.trim();
 
-        String normaliziran = datumVrijeme.trim();
+        DateTimeFormatter[] formati = new DateTimeFormatter[] {
+            // 24h, opcionalne sekundice i vrime
+            new DateTimeFormatterBuilder()
+                .parseCaseInsensitive()
+                .appendPattern("d.M.yyyy")
+                .optionalStart().appendLiteral('.').optionalEnd()
+                .optionalStart()
+                    .appendLiteral(' ')
+                    .appendPattern("H:mm")
+                    .optionalStart().appendLiteral(':').appendPattern("ss").optionalEnd()
+                .optionalEnd()
+                .parseDefaulting(ChronoField.HOUR_OF_DAY, 0)
+                .parseDefaulting(ChronoField.MINUTE_OF_HOUR, 0)
+                .parseDefaulting(ChronoField.SECOND_OF_MINUTE, 0)
+                .toFormatter(),
+                
+            // 12h AM/PM, opcionalne sekundice
+            new DateTimeFormatterBuilder()
+                .parseCaseInsensitive()
+                .appendPattern("d.M.yyyy")
+                .optionalStart().appendLiteral('.').optionalEnd()
+                .appendLiteral(' ')
+                .appendPattern("hh:mm")
+                .optionalStart().appendLiteral(':').appendPattern("ss").optionalEnd()
+                .appendLiteral(' ')
+                .appendPattern("a")
+                .toFormatter()
+        };
 
-        for (DateTimeFormatter formatter : formati) 
+        for (DateTimeFormatter f : formati) 
         {
             try 
             {
-                LocalDateTime parsed = LocalDateTime.parse(normaliziran, formatter);
-                LocalDateTime minDate = LocalDateTime.of(2000, 1, 1, 0, 0);
-                LocalDateTime maxDate = LocalDateTime.of(2100, 12, 31, 23, 59);
-                if (parsed.isBefore(minDate) || parsed.isAfter(maxDate)) 
-                {
-                    System.out.println("Datum izvan raspona: " + datumVrijeme);
-                    return null;
-                }
-                return parsed;
+                return LocalDateTime.parse(s, f);
             } 
-            catch (Exception e) 
-            {
-            	
-            }
-        }
-
-        try 
-        {
-            String[] parts = normaliziran.split(" ");
-            if (parts.length == 2) 
-            {
-                String datePart = parts[0];
-                String timePart = parts[1];
-                String[] dateParts = datePart.split("\\.");
-                String[] timeParts = timePart.split(":");
-                int d = Integer.parseInt(dateParts[0]);
-                int m = Integer.parseInt(dateParts[1]);
-                int y = Integer.parseInt(dateParts[2]);
-                int h = Integer.parseInt(timeParts[0]);
-                int min = Integer.parseInt(timeParts[1]);
-                int s = (timeParts.length >= 3) ? Integer.parseInt(timeParts[2]) : 0;
-                return LocalDateTime.of(y, m, d, h, min, s);
-            }
-        } 
-        catch (Exception ex) 
-        {
-        	
+            catch (Exception ignored) {}
         }
 
         System.out.println("Neuspjelo parsiranje datuma: " + datumVrijeme);
         return null;
     }
-
-	public DateTimeFormatter[] formatiDatuma() 
-	{
-		DateTimeFormatter[] formati = {
-            DateTimeFormatter.ofPattern("d.M.yyyy H:m[:s]"),
-            DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm:ss"),
-            DateTimeFormatter.ofPattern("d.M.yyyy H:mm:ss"),
-            DateTimeFormatter.ofPattern("dd.MM.yyyy H:mm:ss"),
-            DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm"),
-            DateTimeFormatter.ofPattern("d.M.yyyy H:mm"),
-            DateTimeFormatter.ofPattern("d.M.yyyy HH:mm"),
-            DateTimeFormatter.ofPattern("dd.MM.yyyy H:mm")
-        };
-		return formati;
-	}
 
     private int parseIntOrDefault(String value, int defaultValue) 
     {
@@ -163,75 +270,57 @@ public class CsvUcitajSingleton
         }
     }
 
-    private double parseDoubleOrDefault(String value, double defaultValue) 
+    private List<String> parseCSVLine(String linija) 
     {
-        try 
-        {
-            return value != null && !value.trim().isEmpty() ? Double.parseDouble(value.trim()) : defaultValue;
-        } 
-        catch (NumberFormatException e) 
-        {
-            return defaultValue;
-        }
-    }
+        List<String> result = new ArrayList<>();
+        StringBuilder trenutni = new StringBuilder();
+        boolean uNavodnicima = false;
 
-
-    public void ucitajAranzmane(String nazivDatoteke) 
-    {
-        try (BufferedReader br = new BufferedReader(new FileReader(nazivDatoteke))) 
+        for (int i = 0; i < linija.length(); i++) 
         {
-            String linija;
-            boolean prvaLinija = true;
+            char c = linija.charAt(i);
 
-            while ((linija = br.readLine()) != null) 
+            if (c == '"') 
             {
-                if (prvaLinija) 
-                {
-                    prvaLinija = false;
-                    continue;
-                }
-
-                String[] podaci = linija.split(",");
-                if (podaci.length < 5)
-                {
-                    System.out.println("Preskačem liniju zbog nedovoljno podataka: " + linija);
-                    continue;
-                }
-
-                provjeriAtribute(linija, podaci);
+                uNavodnicima = !uNavodnicima;
             }
-        } 
-        catch (IOException e) 
-        {
-            System.out.println("Greška pri čitanju datoteke: " + nazivDatoteke);
+            else if (c == ',' && !uNavodnicima) 
+            {
+                result.add(trenutni.toString().trim());
+                trenutni.setLength(0);
+            } 
+            else 
+            {
+                trenutni.append(c);
+            }
         }
+        result.add(trenutni.toString().trim());
+        return result;
     }
-
-    public void provjeriAtribute(String linija, String[] podaci) 
+    
+    private int brojNavodnika(String tekst) 
     {
-        try 
+        int count = 0;
+        for (char c : tekst.toCharArray()) 
         {
-            int oznaka = Integer.parseInt(podaci[0].trim());
-            String naziv = podaci[1].trim();
-            String program = podaci[2].trim();
-            String pocetniDatum = podaci[3].trim();
-            String zavrsniDatum = podaci[4].trim();
+            if (c == '"') count++;
+        }
+        return count;
+    }
+    
+    public void ispisiDatume()
+    {
+    	System.out.println("Rezervacije datumi:");
+        for (LocalDateTime datum : rezervacijeDatumi) 
+        {
+            System.out.println(datum);
+        }
 
-            String vrijemeKretanja = podaci.length > 5 && !podaci[5].trim().isEmpty() ? podaci[5].trim() : null;
-            String vrijemePovratka = podaci.length > 6 && !podaci[6].trim().isEmpty() ? podaci[6].trim() : null;
-            double cijena = parseDoubleOrDefault(podaci.length > 7 ? podaci[7].trim() : "", 0.0);
-            int minBrojPutnika = parseIntOrDefault(podaci.length > 8 ? podaci[8].trim() : "", 0);
-            int maxBrojPutnika = parseIntOrDefault(podaci.length > 9 ? podaci[9].trim() : "", 0);
-            int brojNocenja = parseIntOrDefault(podaci.length > 10 ? podaci[10].trim() : "", 0);
-            double doplataJednokrevetna = parseDoubleOrDefault(podaci.length > 11 ? podaci[11].trim() : "", 0.0);
-            String prijevoz = podaci.length > 12 && !podaci[12].trim().isEmpty() ? podaci[12].trim() : null;
-            int brojDorucka = parseIntOrDefault(podaci.length > 13 ? podaci[13].trim() : "", 0);
-            int brojRuckova = parseIntOrDefault(podaci.length > 14 ? podaci[14].trim() : "", 0);
-            int brojVecera = parseIntOrDefault(podaci.length > 15 ? podaci[15].trim() : "", 0);
-        } 
-        catch (NumberFormatException e) 
+        System.out.println("Aranzmani datumi:");
+        for (LocalDateTime datum : aranzmaniDatumi) 
         {
-            
+            System.out.println(datum);
         }
     }
+    
 }
