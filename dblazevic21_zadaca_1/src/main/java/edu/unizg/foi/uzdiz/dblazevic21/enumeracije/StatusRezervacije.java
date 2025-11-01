@@ -11,5 +11,6 @@ aranžmanu).
 public enum StatusRezervacije {
 	PRIMLJENA,
 	AKTIVNA,
-	NA_CEKANJU
+	NA_CEKANJU,
+	OTKAZANA
 }
