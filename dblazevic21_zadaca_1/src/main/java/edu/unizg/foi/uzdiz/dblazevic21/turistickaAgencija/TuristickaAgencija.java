@@ -1,4 +1,4 @@
-package edu.unizg.foi.uzdiz.dblazevic21;
+package edu.unizg.foi.uzdiz.dblazevic21.turistickaAgencija;
 
 import edu.unizg.foi.uzdiz.dblazevic21.modeli.aranzmani.Aranzmani;
 import edu.unizg.foi.uzdiz.dblazevic21.modeli.rezervacije.Rezervacija;
