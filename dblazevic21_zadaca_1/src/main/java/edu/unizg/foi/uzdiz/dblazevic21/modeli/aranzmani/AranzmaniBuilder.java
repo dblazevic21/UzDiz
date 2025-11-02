@@ -1,6 +1,5 @@
-package edu.unizg.foi.uzdiz.dblazevic21.interfaces;
+package edu.unizg.foi.uzdiz.dblazevic21.modeli.aranzmani;
 
-import edu.unizg.foi.uzdiz.dblazevic21.modeli.aranzmani.Aranzmani;
 import java.time.LocalDate;
 import java.time.LocalTime;
 

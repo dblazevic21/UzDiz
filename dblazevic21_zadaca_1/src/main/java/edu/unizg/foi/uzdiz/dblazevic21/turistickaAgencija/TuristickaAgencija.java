@@ -66,28 +66,218 @@ public class TuristickaAgencija
             return;
         }
 
-        String trimmedUpper = unos.trim().toUpperCase(Locale.ROOT);
+        String trimanNaCapsSlova = unos.trim().toUpperCase(Locale.ROOT);
 
-        if (trimmedUpper.startsWith("ITAK"))
+        if (trimanNaCapsSlova.startsWith("ITAK"))
         {
             izvrsiITAKkomandu(unos);
             return;
         }
-        if (trimmedUpper.startsWith("ITAP"))
+        if (trimanNaCapsSlova.startsWith("ITAP"))
         {
             izvrsiITAPkomandu(unos);
             return;
         }
-        if (trimmedUpper.startsWith("IRTA"))
+        if (trimanNaCapsSlova.startsWith("IRTA"))
 		{
 			izvrsiIRTAkomandu(unos);
 			return;
 		}
+        if (trimanNaCapsSlova.startsWith("IRO"))
+        {
+        	izvrsiIROkomandu(unos);
+        	return;
+        }
+        if (trimanNaCapsSlova.startsWith("ORTA"))
+        {
+        	izvrsiORTAkomandu(unos);
+        	return;
+        }
+        if (trimanNaCapsSlova.startsWith("DRTA"))
+        {
+        	izvrsiDRTAkomandu(unos);
+        	return;
+        }
 
-        System.out.println("Nepoznata komanda. Lista komandi: ITAK, ITAP");
+        System.out.println("Nepoznata komanda. Lista komandi: ITAK, ITAP, IRO, IRTA, ORTA, DRTA.");
     }
 
-	public void izvrsiITAKkomandu(String unos) {
+    private void izvrsiDRTAkomandu(String unos) 
+    {
+        String odrezano = (unos == null) ? "" : unos.trim();
+
+        Pattern p = Pattern.compile(
+                "^DRTA\\s+([\\p{L}\\p{M}]+)\\s+([\\p{L}\\p{M}]+)\\s+(\\d+)\\s+(\\d{1,2}[\\.\\/]\\d{1,2}[\\.\\/]\\d{4}\\.)\\s+(\\d{1,2}:\\d{1,2}(?::\\d{1,2})?)$",
+                Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE | Pattern.UNICODE_CHARACTER_CLASS
+        );
+
+        Matcher m = p.matcher(odrezano);
+
+        if (!m.matches()) 
+        {
+            System.out.println("Unos komande: " + odrezano);
+            System.out.println("Regex pattern: " + p.pattern());
+            System.out.println("Matcher matches: " + m.matches());
+            System.out.println("Nepoznata komanda. Upotrijebite: DRTA ime prezime oznaka datum vrijeme");
+            return;
+        }
+
+        String ime = m.group(1).trim();
+        String prezime = m.group(2).trim();
+        int oznaka = Integer.parseInt(m.group(3).trim());
+        String datum = m.group(4).trim();
+        String vrijeme = m.group(5).trim();
+
+        LocalDateTime datumVrijeme = normalizirajDatumIVrijeme(datum, vrijeme);
+        if (datumVrijeme == null) 
+        {
+            System.out.println("Greška: neispravan format datuma i vremena. Očekivano: dd.MM.yyyy HH:mm:ss");
+            return;
+        }
+        System.out.println("DATUM: " + datumVrijeme);
+
+        Aranzmani a = aranzmani.get(oznaka);
+        if (a == null) 
+        {
+            System.out.println("Aranžman s oznakom " + oznaka + " ne postoji.");
+            return;
+        }
+
+        try
+        {
+            Rezervacije.getInstance().dodajRezervaciju(ime, prezime, oznaka, datumVrijeme);
+            Rezervacije.getInstance().azurirajStatuseRezervacija(aranzmani);
+            System.out.println("Rezervacija za osobu " + ime + " " + prezime + " na aranžman " + oznaka + " je dodana.");
+        } 
+        catch (Exception e) 
+        {
+            System.out.println("Greška prilikom dodavanja rezervacije: " + e.getMessage());
+        }
+    }
+
+    private LocalDateTime normalizirajDatumIVrijeme(String datum, String vrijeme) 
+    {
+        try 
+        {
+            if (datum.endsWith(".")) 
+            {
+                datum = datum.substring(0, datum.length() - 1);
+            }
+
+            DateTimeFormatter fleksibilniDatum = new DateTimeFormatterBuilder()
+                    .parseLenient()
+                    .appendPattern("[d.M.yyyy][dd.MM.yyyy][d/M/yyyy][dd/MM/yyyy]")
+                    .toFormatter(Locale.ROOT);
+
+            LocalDate parsiranDatum = LocalDate.parse(datum.replace("/", ".").trim(), fleksibilniDatum);
+
+            if (!vrijeme.matches("\\d{1,2}:\\d{1,2}:\\d{1,2}")) 
+            {
+                vrijeme += ":00";
+            }
+
+            DateTimeFormatter fleksibilnoVrijeme = new DateTimeFormatterBuilder()
+                    .parseLenient()
+                    .appendPattern("[H:mm:ss][HH:mm:ss][H:mm][HH:mm]")
+                    .toFormatter(Locale.ROOT);
+
+            LocalTime parsiranoVrijeme = LocalTime.parse(vrijeme.trim(), fleksibilnoVrijeme);
+
+            return LocalDateTime.of(parsiranDatum, parsiranoVrijeme);
+        } 
+        catch (Exception e) 
+        {
+            return null;
+        }
+    }
+    
+	private void izvrsiORTAkomandu(String unos) 
+    {
+		String odrezano = (unos == null) ? "" : unos.trim();
+		
+		Pattern p = Pattern.compile("^ORTA\\s+(\\S+)\\s+(.+)\\s+(\\d+)$", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
+		Matcher m = p.matcher(odrezano);
+		
+		if (!m.matches())
+		{
+			System.out.println("Nepoznata komanda. Upotrijebite: ORTA ime prezime oznaka");
+			return;
+		}
+		
+		String ime = m.group(1).trim();
+		String prezime = m.group(2).trim();
+		int oznaka = Integer.parseInt(m.group(3).trim());
+		
+		Aranzmani a = aranzmani.get(oznaka);
+		if (a == null)
+		{
+			System.out.println("Aranžman s oznakom " + oznaka + " ne postoji.");
+			return;
+		}
+		
+		boolean ok = Rezervacije.getInstance().otkaziRezervaciju(oznaka, ime, prezime, LocalDateTime.now());
+		
+		if (ok)
+		{
+			Rezervacije.getInstance().azurirajStatuseRezervacija(aranzmani);
+			System.out.println("Rezervacija za osobu " + ime + " " + prezime + " na aranžman " + oznaka + " je otkazana.");
+		}
+		else
+		{
+			System.out.println("Ne postoji rezervacija za osobu " + ime + " " + prezime + " na aranžman " + oznaka + ".");
+		}
+	}
+
+	public void izvrsiIROkomandu(String unos)
+    {
+        String trimmed = (unos == null) ? "" : unos.trim();
+        Pattern p = Pattern.compile("^IRO\\s+(\\S+)\\s+(.+)$", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
+        Matcher m = p.matcher(trimmed);
+        if (!m.matches())
+        {
+            System.out.println("Nepoznata komanda. Upotrijebite: IRO ime prezime");
+            return;
+        }
+
+        String ime = m.group(1).trim();
+        String prezime = m.group(2).trim();
+
+        List<Rezervacija> lista = Rezervacije.getInstance().getZaOsobu(ime, prezime);
+
+        if (lista == null || lista.isEmpty())
+        {
+            System.out.println("Nema rezervacija za osobu " + ime + " " + prezime + ".");
+            return;
+        }
+
+        int[] w = {22, 22, 35, 17};
+        printajSeperatorTabliceMulti(w);
+        printajRedTabliceMulti(w, "Datum i vrijeme", "Oznaka aranžmana", "Naziv aranžmana", "Vrsta");
+        printajSeperatorTabliceMulti(w);
+
+        for (Rezervacija r : lista)
+        {
+            Integer oznakaAranzmana = null;
+            try 
+            { 
+            	oznakaAranzmana = r.getOznakaAranzmana(); 
+            }
+            catch (Exception ignored) {}
+
+            String oznakaStr = (oznakaAranzmana == null) ? "-" : String.valueOf(oznakaAranzmana);
+            Aranzmani a = (oznakaAranzmana == null) ? null : aranzmani.get(oznakaAranzmana);
+            String naziv = (a == null) ? "-" : val(a.getNaziv());
+
+            String datumVrijeme = fmtDatumVrijeme(r.getDatumVrijeme(), r.getDatumVrijemeRaw());
+            String vrsta = statusOznaka(r.getStatus());
+
+            printajRedTabliceMulti(w, datumVrijeme, oznakaStr, izrezi(naziv, w[2]), vrsta);
+        }
+
+        printajSeperatorTabliceMulti(w);
+    }
+
+	private void izvrsiITAKkomandu(String unos) {
 		String trimmed = unos.trim();
 
         if (trimmed.equalsIgnoreCase("ITAK")) 
@@ -121,7 +311,7 @@ public class TuristickaAgencija
         System.out.println("Nepoznata komanda. Upotrijebite: ITAK [od do]");
 	}
 	
-	public void izvrsiITAPkomandu(String unos)
+	private void izvrsiITAPkomandu(String unos)
     {
         String trimmed = unos.trim();
 
@@ -164,10 +354,10 @@ public class TuristickaAgencija
         System.out.println("Nepoznata komanda. Upotrijebite: ITAP [min max] ili ITAP [oznaka]");
     }
 	
-	public void izvrsiIRTAkomandu(String unos) 
+	private void izvrsiIRTAkomandu(String unos) 
 	{
 	    String trimmed = unos.trim();
-	    Pattern p = Pattern.compile("^IRTA\\s+(\\d+)(?:\\s+([A-ZČ]+))?$", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
+	    Pattern p = Pattern.compile("^IRTA\\s+(\\d+)(?:\\s+([PAČO]+))?$", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
 	    Matcher m = p.matcher(trimmed);
 	    if (!m.matches()) 
 	    {
@@ -178,6 +368,12 @@ public class TuristickaAgencija
 	    int oznaka = Integer.parseInt(m.group(1));
 	    String flags = (m.group(2) == null) ? "PA" : m.group(2).toUpperCase(Locale.ROOT);
 
+	    if (!flags.matches("[PAČO]+")) 
+	    {
+	        System.out.println("Greška: neispravni filteri. Dozvoljeni su samo PA, Č, O.");
+	        return;
+	    }
+	    
 	    Aranzmani a = aranzmani.get(oznaka);
 	    if (a == null) 
 	    {
@@ -194,14 +390,14 @@ public class TuristickaAgencija
 
 	    Rezervacije.getInstance().azurirajStatuseRezervacija(aranzmani);
 
-	    boolean includePA = flags.contains("PA") || flags.contains("P") || flags.contains("A");
-	    boolean includeWait = flags.contains("Č");
-	    boolean includeCancel = flags.contains("O");
+	    boolean dodajPA = flags.contains("PA");
+	    boolean dodajČekaj = flags.contains("Č");
+	    boolean dodajOtkazan = flags.contains("O");
 
 	    List<Rezervacija> zaIspis = ulaz.stream()
-	        .filter(r -> (includePA && (r.getStatus() == StatusRezervacije.PRIMLJENA || r.getStatus() == StatusRezervacije.AKTIVNA))
-	                || (includeWait && r.getStatus() == StatusRezervacije.NA_CEKANJU)
-	                || (includeCancel && r.getStatus() == StatusRezervacije.OTKAZANA))
+	        .filter(r -> (dodajPA && (r.getStatus() == StatusRezervacije.PRIMLJENA || r.getStatus() == StatusRezervacije.AKTIVNA))
+	                || (dodajČekaj && r.getStatus() == StatusRezervacije.NA_CEKANJU)
+	                || (dodajOtkazan && r.getStatus() == StatusRezervacije.OTKAZANA))
 	        .collect(Collectors.toList());
 
 	    if (zaIspis.isEmpty())
@@ -210,18 +406,38 @@ public class TuristickaAgencija
 	        return;
 	    }
 
-	    int[] w = {20, 20, 22, 14};
+	    int[] w = dodajOtkazan ? new int[] {20, 20, 22, 14, 35} : new int[] {20, 20, 22, 14};
 	    printajSeperatorTabliceMulti(w);
-	    printajRedTabliceMulti(w, "Ime", "Prezime", "Datum i vrijeme", "Vrsta");
+	    
+	    if (dodajOtkazan)
+	    {
+	    	printajRedTabliceMulti(w, "Ime", "Prezime", "Datum i vrijeme", "Vrsta", "Otkazano");
+	    }
+	    else
+	    {
+	    	printajRedTabliceMulti(w, "Ime", "Prezime", "Datum i vrijeme", "Vrsta");
+	    }
 	    printajSeperatorTabliceMulti(w);
 	    
 	    for (Rezervacija r : zaIspis) 
 	    {
-	        printajRedTabliceMulti(w,
-	                val(r.getIme()),
-	                val(r.getPrezime()),
-	                fmtDatumVrijeme(r.getDatumVrijeme(), r.getDatumVrijemeRaw()),
-	                statusOznaka(r.getStatus()));
+	    	 if (dodajOtkazan) 
+	         {
+	             printajRedTabliceMulti(w,
+	                 val(r.getIme()),
+	                 val(r.getPrezime()),
+	                 fmtDatumVrijeme(r.getDatumVrijeme(), r.getDatumVrijemeRaw()),
+	                 statusOznaka(r.getStatus()),
+	                 fmtDatumVrijeme(r.getOtkazanoAt(), null));
+	         } 
+	         else 
+	         {
+	             printajRedTabliceMulti(w,
+	                 val(r.getIme()),
+	                 val(r.getPrezime()),
+	                 fmtDatumVrijeme(r.getDatumVrijeme(), r.getDatumVrijemeRaw()),
+	                 statusOznaka(r.getStatus()));
+	         }
 	    }
 	    printajSeperatorTabliceMulti(w);
 	}

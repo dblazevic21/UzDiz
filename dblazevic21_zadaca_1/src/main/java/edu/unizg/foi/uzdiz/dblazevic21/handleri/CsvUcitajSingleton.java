@@ -1,7 +1,7 @@
 package edu.unizg.foi.uzdiz.dblazevic21.handleri;
 
-import edu.unizg.foi.uzdiz.dblazevic21.interfaces.AranzmaniBuilder;
 import edu.unizg.foi.uzdiz.dblazevic21.modeli.aranzmani.Aranzmani;
+import edu.unizg.foi.uzdiz.dblazevic21.modeli.aranzmani.AranzmaniBuilder;
 import edu.unizg.foi.uzdiz.dblazevic21.modeli.aranzmani.AranzmaniBuilderConcrete;
 import edu.unizg.foi.uzdiz.dblazevic21.modeli.rezervacije.Rezervacije;
 
@@ -93,16 +93,18 @@ public class CsvUcitajSingleton {
         return aranzmani;
     }
 
-    public void ucitajAranzmane(String putanja) {
-        try (BufferedReader br = Files.newBufferedReader(Paths.get(putanja), StandardCharsets.UTF_8)) {
-            String line = br.readLine();
-            if (line == null) return;
+    public void ucitajAranzmane(String putanja)
+    {
+        try (BufferedReader br = Files.newBufferedReader(Paths.get(putanja), StandardCharsets.UTF_8))
+        {
+            String linija = br.readLine();
+            if (linija == null) return;
 
-            while ((line = br.readLine()) != null) {
-                line = line.trim();
-                if (line.isEmpty()) continue;
+            while ((linija = br.readLine()) != null) {
+                linija = linija.trim();
+                if (linija.isEmpty()) continue;
 
-                List<String> cols = parseCsvLiniju(line);
+                List<String> cols = parseCsvLiniju(linija);
                 if (cols.size() < 16) {
                     continue;
                 }
@@ -143,40 +145,61 @@ public class CsvUcitajSingleton {
         }
     }
 
-    public void ucitajRezervacije(String putanja) {
+    public void ucitajRezervacije(String putanja)
+    {
         Rezervacije rez = Rezervacije.getInstance();
 
-        try (BufferedReader br = Files.newBufferedReader(Paths.get(putanja), StandardCharsets.UTF_8)) {
-            String line = br.readLine();
-            if (line == null) return;
+        try (BufferedReader br = Files.newBufferedReader(Paths.get(putanja), StandardCharsets.UTF_8)) 
+        {
+            String linija = br.readLine();
+            if (linija == null) return;
+            
+            int brojLinije = 1;
 
-            while ((line = br.readLine()) != null) {
-                line = line.trim();
-                if (line.isEmpty()) continue;
+            while ((linija = br.readLine()) != null) 
+            {
+				brojLinije++;
+				
+                linija = linija.trim();
+                if (linija.isEmpty()) continue;
 
-                List<String> cols = parseCsvLiniju(line);
-                if (cols.size() < 4) continue;
-
-                String ime = makniNavodnike(cols.get(0));
-                String prezime = makniNavodnike(cols.get(1));
-                int oznaka = toInt(cols.get(2));
-                String dtRaw = makniNavodnike(cols.get(3));
-                LocalDateTime dt = toDateTime(dtRaw);
-                if (!aranzmani.containsKey(oznaka)) 
+                List<String> cols = parseCsvLiniju(linija);
+                if (cols.size() < 4) 
                 {
-                    System.out.println("Upozorenje: Nepostojeći aranžman (" + oznaka + ") u " + putanja + " – red preskočen.");
+                    System.out.println("Greška u retku " + brojLinije);
                     continue;
                 }
 
-                if (dt == null) 
+                try
                 {
-                    rez.dodajRezervaciju(ime, prezime, oznaka, dtRaw);
-                } 
-                else 
+                	String ime = makniNavodnike(cols.get(0));
+                    String prezime = makniNavodnike(cols.get(1));
+                    int oznaka = toInt(cols.get(2));
+                    String dtRaw = makniNavodnike(cols.get(3));
+                    LocalDateTime dt = toDateTime(dtRaw);
+                    
+                    if (!aranzmani.containsKey(oznaka)) 
+                    {
+                        System.out.println("Upozorenje: Nepostojeći aranžman (" + oznaka + ") u " + putanja + " – red preskočen.");
+                        continue;
+                    }
+
+                    if (dt == null) 
+                    {
+                        rez.dodajRezervaciju(ime, prezime, oznaka, dtRaw);
+                    } 
+                    else 
+                    {
+                        rez.dodajRezervaciju(ime, prezime, oznaka, dt);
+                    }
+                }
+                catch (Exception e) 
                 {
-                    rez.dodajRezervaciju(ime, prezime, oznaka, dt);
+                    System.out.println("Greška u retku " + brojLinije + ": " + e.getMessage() + ". Redak preskočen.");
                 }
             }
+            
+            rez.azurirajStatuseRezervacija(aranzmani);
         } 
         catch (IOException e) 
         {
@@ -267,15 +290,15 @@ public class CsvUcitajSingleton {
         return null;
     }
 
-    private static List<String> parseCsvLiniju(String line) 
+    private static List<String> parseCsvLiniju(String linija) 
     {
         List<String> out = new ArrayList<>();
         StringBuilder trenutnaLinija = new StringBuilder();
         boolean inQuotes = false;
 
-        for (int i = 0; i < line.length(); i++) 
+        for (int i = 0; i < linija.length(); i++) 
         {
-            char c = line.charAt(i);
+            char c = linija.charAt(i);
 
             if (c == '\"')
             {

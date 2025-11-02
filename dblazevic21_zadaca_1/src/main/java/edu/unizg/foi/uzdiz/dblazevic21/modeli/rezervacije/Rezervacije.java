@@ -17,6 +17,8 @@ public class Rezervacije
     
     private final List<Rezervacija> sveRezervacije = new ArrayList<>();
     private long counter = 0;
+    
+    private static final Comparator<LocalDateTime> LDT_ORDER = Comparator.nullsLast(Comparator.<LocalDateTime>naturalOrder());
 
     private Rezervacije() {}
 
@@ -49,25 +51,44 @@ public class Rezervacije
         return new ArrayList<>(sveRezervacije);
     }
 
-    public List<Rezervacija> getZaAranzman(int oznaka) 
+    public List<Rezervacija> getZaAranzman(int oznaka)
     {
         return sveRezervacije.stream()
                 .filter(r -> r.getOznakaAranzmana() == oznaka)
                 .sorted(Comparator
-                        .comparing(Rezervacija::getDatumVrijeme, Comparator.nullsLast(Comparator.naturalOrder()))
+                        .comparing(Rezervacija::getDatumVrijeme, LDT_ORDER)
                         .thenComparingLong(Rezervacija::getRedniBroj))
                 .collect(Collectors.toList());
     }
     
-    public void azurirajStatuseRezervacija(Map<Integer, Aranzmani> aranzmani) 
+    public List<Rezervacija> getZaOsobu(String ime, String prezime)
+    {
+        String imeTrimmed = (ime == null) ? "" : ime.trim();
+        String prezimeTrimmed = (prezime == null) ? "" : prezime.trim();
+
+        return sveRezervacije.stream()
+                .filter(r -> equalsIgnorirajCase(r.getIme(), imeTrimmed)
+                          && equalsIgnorirajCase(r.getPrezime(), prezimeTrimmed))
+                .sorted(Comparator
+                        .comparing(Rezervacija::getDatumVrijeme, LDT_ORDER)
+                        .thenComparingLong(Rezervacija::getRedniBroj))
+                .collect(Collectors.toList());
+    }
+    
+    public void azurirajStatuseRezervacija(Map<Integer, Aranzmani> aranzmani)
     {
         Map<Integer, List<Rezervacija>> rezervacijePoAranzmanu = new HashMap<>();
 
-        for (Rezervacija rezervacija : sveRezervacije) 
+        for (Rezervacija rezervacija : sveRezervacije)
         {
+            if (rezervacija.getStatus() == StatusRezervacije.OTKAZANA)
+            {
+                continue;
+            }
+
             rezervacijePoAranzmanu
-                .computeIfAbsent(rezervacija.getOznakaAranzmana(), k -> new ArrayList<>())
-                .add(rezervacija);
+                    .computeIfAbsent(rezervacija.getOznakaAranzmana(), k -> new ArrayList<>())
+                    .add(rezervacija);
         }
 
         for (Map.Entry<Integer, List<Rezervacija>> entry : rezervacijePoAranzmanu.entrySet())
@@ -77,38 +98,38 @@ public class Rezervacije
             Aranzmani aranzman = aranzmani.get(oznakaAranzmana);
 
             rezervacijeZaAranzman.sort(Comparator
-                    .comparing(Rezervacija::getDatumVrijeme, Comparator.nullsLast(Comparator.naturalOrder()))
+                    .comparing(Rezervacija::getDatumVrijeme, LDT_ORDER)
                     .thenComparingLong(Rezervacija::getRedniBroj));
 
             int brojRezervacija = rezervacijeZaAranzman.size();
             int minBrojPutnika = aranzman.getMinBrojPutnika();
             int maksBrojPutnika = aranzman.getMaksBrojPutnika();
 
-            if (brojRezervacija < minBrojPutnika) 
+            if (brojRezervacija < minBrojPutnika)
             {
-                for (Rezervacija rezervacija : rezervacijeZaAranzman) 
+                for (Rezervacija rezervacija : rezervacijeZaAranzman)
                 {
                     rezervacija.setStatus(StatusRezervacije.PRIMLJENA);
                 }
-            } 
-            else if (brojRezervacija <= maksBrojPutnika) 
+            }
+            else if (brojRezervacija <= maksBrojPutnika)
             {
-                for (Rezervacija rezervacija : rezervacijeZaAranzman) 
+                for (Rezervacija rezervacija : rezervacijeZaAranzman)
                 {
                     rezervacija.setStatus(StatusRezervacije.AKTIVNA);
                 }
-            } 
-            else 
+            }
+            else
             {
                 int aktivniCount = 0;
-                for (Rezervacija rezervacija : rezervacijeZaAranzman) 
+                for (Rezervacija rezervacija : rezervacijeZaAranzman)
                 {
-                    if (aktivniCount < maksBrojPutnika) 
+                    if (aktivniCount < maksBrojPutnika)
                     {
                         rezervacija.setStatus(StatusRezervacije.AKTIVNA);
                         aktivniCount++;
-                    } 
-                    else 
+                    }
+                    else
                     {
                         rezervacija.setStatus(StatusRezervacije.NA_CEKANJU);
                     }
@@ -116,29 +137,47 @@ public class Rezervacije
             }
         }
     }
-
-
-
+    
     public boolean otkaziRezervaciju(int oznakaAranzmana, String ime, String prezime, LocalDateTime when) 
     {
-        for (int i = sveRezervacije.size() - 1; i >= 0; i--) {
-            Rezervacija r = sveRezervacije.get(i);
-            if (r.getOznakaAranzmana() == oznakaAranzmana
-                    && equalsIgnorirajCase(r.getIme(), ime)
-                    && equalsIgnorirajCase(r.getPrezime(), prezime)
-                    && r.getStatus() != StatusRezervacije.OTKAZANA) {
-                r.setStatus(StatusRezervacije.OTKAZANA);
-                r.setOtkazanoAt(when != null ? when : LocalDateTime.now());
-                return true;
-            }
+        String i = (ime == null) ? "" : ime.trim();
+        String p = (prezime == null) ? "" : prezime.trim();
+
+        Rezervacija target = sveRezervacije.stream()
+                .filter(r -> r.getOznakaAranzmana() == oznakaAranzmana
+                        && equalsIgnorirajCase(r.getIme(), i)
+                        && equalsIgnorirajCase(r.getPrezime(), p)
+                        && r.getStatus() != StatusRezervacije.OTKAZANA)
+                .min(Comparator
+                        .comparing(Rezervacija::getDatumVrijeme, LDT_ORDER)
+                        .thenComparingLong(Rezervacija::getRedniBroj))
+                .orElse(null);
+
+        if (target == null) return false;
+
+        target.setStatus(StatusRezervacije.OTKAZANA);
+        target.setOtkazanoAt(when != null ? when : LocalDateTime.now());
+
+        Rezervacija promote = sveRezervacije.stream()
+                .filter(r -> r.getOznakaAranzmana() == oznakaAranzmana
+                        && r.getStatus() == StatusRezervacije.NA_CEKANJU)
+                .min(Comparator
+                        .comparing(Rezervacija::getDatumVrijeme, LDT_ORDER)
+                        .thenComparingLong(Rezervacija::getRedniBroj))
+                .orElse(null);
+
+        if (promote != null) 
+        {
+            promote.setStatus(StatusRezervacije.AKTIVNA);
         }
-        return false;
+        return true;
     }
 
-    private boolean equalsIgnorirajCase(String a, String b) 
+    private boolean equalsIgnorirajCase(String rijec1, String rijec2)
     {
-        if (a == null) return b == null;
+        String prvaRijec = (rijec1 == null) ? "" : rijec1.trim();
+        String drugaRijec = (rijec2 == null) ? "" : rijec2.trim();
         
-        return a.equalsIgnoreCase(b == null ? "" : b);
+        return prvaRijec.equalsIgnoreCase(drugaRijec);
     }
 }
