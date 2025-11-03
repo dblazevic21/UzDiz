@@ -1,11 +1,11 @@
 package edu.unizg.foi.uzdiz.dblazevic21.turistickaAgencija;
 
-import edu.unizg.foi.uzdiz.dblazevic21.komande.Komanda;
-import edu.unizg.foi.uzdiz.dblazevic21.komande.DrtaKomanda;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
+//import edu.unizg.foi.uzdiz.dblazevic21.komande.Komanda;
+//import edu.unizg.foi.uzdiz.dblazevic21.komande.DrtaKomanda;
+//import java.util.HashMap;
+//import java.util.List;
+//import java.util.Locale;
+//import java.util.Map;
 
 
 public class IzvrsiteljKomande 
