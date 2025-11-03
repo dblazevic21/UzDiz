@@ -5,43 +5,82 @@ import java.time.LocalDateTime;
 import java.time.LocalTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
+import java.util.Locale;
 
 public class DatumParser
 {
-
-    public static LocalDateTime parseDatumIVrijeme(String datum, String vrijeme)
+	public static String normalizirajDatum(String s)
     {
-        try
+        if (s == null) return "";
+        String x = s.trim().replaceAll("\\.+", ".");
+        if (!x.endsWith(".")) 
         {
-            if (datum.endsWith(".")) 
-            {
-                datum = datum.substring(0, datum.length() - 1);
-            }
+            x += ".";
+        }
+        return x;
+    }
 
-            DateTimeFormatter df = new DateTimeFormatterBuilder()
+    public static LocalDate parseDatumZaKomandu(String s)
+    {
+        try 
+        {
+            String t = (s == null) ? "" : s.trim();
+            if (t.endsWith(".")) 
+            {
+                t = t.substring(0, t.length() - 1);
+            }
+            DateTimeFormatter inputDate = new DateTimeFormatterBuilder()
                     .parseLenient()
-                    .appendPattern("[d.M.yyyy][dd.MM.yyyy][d/M/yyyy][dd/MM/yyyy]")
-                    .toFormatter();
+                    .appendPattern("d.M.yyyy")
+                    .optionalStart().appendLiteral('.').optionalEnd()
+                    .toFormatter(Locale.ROOT);
+            return LocalDate.parse(t, inputDate);
+        } 
+        catch (Exception ignored) 
+        {
+            return null;
+        }
+    }
+    
+    public static LocalDateTime normalizirajDatumIVrijeme(String datum, String vrijeme) 
+    {
+        try 
+        {
+            String d = (datum == null) ? "" : datum.trim();
+            d = d.replaceAll("\\s+", "");
+            d = d.replace('-', '.').replace('/', '.');
+            d = d.replaceAll("\\.+$", "");
 
-            LocalDate d = LocalDate.parse(datum.replace("/", ".").trim(), df);
+            DateTimeFormatter fleksibilniDatum = new DateTimeFormatterBuilder()
+                    .parseLenient()
+                    .appendPattern("[d.M.yyyy][dd.MM.yyyy]")
+                    .toFormatter(Locale.ROOT);
 
-            if (!vrijeme.matches("\\d{1,2}:\\d{1,2}:\\d{1,2}")) 
+            LocalDate parsiranDatum = LocalDate.parse(d, fleksibilniDatum);
+
+            String v = (vrijeme == null) ? "" : vrijeme.trim();
+            if (v.matches("\\d{1,2}:\\d{1,2}")) 
             {
-                vrijeme += ":00";
+                v += ":00";
             }
 
-            DateTimeFormatter tf = new DateTimeFormatterBuilder()
+            DateTimeFormatter fleksibilnoVrijeme = new DateTimeFormatterBuilder()
                     .parseLenient()
                     .appendPattern("[H:mm:ss][HH:mm:ss][H:mm][HH:mm]")
-                    .toFormatter();
+                    .toFormatter(Locale.ROOT);
 
-            LocalTime t = LocalTime.parse(vrijeme.trim(), tf);
+            LocalTime parsiranoVrijeme = LocalTime.parse(v, fleksibilnoVrijeme);
 
-            return LocalDateTime.of(d, t);
-        } 
+            return LocalDateTime.of(parsiranDatum, parsiranoVrijeme);
+        }
         catch (Exception e) 
         {
             return null;
         }
+    }
+
+    public static LocalDateTime parseDatumIVrijeme(String datum, String vrijeme)
+    {
+        return normalizirajDatumIVrijeme(datum, vrijeme);
     }
 }

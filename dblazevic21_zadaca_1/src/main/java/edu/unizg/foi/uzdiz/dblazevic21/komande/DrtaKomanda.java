@@ -5,7 +5,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import edu.unizg.foi.uzdiz.dblazevic21.ispis.FormaterZaIspise;
+import edu.unizg.foi.uzdiz.dblazevic21.util.DatumParser;
+import edu.unizg.foi.uzdiz.dblazevic21.util.VelikoPocetnoSlovo;
 import edu.unizg.foi.uzdiz.dblazevic21.modeli.aranzmani.Aranzmani;
 import edu.unizg.foi.uzdiz.dblazevic21.modeli.rezervacije.Rezervacije;
 
@@ -31,9 +32,16 @@ public class DrtaKomanda implements Komanda
         String odrezano = (unos == null) ? "" : unos.trim();
 
         Pattern p = Pattern.compile(
-                "^DRTA\\s+([\\p{L}\\p{M}]+)\\s+([\\p{L}\\p{M}]+)\\s+(\\d+)\\s+(\\d{1,2}[\\.\\/]\\d{1,2}[\\.\\/]\\d{4}\\.)\\s+(\\d{1,2}:\\d{1,2}(?::\\d{1,2})?)$",
-                Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE | Pattern.UNICODE_CHARACTER_CLASS
-        );
+                "^DRTA\\s+" +
+                "([\\p{L}\\p{M}]+)\\s+" +
+                "([\\p{L}\\p{M}\\s'-]+)\\s+" +
+                "(\\d+)\\s+" +
+                "([\\d]{1,2}\\.[\\d]{1,2}\\.[\\d]{4})\\.?" +
+                "\\s+" +
+                "(\\d{1,2}:\\d{2}(?::\\d{2})?)$",
+                Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE
+            );
+
 
         Matcher m = p.matcher(odrezano);
 
@@ -43,16 +51,17 @@ public class DrtaKomanda implements Komanda
             return;
         }
 
-        String ime = m.group(1).trim();
-        String prezime = m.group(2).trim();
+        String ime = VelikoPocetnoSlovo.velikoPocetnoSlovo(m.group(1).trim());
+        String prezime = VelikoPocetnoSlovo.velikoPocetnoSlovo(m.group(2).trim());
         int oznaka = Integer.parseInt(m.group(3).trim());
         String datum = m.group(4).trim();
         String vrijeme = m.group(5).trim();
 
-        LocalDateTime datumVrijeme = FormaterZaIspise.normalizirajDatumIVrijeme(datum, vrijeme);
+        LocalDateTime datumVrijeme = DatumParser.normalizirajDatumIVrijeme(datum, vrijeme);
+        
         if (datumVrijeme == null) 
         {
-            System.out.println("Greška: neispravan format datuma i vremena. Očekivano: dd.MM.yyyy HH:mm:ss");
+            System.out.println("Greška: neispravan format datuma i vremena. Očekivano: dd.MM.yyyy. HH:mm:ss");
             return;
         }
 

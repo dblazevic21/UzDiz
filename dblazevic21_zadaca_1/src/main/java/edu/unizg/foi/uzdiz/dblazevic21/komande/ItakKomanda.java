@@ -2,6 +2,7 @@ package edu.unizg.foi.uzdiz.dblazevic21.komande;
 
 import edu.unizg.foi.uzdiz.dblazevic21.modeli.aranzmani.Aranzmani;
 import edu.unizg.foi.uzdiz.dblazevic21.ispis.FormaterZaIspise;
+import edu.unizg.foi.uzdiz.dblazevic21.util.DatumParser;
 import edu.unizg.foi.uzdiz.dblazevic21.ispis.TablicaPrinter;
 
 import java.time.LocalDate;
@@ -42,11 +43,11 @@ public class ItakKomanda implements Komanda
         
         if (m.matches()) 
         {
-            String odStr = FormaterZaIspise.normalizirajDatum(m.group(1));
-            String doStr = FormaterZaIspise.normalizirajDatum(m.group(2));
+            String odStr = DatumParser.normalizirajDatum(m.group(1));
+            String doStr = DatumParser.normalizirajDatum(m.group(2));
 
-            LocalDate od = FormaterZaIspise.parseDatumZaKomandu(odStr);
-            LocalDate dO = FormaterZaIspise.parseDatumZaKomandu(doStr);
+            LocalDate od = DatumParser.parseDatumZaKomandu(odStr);
+            LocalDate dO = DatumParser.parseDatumZaKomandu(doStr);
 
             if (od == null || dO == null)
             {
