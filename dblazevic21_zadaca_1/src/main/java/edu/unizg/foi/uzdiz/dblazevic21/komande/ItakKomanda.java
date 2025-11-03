@@ -30,16 +30,16 @@ public class ItakKomanda implements Komanda
     @Override
     public void izvrsi(String unos)
     {
-        String trimmed = (unos == null) ? "" : unos.trim();
+        String izrezano = (unos == null) ? "" : unos.trim();
 
-        if (trimmed.equalsIgnoreCase("ITAK"))
+        if (izrezano.equalsIgnoreCase("ITAK"))
         {
             ispisiAranzmane(null, null);
             return;
         }
 
         Pattern p = Pattern.compile("^ITAK\\s+(.+)\\s+(.+)$", Pattern.CASE_INSENSITIVE);
-        Matcher m = p.matcher(trimmed);
+        Matcher m = p.matcher(izrezano);
         
         if (m.matches()) 
         {

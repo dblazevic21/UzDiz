@@ -29,14 +29,14 @@ public class DatumParser
             {
                 t = t.substring(0, t.length() - 1);
             }
-            DateTimeFormatter inputDate = new DateTimeFormatterBuilder()
+            DateTimeFormatter ulazDatum = new DateTimeFormatterBuilder()
                     .parseLenient()
                     .appendPattern("d.M.yyyy")
                     .optionalStart().appendLiteral('.').optionalEnd()
                     .toFormatter(Locale.ROOT);
-            return LocalDate.parse(t, inputDate);
+            return LocalDate.parse(t, ulazDatum);
         } 
-        catch (Exception ignored) 
+        catch (Exception ignoriran) 
         {
             return null;
         }
@@ -83,4 +83,57 @@ public class DatumParser
     {
         return normalizirajDatumIVrijeme(datum, vrijeme);
     }
+    
+    public static LocalDate parseCsvDatum(String s) 
+    {
+        try 
+        {
+            String t = (s == null) ? "" : s.trim();
+            if (t.isEmpty()) return null;
+            DateTimeFormatter csvDatum = DateTimeFormatter.ofPattern("d.M.yyyy").withLocale(Locale.ROOT);
+            return LocalDate.parse(t, csvDatum);
+        } 
+        catch (Exception e) 
+        {
+            return null;
+        }
+    }
+
+    public static LocalTime parseCsvVrijeme(String s) 
+    {
+        try 
+        {
+            String t = (s == null) ? "" : s.trim();
+            if (t.isEmpty()) return null;
+            DateTimeFormatter csvVrijeme = DateTimeFormatter.ofPattern("H:mm[:ss]").withLocale(Locale.ROOT);
+            return LocalTime.parse(t, csvVrijeme);
+        } 
+        catch (Exception e)
+        {
+            return null;
+        }
+    }
+
+    public static LocalDateTime parseCsvDatumVrijeme(String s, DateTimeFormatter[] formateri)
+    {
+        if (s == null) 
+        {
+        	return null;
+        }
+        String t = s.trim();
+        
+        for (DateTimeFormatter f : formateri) 
+        {
+            try 
+            {
+                return LocalDateTime.parse(t, f);
+            } 
+            catch (Exception ignoriran) 
+            {
+            	
+            }
+        }
+        return null;
+    }
+
 }

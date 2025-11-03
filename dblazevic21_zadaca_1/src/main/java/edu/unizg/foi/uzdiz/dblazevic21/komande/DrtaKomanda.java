@@ -6,7 +6,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import edu.unizg.foi.uzdiz.dblazevic21.util.DatumParser;
-import edu.unizg.foi.uzdiz.dblazevic21.util.VelikoPocetnoSlovo;
+import edu.unizg.foi.uzdiz.dblazevic21.util.GramatikaIJezik;
 import edu.unizg.foi.uzdiz.dblazevic21.modeli.aranzmani.Aranzmani;
 import edu.unizg.foi.uzdiz.dblazevic21.modeli.rezervacije.Rezervacije;
 
@@ -51,8 +51,8 @@ public class DrtaKomanda implements Komanda
             return;
         }
 
-        String ime = VelikoPocetnoSlovo.velikoPocetnoSlovo(m.group(1).trim());
-        String prezime = VelikoPocetnoSlovo.velikoPocetnoSlovo(m.group(2).trim());
+        String ime = GramatikaIJezik.velikoPocetnoSlovo(m.group(1).trim());
+        String prezime = GramatikaIJezik.velikoPocetnoSlovo(m.group(2).trim());
         int oznaka = Integer.parseInt(m.group(3).trim());
         String datum = m.group(4).trim();
         String vrijeme = m.group(5).trim();
