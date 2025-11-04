@@ -4,11 +4,14 @@ import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.List;
 
 import edu.unizg.foi.uzdiz.dblazevic21.util.DatumParser;
 import edu.unizg.foi.uzdiz.dblazevic21.util.GramatikaIJezik;
+import edu.unizg.foi.uzdiz.dblazevic21.ispis.FormaterZaIspise;
 import edu.unizg.foi.uzdiz.dblazevic21.modeli.aranzmani.Aranzmani;
 import edu.unizg.foi.uzdiz.dblazevic21.modeli.rezervacije.Rezervacije;
+import edu.unizg.foi.uzdiz.dblazevic21.modeli.rezervacije.Rezervacija;
 
 public class DrtaKomanda implements Komanda 
 {
@@ -32,13 +35,8 @@ public class DrtaKomanda implements Komanda
         String odrezano = (unos == null) ? "" : unos.trim();
 
         Pattern p = Pattern.compile(
-                "^DRTA\\s+" +
-                "([\\p{L}\\p{M}]+)\\s+" +
-                "([\\p{L}\\p{M}\\s'-]+)\\s+" +
-                "(\\d+)\\s+" +
-                "([\\d]{1,2}\\.[\\d]{1,2}\\.[\\d]{4})\\.?" +
-                "\\s+" +
-                "(\\d{1,2}:\\d{2}(?::\\d{2})?)$",
+                "^DRTA\\s+" + "([\\p{L}\\p{M}]+)\\s+" + "([\\p{L}\\p{M}\\s'-]+)\\s+" + "(\\d+)\\s+" +
+                "([\\d]{1,2}\\.[\\d]{1,2}\\.[\\d]{4})\\.?" + "\\s+" + "(\\d{1,2}:\\d{2}(?::\\d{2})?)$",
                 Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE
             );
 
@@ -72,6 +70,28 @@ public class DrtaKomanda implements Komanda
             return;
         }
 
+        provjeriIDodajRezervaciju(ime, prezime, oznaka, datumVrijeme);
+    }
+
+	public void provjeriIDodajRezervaciju(String ime, String prezime, int oznaka, LocalDateTime datumVrijeme) 
+	{
+		List<Rezervacija> postojeceRezervacije = Rezervacije.getInstance().getZaOsobu(ime,  prezime);
+        
+        for (Rezervacija r : postojeceRezervacije)
+        {
+        	if (r.getOznakaAranzmana() == oznaka)
+        	{
+        		System.out.println("Osoba " + ime + " " + prezime + " već ima rezervaciju za aranžman " + oznaka + ".");
+				return;
+        	}
+        	
+        	if (r.getDatumVrijeme().equals(datumVrijeme))
+        	{
+        		System.out.println("Osoba " + ime + " " + prezime + " već ima rezervaciju u terminu " + FormaterZaIspise.fmtDatumVrijeme(datumVrijeme, r.getDatumVrijemeRaw()) + ".");
+				return;
+        	}
+        }
+        
         try 
         {
             Rezervacije.getInstance().dodajRezervaciju(ime, prezime, oznaka, datumVrijeme);
@@ -82,5 +102,5 @@ public class DrtaKomanda implements Komanda
         {
             System.out.println("Greška prilikom dodavanja rezervacije: " + e.getMessage());
         }
-    }
+	}
 }
