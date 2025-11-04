@@ -6,8 +6,10 @@ import edu.unizg.foi.uzdiz.dblazevic21.modeli.aranzmani.AranzmaniBuilderConcrete
 import edu.unizg.foi.uzdiz.dblazevic21.modeli.rezervacije.Rezervacije;
 import edu.unizg.foi.uzdiz.dblazevic21.util.CsvParser;
 import edu.unizg.foi.uzdiz.dblazevic21.util.GramatikaIJezik;
+import edu.unizg.foi.uzdiz.dblazevic21.ispis.IspisiGresku;
 
 import java.io.BufferedReader;
+import java.util.ArrayList;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -25,6 +27,8 @@ public class CsvUcitajSingleton
     private static volatile CsvUcitajSingleton INSTANCE;
 
     private final Map<Integer, Aranzmani> aranzmani = new HashMap<>();
+    
+    public static int brojGreske = 0;
 
     private CsvUcitajSingleton() {}
 
@@ -53,17 +57,31 @@ public class CsvUcitajSingleton
         {
             String linija = br.readLine();
             if (linija == null) return;
+            
+            int brojLinije = 1;
 
             while ((linija = br.readLine()) != null) 
             {
+            	brojLinije++;
+            	
+            	String raw = linija;
+            	
                 linija = linija.trim();
                 if (linija.isEmpty()) continue;
 
                 List<String> stupci = CsvParser.parseCsvLiniju(linija);
-                if (stupci.size() < 16) 
+                
+                List<String> razloziGreske = new ArrayList<>();
+                
+                IspisiGresku.provjeriStupceAranzmana(stupci, razloziGreske);
+                
+                if (!razloziGreske.isEmpty())
                 {
+                    ++brojGreske;
+                    IspisiGresku.ispisiGresku(brojGreske, brojLinije, raw, razloziGreske, putanja);
                     continue;
                 }
+                
 
                 int oznaka = CsvParser.uInt(stupci.get(0));
                 String naziv = GramatikaIJezik.makniNavodnike(stupci.get(1));
@@ -104,6 +122,8 @@ public class CsvUcitajSingleton
         }
     }
 
+	
+
     public void ucitajRezervacije(String putanja)
     {
         Rezervacije rez = Rezervacije.getInstance();
@@ -114,18 +134,26 @@ public class CsvUcitajSingleton
             if (linija == null) return;
             
             int brojLinije = 1;
-
+            
             while ((linija = br.readLine()) != null) 
             {
 				brojLinije++;
+				
+				String raw = linija;
 				
                 linija = linija.trim();
                 if (linija.isEmpty()) continue;
 
                 List<String> stupci = CsvParser.parseCsvLiniju(linija);
-                if (stupci.size() < 4) 
+                
+                List<String> razloziGreske = new ArrayList<>();
+                
+                IspisiGresku.provjeriStupceRezervacije(stupci, razloziGreske);
+                
+                if (!razloziGreske.isEmpty())
                 {
-                    System.out.println("Greška u retku " + brojLinije);
+                    ++brojGreske;
+                    IspisiGresku.ispisiGresku(brojGreske, brojLinije, raw, razloziGreske, putanja);
                     continue;
                 }
 
@@ -139,7 +167,6 @@ public class CsvUcitajSingleton
                     
                     if (!aranzmani.containsKey(oznaka)) 
                     {
-                        System.out.println("Upozorenje: Nepostojeći aranžman (" + oznaka + ") u " + putanja + " – red preskočen.");
                         continue;
                     }
 
@@ -165,4 +192,6 @@ public class CsvUcitajSingleton
             System.out.println("Greška pri čitanju datoteke rezervacija: " + putanja + " (" + e.getMessage() + ")");
         }
     }
+
+	
 }
