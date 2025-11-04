@@ -100,14 +100,9 @@ public class CsvUcitajSingleton
                 int ruc = CsvParser.uInt(stupci.get(14));
                 int vec = CsvParser.uInt(stupci.get(15));
 
-                AranzmaniBuilder builder = new AranzmaniBuilderConcrete()
-                        .kreirajAranzmane(
-                                oznaka, naziv, program,
-                                pocetni, zavrsni,
-                                vrijemeKretanja, vrijemePovratka,
-                                cijena, min, max, nocenja, doplata,
-                                prijevoz, dor, ruc, vec
-                        );
+                AranzmaniBuilder builder = kreirajAranzmanSBuilderom(oznaka, naziv, program, pocetni, zavrsni,
+						vrijemeKretanja, vrijemePovratka, cijena, min, max, nocenja, doplata, prijevoz, dor, ruc, vec);
+
 
                 Aranzmani a = builder.getAranzman();
                 if (a != null) 
@@ -121,6 +116,30 @@ public class CsvUcitajSingleton
             System.out.println("Greška pri čitanju datoteke aranžmana: " + putanja + " (" + e.getMessage() + ")");
         }
     }
+
+	public AranzmaniBuilder kreirajAranzmanSBuilderom(int oznaka, String naziv, String program, LocalDate pocetni,
+			LocalDate zavrsni, LocalTime vrijemeKretanja, LocalTime vrijemePovratka, float cijena, int min, int max,
+			int nocenja, float doplata, String prijevoz, int dor, int ruc, int vec) 
+	{
+		AranzmaniBuilder builder = new AranzmaniBuilderConcrete()
+			    .setOznaka(oznaka)
+			    .setNaziv(naziv)
+			    .setProgram(program)
+			    .setPocetniDatum(pocetni)
+			    .setZavrsniDatum(zavrsni)
+			    .setVrijemeKretanja(vrijemeKretanja)
+			    .setVrijemePovratka(vrijemePovratka)
+			    .setCijena(cijena)
+			    .setMinBrojPutnika(min)
+			    .setMaksBrojPutnika(max)
+			    .setBrojNocenja(nocenja)
+			    .setDoplataSobe(doplata)
+			    .setPrijevoz(prijevoz)
+			    .setBrojDorucka(dor)
+			    .setBrojRucka(ruc)
+			    .setBrojVecera(vec);
+		return builder;
+	}
 
 	
 

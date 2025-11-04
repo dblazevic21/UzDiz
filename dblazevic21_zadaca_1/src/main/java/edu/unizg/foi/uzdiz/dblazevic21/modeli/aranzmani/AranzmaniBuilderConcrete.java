@@ -8,7 +8,10 @@ public class AranzmaniBuilderConcrete implements AranzmaniBuilder
 {
 	protected Aranzmani aranzman;
 	
-	public AranzmaniBuilderConcrete() { }
+	public AranzmaniBuilderConcrete() 
+	{
+		this.aranzman = new Aranzmani();
+	}
 	
 	public AranzmaniBuilder kreirajAranzmane(
 			int oznaka,
@@ -47,6 +50,16 @@ public class AranzmaniBuilderConcrete implements AranzmaniBuilder
 		this.aranzman.setBrojRucka(brojRucka);
 		this.aranzman.setBrojVecera(brojVecera);
 		return this;		
+	}
+	
+	public AranzmaniBuilder setOznaka(int oznaka) {
+		this.aranzman.setOznaka(oznaka);
+		return this;
+	}
+	
+	public AranzmaniBuilder setNaziv(String naziv) {
+		this.aranzman.setNaziv(naziv);
+		return this;
 	}
 	
 	public AranzmaniBuilder setBrojDorucka(int brojDorucka) {
@@ -108,6 +121,17 @@ public class AranzmaniBuilderConcrete implements AranzmaniBuilder
 		this.aranzman.setZavrsniDatum(zavrsniDatum);
 		return this;
 	}
+	
+	public AranzmaniBuilder setVrijemeKretanja(LocalTime vrijemeKretanja) {
+		this.aranzman.setVrijemeKretanja(vrijemeKretanja);
+		return this;
+	}
+	
+	public AranzmaniBuilder setVrijemePovratka(LocalTime vrijemePovratka) {
+		this.aranzman.setVrijemePovratka(vrijemePovratka);
+		return this;
+	}
+	
 	
 	public Aranzmani getAranzman() {
 		return this.aranzman;
