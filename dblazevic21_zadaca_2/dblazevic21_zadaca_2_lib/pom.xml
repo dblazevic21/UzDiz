@@ -7,6 +7,7 @@
   </parent>
   <artifactId>dblazevic21_zadaca_2_lib</artifactId>
   <name>dblazevic21_zadaca_2_lib</name>
+  <packaging>jar</packaging>
   
 <!--  <dependencies>-->
 <!--    <dependency>-->

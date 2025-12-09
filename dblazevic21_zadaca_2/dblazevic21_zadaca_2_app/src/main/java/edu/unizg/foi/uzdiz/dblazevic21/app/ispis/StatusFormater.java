@@ -1,6 +1,6 @@
 package edu.unizg.foi.uzdiz.dblazevic21.app.ispis;
 
-import edu.unizg.foi.uzdiz.dblazevic21.lib.enumeracije.StatusRezervacije;
+import edu.unizg.foi.uzdiz.dblazevic21.app.enumeracije.StatusRezervacije;
 
 public class StatusFormater 
 {

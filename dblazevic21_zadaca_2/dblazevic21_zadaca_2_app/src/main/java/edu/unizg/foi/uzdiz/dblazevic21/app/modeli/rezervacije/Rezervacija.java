@@ -1,8 +1,8 @@
-package edu.unizg.foi.uzdiz.dblazevic21.lib.modeli.rezervacije;
+package edu.unizg.foi.uzdiz.dblazevic21.app.modeli.rezervacije;
 
 import java.time.LocalDateTime;
 
-import edu.unizg.foi.uzdiz.dblazevic21.lib.enumeracije.StatusRezervacije;
+import edu.unizg.foi.uzdiz.dblazevic21.app.enumeracije.StatusRezervacije;
 
 public class Rezervacija 
 {

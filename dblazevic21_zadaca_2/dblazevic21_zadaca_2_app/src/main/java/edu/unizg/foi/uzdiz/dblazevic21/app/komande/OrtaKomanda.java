@@ -5,8 +5,8 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import edu.unizg.foi.uzdiz.dblazevic21.lib.modeli.aranzmani.Aranzmani;
-import edu.unizg.foi.uzdiz.dblazevic21.lib.modeli.rezervacije.Rezervacije;
+import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.aranzmani.Aranzmani;
+import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.rezervacije.Rezervacije;
 
 public class OrtaKomanda implements Komanda 
 {

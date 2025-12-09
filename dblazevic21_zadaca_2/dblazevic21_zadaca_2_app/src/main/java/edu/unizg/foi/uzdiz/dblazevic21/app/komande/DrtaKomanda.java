@@ -6,12 +6,12 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import edu.unizg.foi.uzdiz.dblazevic21.lib.modeli.aranzmani.Aranzmani;
-import edu.unizg.foi.uzdiz.dblazevic21.lib.modeli.rezervacije.Rezervacija;
-import edu.unizg.foi.uzdiz.dblazevic21.lib.modeli.rezervacije.Rezervacije;
-import edu.unizg.foi.uzdiz.dblazevic21.lib.util.DatumParser;
-import edu.unizg.foi.uzdiz.dblazevic21.lib.util.FormaterZaIspise;
-import edu.unizg.foi.uzdiz.dblazevic21.lib.util.GramatikaIJezik;
+import edu.unizg.foi.uzdiz.dblazevic21.app.ispis.FormaterZaIspise;
+import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.aranzmani.Aranzmani;
+import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.rezervacije.Rezervacija;
+import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.rezervacije.Rezervacije;
+import edu.unizg.foi.uzdiz.dblazevic21.app.utils.DatumParser;
+import edu.unizg.foi.uzdiz.dblazevic21.app.utils.GramatikaIJezikApp;
 
 public class DrtaKomanda implements Komanda 
 {
@@ -49,8 +49,8 @@ public class DrtaKomanda implements Komanda
             return;
         }
 
-        String ime = GramatikaIJezik.velikoPocetnoSlovo(m.group(1).trim());
-        String prezime = GramatikaIJezik.velikoPocetnoSlovo(m.group(2).trim());
+        String ime = GramatikaIJezikApp.velikoPocetnoSlovo(m.group(1).trim());
+        String prezime = GramatikaIJezikApp.velikoPocetnoSlovo(m.group(2).trim());
         int oznaka = Integer.parseInt(m.group(3).trim());
         String datum = m.group(4).trim();
         String vrijeme = m.group(5).trim();

@@ -7,9 +7,9 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import edu.unizg.foi.uzdiz.dblazevic21.app.ispis.FormaterZaIspise;
 import edu.unizg.foi.uzdiz.dblazevic21.app.ispis.TablicaPrinter;
-import edu.unizg.foi.uzdiz.dblazevic21.lib.modeli.aranzmani.Aranzmani;
-import edu.unizg.foi.uzdiz.dblazevic21.lib.util.FormaterZaIspise;
+import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.aranzmani.Aranzmani;
 
 public class ItapKomanda implements Komanda
 {

@@ -1,4 +1,4 @@
-package edu.unizg.foi.uzdiz.dblazevic21.lib.modeli.rezervacije;
+package edu.unizg.foi.uzdiz.dblazevic21.app.modeli.rezervacije;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -8,8 +8,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import edu.unizg.foi.uzdiz.dblazevic21.lib.enumeracije.StatusRezervacije;
-import edu.unizg.foi.uzdiz.dblazevic21.lib.modeli.aranzmani.Aranzmani;
+import edu.unizg.foi.uzdiz.dblazevic21.app.enumeracije.StatusRezervacije;
+import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.aranzmani.Aranzmani;
 
 public class Rezervacije 
 {

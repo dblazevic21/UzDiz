@@ -8,7 +8,7 @@ import java.util.Map;
 import java.util.Scanner;
 
 import edu.unizg.foi.uzdiz.dblazevic21.app.turistickaAgencija.TuristickaAgencija;
-import edu.unizg.foi.uzdiz.dblazevic21.lib.facade.CsvUcitajSingleton;
+import edu.unizg.foi.uzdiz.dblazevic21.lib.handleri.CsvUcitajSingleton;
 
 public class Glavna
 {
@@ -17,8 +17,6 @@ public class Glavna
         if (args.length == 0)
         {
             System.out.println("Niste unijeli argumente!");
-            System.out.println("Primjer:");
-            System.out.println("java -jar dblazevic21_zadaca_1.jar --ta DZ_1_aranzmani.csv --rta DZ_1_rezervacije.csv [--rta DZ_1_rezervacije_1.csv]");
             return;
         }
 

@@ -2,7 +2,7 @@ package edu.unizg.foi.uzdiz.dblazevic21.app.komande;
 
 import java.util.Map;
 
-import edu.unizg.foi.uzdiz.dblazevic21.lib.modeli.aranzmani.Aranzmani;
+import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.aranzmani.Aranzmani;
 
 public class KomandaConcreteCreator extends KomandaCreator 
 {

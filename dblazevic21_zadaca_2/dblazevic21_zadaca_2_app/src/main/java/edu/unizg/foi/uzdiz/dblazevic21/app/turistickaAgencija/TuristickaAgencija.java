@@ -5,7 +5,7 @@ import java.util.Map;
 
 import edu.unizg.foi.uzdiz.dblazevic21.app.komande.KomandaConcreteCreator;
 import edu.unizg.foi.uzdiz.dblazevic21.app.komande.KomandaCreator;
-import edu.unizg.foi.uzdiz.dblazevic21.lib.modeli.aranzmani.Aranzmani;
+import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.aranzmani.Aranzmani;
 
 public class TuristickaAgencija 
 {
