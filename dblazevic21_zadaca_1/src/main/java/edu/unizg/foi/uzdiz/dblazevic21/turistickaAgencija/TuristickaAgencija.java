@@ -1,29 +1,24 @@
 package edu.unizg.foi.uzdiz.dblazevic21.turistickaAgencija;
 
-import edu.unizg.foi.uzdiz.dblazevic21.komande.Komanda;
-import edu.unizg.foi.uzdiz.dblazevic21.komande.DrtaKomanda;
-import edu.unizg.foi.uzdiz.dblazevic21.komande.IrtaKomanda;
-import edu.unizg.foi.uzdiz.dblazevic21.komande.IroKomanda;
-import edu.unizg.foi.uzdiz.dblazevic21.komande.OrtaKomanda;
-import edu.unizg.foi.uzdiz.dblazevic21.komande.ItakKomanda;
-import edu.unizg.foi.uzdiz.dblazevic21.komande.ItapKomanda;
-import edu.unizg.foi.uzdiz.dblazevic21.modeli.aranzmani.Aranzmani;
-
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+
+import edu.unizg.foi.uzdiz.dblazevic21.komande.KomandaConcreteCreator;
+import edu.unizg.foi.uzdiz.dblazevic21.komande.KomandaCreator;
+import edu.unizg.foi.uzdiz.dblazevic21.modeli.aranzmani.Aranzmani;
 
 public class TuristickaAgencija 
 {
 
     private static volatile TuristickaAgencija INSTANCE;
 
-    private final Map<String, Komanda> komande = new HashMap<>();
     private Map<Integer, Aranzmani> aranzmani = new HashMap<>();
+    private KomandaCreator komandaCreator;
 
     private TuristickaAgencija() 
     {
-        registrirajKomande();
+        this.komandaCreator = new KomandaConcreteCreator(aranzmani);
     }
 
     public static TuristickaAgencija getInstance()
@@ -44,7 +39,7 @@ public class TuristickaAgencija
     public void setAranzmani(Map<Integer, Aranzmani> aranzmani) 
     {
         this.aranzmani = (aranzmani != null) ? aranzmani : new HashMap<>();
-        registrirajKomande();
+        this.komandaCreator = new KomandaConcreteCreator(this.aranzmani);
     }
 
     public Map<Integer, Aranzmani> getAranzmani() 
@@ -61,27 +56,7 @@ public class TuristickaAgencija
         }
 
         String izrezan = unos.trim();
-        String veliko = izrezan.toUpperCase(Locale.ROOT);
-        String naziv = veliko.split("\\s+", 2)[0];
 
-        Komanda k = komande.get(naziv);
-        
-        if (k == null) 
-        {
-            System.out.println("Nepoznata komanda. Lista komandi: ITAK, ITAP, IRO, IRTA, ORTA, DRTA.");
-            return;
-        }
-        k.izvrsi(unos);
-    }
-
-    private void registrirajKomande() 
-    {
-        komande.clear();
-        komande.put("DRTA", new DrtaKomanda(aranzmani));
-        komande.put("IRTA", new IrtaKomanda(aranzmani));
-        komande.put("IRO", new IroKomanda(aranzmani));
-        komande.put("ORTA", new OrtaKomanda(aranzmani));
-        komande.put("ITAK", new ItakKomanda(aranzmani));
-        komande.put("ITAP", new ItapKomanda(aranzmani));
+        komandaCreator.izvrsiKomandu(izrezan);
     }
 }

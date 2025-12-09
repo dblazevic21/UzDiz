@@ -1,15 +1,6 @@
 package edu.unizg.foi.uzdiz.dblazevic21.handleri;
 
-import edu.unizg.foi.uzdiz.dblazevic21.modeli.aranzmani.Aranzmani;
-import edu.unizg.foi.uzdiz.dblazevic21.modeli.aranzmani.AranzmaniBuilder;
-import edu.unizg.foi.uzdiz.dblazevic21.modeli.aranzmani.AranzmaniBuilderConcrete;
-import edu.unizg.foi.uzdiz.dblazevic21.modeli.rezervacije.Rezervacije;
-import edu.unizg.foi.uzdiz.dblazevic21.util.CsvParser;
-import edu.unizg.foi.uzdiz.dblazevic21.util.GramatikaIJezik;
-import edu.unizg.foi.uzdiz.dblazevic21.ispis.IspisiGresku;
-
 import java.io.BufferedReader;
-import java.util.ArrayList;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -17,9 +8,17 @@ import java.nio.file.Paths;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
+import edu.unizg.foi.uzdiz.dblazevic21.ispis.IspisiGresku;
+import edu.unizg.foi.uzdiz.dblazevic21.modeli.aranzmani.Aranzmani;
+import edu.unizg.foi.uzdiz.dblazevic21.modeli.aranzmani.AranzmaniDirector;
+import edu.unizg.foi.uzdiz.dblazevic21.modeli.rezervacije.Rezervacije;
+import edu.unizg.foi.uzdiz.dblazevic21.util.CsvParser;
+import edu.unizg.foi.uzdiz.dblazevic21.util.GramatikaIJezik;
 
 public class CsvUcitajSingleton 
 {
@@ -29,6 +28,8 @@ public class CsvUcitajSingleton
     private final Map<Integer, Aranzmani> aranzmani = new HashMap<>();
     
     public static int brojGreske = 0;
+    
+    private final AranzmaniDirector aranzmaniDirector = new AranzmaniDirector();
 
     private CsvUcitajSingleton() {}
 
@@ -100,11 +101,25 @@ public class CsvUcitajSingleton
                 int ruc = CsvParser.uInt(stupci.get(14));
                 int vec = CsvParser.uInt(stupci.get(15));
 
-                AranzmaniBuilder builder = kreirajAranzmanSBuilderom(oznaka, naziv, program, pocetni, zavrsni,
-						vrijemeKretanja, vrijemePovratka, cijena, min, max, nocenja, doplata, prijevoz, dor, ruc, vec);
+                Aranzmani a = aranzmaniDirector.kreirajOsnovniAranzman(
+                        oznaka,
+                        naziv,
+                        program,
+                        pocetni,
+                        zavrsni,
+                        vrijemeKretanja,
+                        vrijemePovratka,
+                        cijena,
+                        min,
+                        max,
+                        nocenja,
+                        doplata,
+                        prijevoz,
+                        dor,
+                        ruc,
+                        vec
+                );
 
-
-                Aranzmani a = builder.getAranzman();
                 if (a != null) 
                 {
                     aranzmani.put(oznaka, a);
@@ -117,31 +132,31 @@ public class CsvUcitajSingleton
         }
     }
 
-	public AranzmaniBuilder kreirajAranzmanSBuilderom(int oznaka, String naziv, String program, LocalDate pocetni,
-			LocalDate zavrsni, LocalTime vrijemeKretanja, LocalTime vrijemePovratka, float cijena, int min, int max,
-			int nocenja, float doplata, String prijevoz, int dor, int ruc, int vec) 
-	{
-		AranzmaniBuilder builder = new AranzmaniBuilderConcrete()
-			    .setOznaka(oznaka)
-			    .setNaziv(naziv)
-			    .setProgram(program)
-			    .setPocetniDatum(pocetni)
-			    .setZavrsniDatum(zavrsni)
-			    .setVrijemeKretanja(vrijemeKretanja)
-			    .setVrijemePovratka(vrijemePovratka)
-			    .setCijena(cijena)
-			    .setMinBrojPutnika(min)
-			    .setMaksBrojPutnika(max)
-			    .setBrojNocenja(nocenja)
-			    .setDoplataSobe(doplata)
-			    .setPrijevoz(prijevoz)
-			    .setBrojDorucka(dor)
-			    .setBrojRucka(ruc)
-			    .setBrojVecera(vec);
-		return builder;
-	}
-
-	
+//	public AranzmaniBuilder kreirajAranzmanSBuilderom(int oznaka, String naziv, String program, LocalDate pocetni,
+//			LocalDate zavrsni, LocalTime vrijemeKretanja, LocalTime vrijemePovratka, float cijena, int min, int max,
+//			int nocenja, float doplata, String prijevoz, int dor, int ruc, int vec) 
+//	{
+//		AranzmaniBuilder builder = new AranzmaniBuilderConcrete()
+//			    .setOznaka(oznaka)
+//			    .setNaziv(naziv)
+//			    .setProgram(program)
+//			    .setPocetniDatum(pocetni)
+//			    .setZavrsniDatum(zavrsni)
+//			    .setVrijemeKretanja(vrijemeKretanja)
+//			    .setVrijemePovratka(vrijemePovratka)
+//			    .setCijena(cijena)
+//			    .setMinBrojPutnika(min)
+//			    .setMaksBrojPutnika(max)
+//			    .setBrojNocenja(nocenja)
+//			    .setDoplataSobe(doplata)
+//			    .setPrijevoz(prijevoz)
+//			    .setBrojDorucka(dor)
+//			    .setBrojRucka(ruc)
+//			    .setBrojVecera(vec);
+//		return builder;
+//	}
+//
+//	
 
     public void ucitajRezervacije(String putanja)
     {
