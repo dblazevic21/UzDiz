@@ -33,7 +33,7 @@ public class Glavna
         ta.ucitajRezervacije(rezervacijaPodaci);
 
         Map<Integer, Aranzmani> aranzmani = ta.getAranzmani();
-        KomandaCreator komanda = new KomandaConcreteCreator(aranzmani);
+        KomandaCreator komandaCreator = new KomandaConcreteCreator(aranzmani);
 
         System.out.println("Učitano " + aranzmani.size() + " aranžmana.");
         System.out.println("Broj grešaka: " + facade.getBrojGresaka());
@@ -50,7 +50,7 @@ public class Glavna
                     break;
                 }
 
-                komanda.izvrsiKomandu(unos);
+                komandaCreator.izvrsiKomandu(unos);
             }
         }
     }
