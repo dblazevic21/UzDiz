@@ -6,18 +6,13 @@ import java.util.List;
 import edu.unizg.foi.uzdiz.dblazevic21.lib.csv.AranzmanCsvRecord;
 import edu.unizg.foi.uzdiz.dblazevic21.lib.csv.RezervacijaCsvRecord;
 import edu.unizg.foi.uzdiz.dblazevic21.lib.handleri.CsvUcitajSingleton;
+import edu.unizg.foi.uzdiz.dblazevic21.lib.util.CsvParser;
 
 public class Facade 
 {
-
     private static volatile Facade INSTANCE;
 
-    private final CsvUcitajSingleton csvUcitaj;
-
-    private Facade() 
-    {
-        this.csvUcitaj = CsvUcitajSingleton.getInstance();
-    }
+    private Facade() {}
 
     public static Facade getInstance() 
     {
@@ -33,31 +28,57 @@ public class Facade
         }
         return INSTANCE;
     }
-    
-    public List<AranzmanCsvRecord> ucitajAranzmaneSve(List<String> putanje) 
+
+    public List<Object[]> ucitajAranzmane(String putanja) 
     {
-        List<AranzmanCsvRecord> rezultat = new ArrayList<>();
-        if (putanje == null) 
+        List<AranzmanCsvRecord> records = CsvUcitajSingleton.getInstance().ucitajAranzmaneKaoRecorde(putanja);
+        List<Object[]> rezultat = new ArrayList<>();
+
+        for (AranzmanCsvRecord r : records) 
         {
-            return rezultat;
+            Object[] podaci = new Object[16];
+            podaci[0] = CsvParser.uInt(r.oznaka());
+            podaci[1] = r.naziv();
+            podaci[2] = r.program();
+            podaci[3] = CsvParser.uDatum(r.pocetniDatum());
+            podaci[4] = CsvParser.uDatum(r.zavrsniDatum());
+            podaci[5] = CsvParser.uVrijeme(r.vrijemeKretanja());
+            podaci[6] = CsvParser.uVrijeme(r.vrijemePovratka());
+            podaci[7] = CsvParser.uFloat(r.cijena());
+            podaci[8] = CsvParser.uInt(r.minBrojPutnika());
+            podaci[9] = CsvParser.uInt(r.maksBrojPutnika());
+            podaci[10] = CsvParser.uInt(r.brojNocenja());
+            podaci[11] = CsvParser.uFloat(r.doplataJednokrevetnaSoba());
+            podaci[12] = r.prijevoz();
+            podaci[13] = CsvParser.uInt(r.brojDorucaka());
+            podaci[14] = CsvParser.uInt(r.brojRuckova());
+            podaci[15] = CsvParser.uInt(r.brojVecera());
+            rezultat.add(podaci);
         }
-        for (String p : putanje) {
-            rezultat.addAll(csvUcitaj.ucitajAranzmaneKaoRecorde(p));
-        }
+
         return rezultat;
     }
-    
-    public List<RezervacijaCsvRecord> ucitajRezervacijeSve(List<String> putanje) 
+
+    public List<Object[]> ucitajRezervacije(String putanja) 
     {
-        List<RezervacijaCsvRecord> rezultat = new ArrayList<>();
-        if (putanje == null) 
+        List<RezervacijaCsvRecord> records = CsvUcitajSingleton.getInstance().ucitajRezervacijeKaoRecorde(putanja);
+        List<Object[]> rezultat = new ArrayList<>();
+
+        for (RezervacijaCsvRecord r : records) 
         {
-            return rezultat;
+            Object[] podaci = new Object[4];
+            podaci[0] = r.ime();
+            podaci[1] = r.prezime();
+            podaci[2] = CsvParser.uInt(r.oznakaAranzmana());
+            podaci[3] = CsvParser.uDatumVrijeme(r.datumVrijeme());
+            rezultat.add(podaci);
         }
-        for (String p : putanje) 
-        {
-            rezultat.addAll(csvUcitaj.ucitajRezervacijeKaoRecorde(p));
-        }
+
         return rezultat;
+    }
+
+    public int getBrojGresaka() 
+    {
+        return CsvUcitajSingleton.brojGreske;
     }
 }

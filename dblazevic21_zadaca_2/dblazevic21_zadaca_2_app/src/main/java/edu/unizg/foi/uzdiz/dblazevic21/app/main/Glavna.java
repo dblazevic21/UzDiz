@@ -1,117 +1,56 @@
 package edu.unizg.foi.uzdiz.dblazevic21.app.main;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
+import edu.unizg.foi.uzdiz.dblazevic21.app.komande.KomandaConcreteCreator;
+import edu.unizg.foi.uzdiz.dblazevic21.app.komande.KomandaCreator;
+import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.aranzmani.Aranzmani;
 import edu.unizg.foi.uzdiz.dblazevic21.app.turistickaAgencija.TuristickaAgencija;
 import edu.unizg.foi.uzdiz.dblazevic21.lib.facade.Facade;
 
-public class Glavna
+public class Glavna 
 {
-    public static void main(String[] args)
+    public static void main(String[] args) 
     {
-        if (args.length == 0)
+        if (args.length < 2) 
         {
-            System.out.println("Niste unijeli argumente!");
+            System.out.println("Potrebno je navesti putanje do CSV datoteka.");
             return;
         }
 
-        Map<String, List<String>> argumenti = new HashMap<>();
-        provjeriKomandu(args, argumenti);
-
-        List<String> datotekeAranzmani = argumenti.get("--ta");
-        List<String> datotekeRezervacije = argumenti.get("--rta");
-
-        System.out.println("\nPokretanje programa...");
+        String putanjaAranzmani = args[0];
+        String putanjaRezervacije = args[1];
 
         Facade facade = Facade.getInstance();
 
-        if (datotekeAranzmani == null)
-        {
-            System.out.println("Niste naveli datoteku aranžmana (--ta)!");
-        }
-        else
-        {
-            for (String dat : datotekeAranzmani)
-            {
-                provjeriDatoteku(dat);
-                System.out.println("\nUčitani aranžmani iz " + dat);
-            }
-        }
-
-        if (datotekeRezervacije == null)
-        {
-            System.out.println("Niste naveli nijednu datoteku s rezervacijama (--rta)!");
-        }
-        else
-        {
-            for (String dat : datotekeRezervacije)
-            {
-                provjeriDatoteku(dat);
-                System.out.println("\nUčitane rezervacije iz " + dat);
-            }
-        }
-
-        var aranzmanRecords = facade.ucitajAranzmaneSve(datotekeAranzmani);
-        var rezervacijaRecords = facade.ucitajRezervacijeSve(datotekeRezervacije);
+        List<Object[]> aranzmanPodaci = facade.ucitajAranzmane(putanjaAranzmani);
+        List<Object[]> rezervacijaPodaci = facade.ucitajRezervacije(putanjaRezervacije);
 
         TuristickaAgencija ta = TuristickaAgencija.getInstance();
-        ta.ucitajAranzmaneIzRecorda(aranzmanRecords);
-        ta.ucitajRezervacijeIzRecorda(rezervacijaRecords);
+        ta.ucitajAranzmane(aranzmanPodaci);
+        ta.ucitajRezervacije(rezervacijaPodaci);
 
-        pokreniInteraktivniNacin();
-    }
+        Map<Integer, Aranzmani> aranzmani = ta.getAranzmani();
+        KomandaCreator komanda = new KomandaConcreteCreator(aranzmani);
 
-    public static void provjeriKomandu(String[] args, Map<String, List<String>> argumenti)
-    {
-        String currentFlag = null;
+        System.out.println("Učitano " + aranzmani.size() + " aranžmana.");
+        System.out.println("Broj grešaka: " + facade.getBrojGresaka());
 
-        for (String arg : args)
+        try (Scanner scanner = new Scanner(System.in)) 
         {
-            if (arg.startsWith("--"))
-            {
-                currentFlag = arg;
-                argumenti.putIfAbsent(currentFlag, new ArrayList<>());
-            }
-            else if (currentFlag != null)
-            {
-                argumenti.get(currentFlag).add(arg);
-            }
-        }
-    }
-
-    private static void provjeriDatoteku(String naziv)
-    {
-        File f = new File(naziv);
-        if (!f.exists())
-        {
-            System.out.println("Datoteka \"" + naziv + "\" ne postoji u trenutnom direktoriju!");
-        }
-    }
-
-    private static void pokreniInteraktivniNacin()
-    {
-        System.out.println("\nSustav je spreman za interaktivni način rada.");
-        System.out.println("Unesite komande (za izlaz upišite 'Q').");
-
-        try (Scanner scanner = new Scanner(System.in))
-        {
-            while (true)
+            while (true) 
             {
                 System.out.print("> ");
-                String komanda = scanner.nextLine().trim();
+                String unos = scanner.nextLine();
 
-                if ("Q".equalsIgnoreCase(komanda))
+                if (unos == null || unos.trim().equalsIgnoreCase("Q")) 
                 {
-                    System.out.println("Izlaz iz programa...");
                     break;
                 }
 
-                TuristickaAgencija.getInstance().izvrsiKomandu(komanda);
+                komanda.izvrsiKomandu(unos);
             }
         }
     }
