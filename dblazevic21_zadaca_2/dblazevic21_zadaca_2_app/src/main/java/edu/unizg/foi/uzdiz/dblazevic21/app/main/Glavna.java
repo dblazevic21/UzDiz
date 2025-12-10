@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Scanner;
 
 import edu.unizg.foi.uzdiz.dblazevic21.app.turistickaAgencija.TuristickaAgencija;
-import edu.unizg.foi.uzdiz.dblazevic21.lib.handleri.CsvUcitajSingleton;
 
 public class Glavna
 {

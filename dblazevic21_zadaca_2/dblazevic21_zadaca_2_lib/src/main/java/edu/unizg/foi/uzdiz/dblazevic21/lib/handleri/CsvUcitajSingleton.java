@@ -1,37 +1,27 @@
 package edu.unizg.foi.uzdiz.dblazevic21.lib.handleri;
 
+import edu.unizg.foi.uzdiz.dblazevic21.lib.csv.AranzmanCsvRecord;
+import edu.unizg.foi.uzdiz.dblazevic21.lib.csv.RezervacijaCsvRecord;
+import edu.unizg.foi.uzdiz.dblazevic21.lib.ispis.IspisiGresku;
+import edu.unizg.foi.uzdiz.dblazevic21.lib.util.CsvParser;
+import edu.unizg.foi.uzdiz.dblazevic21.lib.util.GramatikaIJezik;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
-import edu.unizg.foi.uzdiz.dblazevic21.lib.ispis.IspisiGresku;
-import edu.unizg.foi.uzdiz.dblazevic21.lib.modeli.aranzmani.Aranzmani;
-import edu.unizg.foi.uzdiz.dblazevic21.lib.modeli.aranzmani.AranzmaniDirector;
-import edu.unizg.foi.uzdiz.dblazevic21.lib.modeli.rezervacije.Rezervacije;
-import edu.unizg.foi.uzdiz.dblazevic21.lib.util.CsvParser;
-import edu.unizg.foi.uzdiz.dblazevic21.lib.util.GramatikaIJezik;
 
 public class CsvUcitajSingleton 
 {
 
     private static volatile CsvUcitajSingleton INSTANCE;
 
-    private final Map<Integer, Aranzmani> aranzmani = new HashMap<>();
-    
     public static int brojGreske = 0;
-    
-    private final AranzmaniDirector aranzmaniDirector = new AranzmaniDirector();
 
-    private CsvUcitajSingleton() {}
+    private CsvUcitajSingleton() { }
 
     public static CsvUcitajSingleton getInstance() 
     {
@@ -39,7 +29,7 @@ public class CsvUcitajSingleton
         {
             synchronized (CsvUcitajSingleton.class) 
             {
-                if (INSTANCE == null) 
+                if (INSTANCE == null)
                 {
                     INSTANCE = new CsvUcitajSingleton();
                 }
@@ -48,184 +38,156 @@ public class CsvUcitajSingleton
         return INSTANCE;
     }
 
-    public Map<Integer, Aranzmani> getAranzmani() {
-        return aranzmani;
-    }
-
-    public void ucitajAranzmane(String putanja)
+    
+    public List<AranzmanCsvRecord> ucitajAranzmaneKaoRecorde(String putanja) 
     {
-        try (BufferedReader br = Files.newBufferedReader(Paths.get(putanja), StandardCharsets.UTF_8))
+        List<AranzmanCsvRecord> rezultat = new ArrayList<>();
+
+        try (BufferedReader br = Files.newBufferedReader(Paths.get(putanja), StandardCharsets.UTF_8)) 
         {
             String linija = br.readLine();
-            if (linija == null) return;
-            
+            if (linija == null) 
+            {
+                return rezultat;
+            }
+
             int brojLinije = 1;
 
             while ((linija = br.readLine()) != null) 
             {
-            	brojLinije++;
-            	
-            	String raw = linija;
-            	
+                brojLinije++;
+
+                String raw = linija;
                 linija = linija.trim();
-                if (linija.isEmpty()) continue;
+                if (linija.isEmpty()) {
+                    continue;
+                }
 
                 List<String> stupci = CsvParser.parseCsvLiniju(linija);
-                
                 List<String> razloziGreske = new ArrayList<>();
-                
+
                 IspisiGresku.provjeriStupceAranzmana(stupci, razloziGreske);
-                
-                if (!razloziGreske.isEmpty())
+
+                if (!razloziGreske.isEmpty()) 
                 {
                     ++brojGreske;
                     IspisiGresku.ispisiGresku(brojGreske, brojLinije, raw, razloziGreske, putanja);
                     continue;
                 }
-                
 
-                int oznaka = CsvParser.uInt(stupci.get(0));
+                while (stupci.size() < 16) {
+                    stupci.add("");
+                }
+
+                String oznaka = stupci.get(0);
                 String naziv = GramatikaIJezik.makniNavodnike(stupci.get(1));
                 String program = GramatikaIJezik.makniNavodnike(stupci.get(2));
-                LocalDate pocetni = CsvParser.uDatum(stupci.get(3));
-                LocalDate zavrsni = CsvParser.uDatum(stupci.get(4));
-                LocalTime vrijemeKretanja = CsvParser.uVrijeme(stupci.get(5));
-                LocalTime vrijemePovratka = CsvParser.uVrijeme(stupci.get(6));
-                float cijena = CsvParser.uFloat(stupci.get(7));
-                int min = CsvParser.uInt(stupci.get(8));
-                int max = CsvParser.uInt(stupci.get(9));
-                int nocenja = CsvParser.uInt(stupci.get(10));
-                float doplata = CsvParser.uFloat(stupci.get(11));
+                String pocetniDatum = stupci.get(3);
+                String zavrsniDatum = stupci.get(4);
+                String vrijemeKretanja = stupci.get(5);
+                String vrijemePovratka = stupci.get(6);
+                String cijena = stupci.get(7);
+                String minBrojPutnika = stupci.get(8);
+                String maksBrojPutnika = stupci.get(9);
+                String brojNocenja = stupci.get(10);
+                String doplataSobe = stupci.get(11);
                 String prijevoz = GramatikaIJezik.makniNavodnike(stupci.get(12));
-                int dor = CsvParser.uInt(stupci.get(13));
-                int ruc = CsvParser.uInt(stupci.get(14));
-                int vec = CsvParser.uInt(stupci.get(15));
+                String brojDorucka = stupci.get(13);
+                String brojRucka = stupci.get(14);
+                String brojVecera = stupci.get(15);
 
-                Aranzmani a = aranzmaniDirector.kreirajOsnovniAranzman(
+                AranzmanCsvRecord record = new AranzmanCsvRecord(
                         oznaka,
                         naziv,
                         program,
-                        pocetni,
-                        zavrsni,
+                        pocetniDatum,
+                        zavrsniDatum,
                         vrijemeKretanja,
                         vrijemePovratka,
                         cijena,
-                        min,
-                        max,
-                        nocenja,
-                        doplata,
+                        minBrojPutnika,
+                        maksBrojPutnika,
+                        brojNocenja,
+                        doplataSobe,
                         prijevoz,
-                        dor,
-                        ruc,
-                        vec
+                        brojDorucka,
+                        brojRucka,
+                        brojVecera
                 );
 
-                if (a != null) 
-                {
-                    aranzmani.put(oznaka, a);
-                }
+                rezultat.add(record);
             }
         } 
         catch (IOException e) 
         {
             System.out.println("Greška pri čitanju datoteke aranžmana: " + putanja + " (" + e.getMessage() + ")");
         }
+
+        return rezultat;
     }
 
-//	public AranzmaniBuilder kreirajAranzmanSBuilderom(int oznaka, String naziv, String program, LocalDate pocetni,
-//			LocalDate zavrsni, LocalTime vrijemeKretanja, LocalTime vrijemePovratka, float cijena, int min, int max,
-//			int nocenja, float doplata, String prijevoz, int dor, int ruc, int vec) 
-//	{
-//		AranzmaniBuilder builder = new AranzmaniBuilderConcrete()
-//			    .setOznaka(oznaka)
-//			    .setNaziv(naziv)
-//			    .setProgram(program)
-//			    .setPocetniDatum(pocetni)
-//			    .setZavrsniDatum(zavrsni)
-//			    .setVrijemeKretanja(vrijemeKretanja)
-//			    .setVrijemePovratka(vrijemePovratka)
-//			    .setCijena(cijena)
-//			    .setMinBrojPutnika(min)
-//			    .setMaksBrojPutnika(max)
-//			    .setBrojNocenja(nocenja)
-//			    .setDoplataSobe(doplata)
-//			    .setPrijevoz(prijevoz)
-//			    .setBrojDorucka(dor)
-//			    .setBrojRucka(ruc)
-//			    .setBrojVecera(vec);
-//		return builder;
-//	}
-//
-//	
-
-    public void ucitajRezervacije(String putanja)
+   
+    public List<RezervacijaCsvRecord> ucitajRezervacijeKaoRecorde(String putanja) 
     {
-        Rezervacije rez = Rezervacije.getInstance();
+        List<RezervacijaCsvRecord> rezultat = new ArrayList<>();
 
         try (BufferedReader br = Files.newBufferedReader(Paths.get(putanja), StandardCharsets.UTF_8)) 
         {
             String linija = br.readLine();
-            if (linija == null) return;
-            
-            int brojLinije = 1;
-            
-            while ((linija = br.readLine()) != null) 
+            if (linija == null) 
             {
-				brojLinije++;
-				
-				String raw = linija;
-				
+                return rezultat;
+            }
+
+            int brojLinije = 1;
+
+            while ((linija = br.readLine()) != null) {
+                brojLinije++;
+
+                String raw = linija;
                 linija = linija.trim();
-                if (linija.isEmpty()) continue;
+                if (linija.isEmpty()) 
+                {
+                    continue;
+                }
 
                 List<String> stupci = CsvParser.parseCsvLiniju(linija);
-                
                 List<String> razloziGreske = new ArrayList<>();
-                
+
                 IspisiGresku.provjeriStupceRezervacije(stupci, razloziGreske);
-                
-                if (!razloziGreske.isEmpty())
+
+                if (!razloziGreske.isEmpty()) 
                 {
                     ++brojGreske;
                     IspisiGresku.ispisiGresku(brojGreske, brojLinije, raw, razloziGreske, putanja);
                     continue;
                 }
 
-                try
+                while (stupci.size() < 4) 
                 {
-                	String ime = GramatikaIJezik.makniNavodnike(stupci.get(0));
-                    String prezime = GramatikaIJezik.makniNavodnike(stupci.get(1));
-                    int oznaka = CsvParser.uInt(stupci.get(2));
-                    String dtRaw = GramatikaIJezik.makniNavodnike(stupci.get(3));
-                    LocalDateTime dt = CsvParser.uDatumVrijeme(dtRaw);
-                    
-                    if (!aranzmani.containsKey(oznaka)) 
-                    {
-                        continue;
-                    }
+                    stupci.add("");
+                }
 
-                    if (dt == null) 
-                    {
-                        rez.dodajRezervaciju(ime, prezime, oznaka, dtRaw);
-                    } 
-                    else 
-                    {
-                        rez.dodajRezervaciju(ime, prezime, oznaka, dt);
-                    }
-                }
-                catch (Exception e) 
-                {
-                    System.out.println("Greška u retku " + brojLinije + ": " + e.getMessage() + ". Redak preskočen.");
-                }
+                String ime = GramatikaIJezik.makniNavodnike(stupci.get(0));
+                String prezime = GramatikaIJezik.makniNavodnike(stupci.get(1));
+                String oznakaAranzmana = stupci.get(2);
+                String datumVrijemeRaw = GramatikaIJezik.makniNavodnike(stupci.get(3));
+
+                RezervacijaCsvRecord record = new RezervacijaCsvRecord(
+                        ime,
+                        prezime,
+                        oznakaAranzmana,
+                        datumVrijemeRaw
+                );
+
+                rezultat.add(record);
             }
-            
-            rez.azurirajStatuseRezervacija(aranzmani);
-        } 
-        catch (IOException e) 
+        }
+        catch (IOException e)
         {
             System.out.println("Greška pri čitanju datoteke rezervacija: " + putanja + " (" + e.getMessage() + ")");
         }
-    }
 
-	
+        return rezultat;
+    }
 }
