@@ -23,12 +23,13 @@ public class Glavna
         String putanjaAranzmani = args[0];
         String putanjaRezervacije = args[1];
 
-        Facade facade = Facade.getInstance();
+        Facade facade = new Facade();
 
-        List<Object[]> aranzmanPodaci = facade.ucitajAranzmane(putanjaAranzmani);
-        List<Object[]> rezervacijaPodaci = facade.ucitajRezervacije(putanjaRezervacije);
+        List<List<String>> aranzmanPodaci = facade.ucitajAranzmane(putanjaAranzmani);
+        List<List<String>> rezervacijaPodaci = facade.ucitajRezervacije(putanjaRezervacije);
 
         TuristickaAgencija ta = TuristickaAgencija.getInstance();
+
         ta.ucitajAranzmane(aranzmanPodaci);
         ta.ucitajRezervacije(rezervacijaPodaci);
 
