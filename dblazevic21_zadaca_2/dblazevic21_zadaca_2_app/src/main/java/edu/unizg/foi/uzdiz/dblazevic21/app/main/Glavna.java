@@ -8,6 +8,7 @@ import java.util.Map;
 import java.util.Scanner;
 
 import edu.unizg.foi.uzdiz.dblazevic21.app.turistickaAgencija.TuristickaAgencija;
+import edu.unizg.foi.uzdiz.dblazevic21.lib.facade.Facade;
 
 public class Glavna
 {
@@ -20,7 +21,6 @@ public class Glavna
         }
 
         Map<String, List<String>> argumenti = new HashMap<>();
-
         provjeriKomandu(args, argumenti);
 
         List<String> datotekeAranzmani = argumenti.get("--ta");
@@ -28,13 +28,40 @@ public class Glavna
 
         System.out.println("\nPokretanje programa...");
 
-        CsvUcitajSingleton csvUcitaj = CsvUcitajSingleton.getInstance();
+        Facade facade = Facade.getInstance();
 
-        ucitajCsvAranzmana(datotekeAranzmani, csvUcitaj);
+        if (datotekeAranzmani == null)
+        {
+            System.out.println("Niste naveli datoteku aranžmana (--ta)!");
+        }
+        else
+        {
+            for (String dat : datotekeAranzmani)
+            {
+                provjeriDatoteku(dat);
+                System.out.println("\nUčitani aranžmani iz " + dat);
+            }
+        }
 
-        TuristickaAgencija.getInstance().setAranzmani(csvUcitaj.getAranzmani());
+        if (datotekeRezervacije == null)
+        {
+            System.out.println("Niste naveli nijednu datoteku s rezervacijama (--rta)!");
+        }
+        else
+        {
+            for (String dat : datotekeRezervacije)
+            {
+                provjeriDatoteku(dat);
+                System.out.println("\nUčitane rezervacije iz " + dat);
+            }
+        }
 
-        ucitajCsvRezervacija(datotekeRezervacije, csvUcitaj);
+        var aranzmanRecords = facade.ucitajAranzmaneSve(datotekeAranzmani);
+        var rezervacijaRecords = facade.ucitajRezervacijeSve(datotekeRezervacije);
+
+        TuristickaAgencija ta = TuristickaAgencija.getInstance();
+        ta.ucitajAranzmaneIzRecorda(aranzmanRecords);
+        ta.ucitajRezervacijeIzRecorda(rezervacijaRecords);
 
         pokreniInteraktivniNacin();
     }
@@ -54,40 +81,6 @@ public class Glavna
             {
                 argumenti.get(currentFlag).add(arg);
             }
-        }
-    }
-
-    public static void ucitajCsvRezervacija(List<String> datotekeRezervacije, CsvUcitajSingleton csvUcitaj)
-    {
-        if (datotekeRezervacije != null)
-        {
-            for (String dat : datotekeRezervacije)
-            {
-                provjeriDatoteku(dat);
-                System.out.println("\nUčitane rezervacije iz " + dat);
-                csvUcitaj.ucitajRezervacije(dat);
-            }
-        }
-        else
-        {
-            System.out.println("Niste naveli nijednu datoteku s rezervacijama (--rta)!");
-        }
-    }
-
-    public static void ucitajCsvAranzmana(List<String> datotekeAranzmani, CsvUcitajSingleton csvUcitaj)
-    {
-        if (datotekeAranzmani != null)
-        {
-            for (String dat : datotekeAranzmani)
-            {
-                provjeriDatoteku(dat);
-                System.out.println("\nUčitani aranžmani iz " + dat);
-                csvUcitaj.ucitajAranzmane(dat);
-            }
-        }
-        else
-        {
-            System.out.println("Niste naveli datoteku aranžmana (--ta)!");
         }
     }
 
