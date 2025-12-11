@@ -8,14 +8,4 @@
   <artifactId>dblazevic21_zadaca_2_lib</artifactId>
   <name>dblazevic21_zadaca_2_lib</name>
   <packaging>jar</packaging>
-  
-<!--  <dependencies>-->
-<!--    <dependency>-->
-<!--      <groupId>org.apache.commons</groupId>-->
-<!--      <artifactId>commons-csv</artifactId>-->
-<!--      <version>1.10.0</version>-->
-<!--    </dependency>-->
-<!--  </dependencies>-->
-  
-  
 </project>
