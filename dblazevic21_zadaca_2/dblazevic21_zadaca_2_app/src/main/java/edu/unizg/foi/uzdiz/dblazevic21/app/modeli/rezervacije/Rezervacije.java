@@ -177,7 +177,8 @@ public class Rezervacije
             {
                 Rezervacija trenutna = rezervacijeOsobe.get(i);
 
-                if (!(trenutna.getStatus() instanceof AktivnaConcreteState))
+                if (trenutna.getStatus() instanceof OtkazanaConcreteState ||
+                    trenutna.getStatus() instanceof OdgodenaConcreteState)
                 {
                     continue;
                 }
@@ -189,7 +190,7 @@ public class Rezervacije
                 {
                     Rezervacija ranija = rezervacijeOsobe.get(j);
 
-                    if (!(ranija.getStatus() instanceof AktivnaConcreteState))
+                    if (ranija.getStatus() instanceof OtkazanaConcreteState)
                     {
                         continue;
                     }
@@ -199,8 +200,13 @@ public class Rezervacije
 
                     if (aranzmaniSePreklapaju(aranzmanRaniji, aranzmanTrenutni))
                     {
-                        trenutna.setStatus(new OdgodenaConcreteState());
-                        break;
+                        if (ranija.getStatus() instanceof AktivnaConcreteState ||
+                            ranija.getStatus() instanceof PrimljenaConcreteState ||
+                            ranija.getStatus() instanceof NaCekanjuConcreteState)
+                        {
+                            trenutna.setStatus(new OdgodenaConcreteState());
+                            break;
+                        }
                     }
                 }
             }

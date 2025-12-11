@@ -13,6 +13,7 @@ import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.aranzmani.AranzmaniBuilderConc
 import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.aranzmani.AranzmaniDirector;
 import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.rezervacije.Rezervacija;
 import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.rezervacije.Rezervacije;
+import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.OtkazanaConcreteState;
 import edu.unizg.foi.uzdiz.dblazevic21.app.utils.DatumParser;
 import edu.unizg.foi.uzdiz.dblazevic21.app.utils.GramatikaIJezikApp;
 
@@ -132,8 +133,7 @@ public class TuristickaAgencija
         rez.azurirajStatuseRezervacija(aranzmani);
     }
 
-    private boolean jeDuplikatRezervacije(Rezervacije rez, String ime, String prezime, 
-            int oznakaAranzmana, LocalDateTime datumVrijeme, String dtRaw)
+    private boolean jeDuplikatRezervacije(Rezervacije rez, String ime, String prezime, int oznakaAranzmana, LocalDateTime datumVrijeme, String dtRaw)
     {
         for (Rezervacija r : rez.getSveRezervacije())
         {
@@ -147,19 +147,9 @@ public class TuristickaAgencija
                 continue;
             }
             
-            if (datumVrijeme != null && r.getDatumVrijeme() != null)
+            if (!(r.getStatus() instanceof OtkazanaConcreteState))
             {
-                if (datumVrijeme.equals(r.getDatumVrijeme()))
-                {
-                    return true;
-                }
-            }
-            else if (dtRaw != null && r.getDatumVrijemeRaw() != null)
-            {
-                if (dtRaw.equals(r.getDatumVrijemeRaw()))
-                {
-                    return true;
-                }
+                return true;
             }
         }
         return false;
