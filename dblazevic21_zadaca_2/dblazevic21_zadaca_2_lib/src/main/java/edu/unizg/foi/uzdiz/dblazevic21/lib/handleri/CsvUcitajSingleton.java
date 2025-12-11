@@ -11,7 +11,8 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 
-public class CsvUcitajSingleton {
+public class CsvUcitajSingleton
+{
 
     private static volatile CsvUcitajSingleton INSTANCE;
     public static int brojGreske = 0;
@@ -21,10 +22,14 @@ public class CsvUcitajSingleton {
 
     private CsvUcitajSingleton() {}
 
-    public static CsvUcitajSingleton getInstance() {
-        if (INSTANCE == null) {
-            synchronized (CsvUcitajSingleton.class) {
-                if (INSTANCE == null) {
+    public static CsvUcitajSingleton getInstance() 
+    {
+        if (INSTANCE == null) 
+        {
+            synchronized (CsvUcitajSingleton.class)
+            {
+                if (INSTANCE == null) 
+                {
                     INSTANCE = new CsvUcitajSingleton();
                 }
             }
@@ -32,52 +37,63 @@ public class CsvUcitajSingleton {
         return INSTANCE;
     }
 
-    public void ucitajAranzmane(String putanja) {
+    public void ucitajAranzmane(String putanja) 
+    {
         List<List<String>> rezultat = ucitajCsv(putanja, 16);
         aranzmani.addAll(rezultat);
     }
 
-    public void ucitajRezervacije(String putanja) {
+    public void ucitajRezervacije(String putanja) 
+    {
         List<List<String>> rezultat = ucitajCsv(putanja, 4);
         rezervacije.addAll(rezultat);
     }
 
-    public List<List<String>> getAranzmani() {
+    public List<List<String>> getAranzmani() 
+    {
         return new ArrayList<>(aranzmani);
     }
 
-    public List<List<String>> getRezervacije() {
+    public List<List<String>> getRezervacije() 
+    {
         return new ArrayList<>(rezervacije);
     }
 
-    private List<List<String>> ucitajCsv(String putanja, int ocekivaniBrojStupaca) {
+    private List<List<String>> ucitajCsv(String putanja, int ocekivaniBrojStupaca)
+    {
         List<List<String>> rezultat = new ArrayList<>();
 
-        try (BufferedReader br = Files.newBufferedReader(Paths.get(putanja), StandardCharsets.UTF_8)) {
+        try (BufferedReader br = Files.newBufferedReader(Paths.get(putanja), StandardCharsets.UTF_8))
+        {
             String linija = br.readLine();
-            if (linija == null) {
+            if (linija == null) 
+            {
                 return rezultat;
             }
 
             int brojLinije = 1;
 
-            while ((linija = br.readLine()) != null) {
+            while ((linija = br.readLine()) != null) 
+            {
                 brojLinije++;
 
                 String raw = linija;
                 linija = linija.trim();
-                if (linija.isEmpty()) {
+                if (linija.isEmpty()) 
+                {
                     continue;
                 }
 
                 List<String> stupci = CsvParser.parseCsvLiniju(linija);
                 List<String> razloziGreske = new ArrayList<>();
 
-                if (stupci.size() != ocekivaniBrojStupaca) {
+                if (stupci.size() != ocekivaniBrojStupaca)
+                {
                     razloziGreske.add("Neispravan broj stupaca: " + stupci.size() + " (očekivano: " + ocekivaniBrojStupaca + ")");
                 }
 
-                if (!razloziGreske.isEmpty()) {
+                if (!razloziGreske.isEmpty()) 
+                {
                     ++brojGreske;
                     IspisiGresku.ispisiGresku(brojGreske, brojLinije, raw, razloziGreske, putanja);
                     continue;
@@ -85,7 +101,9 @@ public class CsvUcitajSingleton {
 
                 rezultat.add(stupci);
             }
-        } catch (IOException e) {
+        } 
+        catch (IOException e) 
+        {
             System.out.println("Greška pri čitanju datoteke: " + putanja + " (" + e.getMessage() + ")");
         }
 

@@ -88,9 +88,18 @@ public class DatumParser
     {
         try 
         {
-            String t = (s == null) ? "" : s.trim();
+        	String t = (s == null) ? "" : s.trim();
             if (t.isEmpty()) return null;
-            DateTimeFormatter csvDatum = DateTimeFormatter.ofPattern("d.M.yyyy").withLocale(Locale.ROOT);
+            if (t.endsWith("."))
+            {
+                t = t.substring(0, t.length() - 1);
+            }
+
+            DateTimeFormatter csvDatum = new DateTimeFormatterBuilder()
+                    .parseLenient()
+                    .appendPattern("d.M.yyyy")
+                    .optionalStart().appendLiteral('.').optionalEnd()
+                    .toFormatter(Locale.ROOT);
             return LocalDate.parse(t, csvDatum);
         } 
         catch (Exception e) 

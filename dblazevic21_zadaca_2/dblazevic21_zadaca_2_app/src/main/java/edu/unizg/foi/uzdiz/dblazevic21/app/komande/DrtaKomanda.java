@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import edu.unizg.foi.uzdiz.dblazevic21.app.enumeracije.StatusRezervacije;
 import edu.unizg.foi.uzdiz.dblazevic21.app.ispis.FormaterZaIspise;
 import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.aranzmani.Aranzmani;
 import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.rezervacije.Rezervacija;
@@ -79,17 +80,20 @@ public class DrtaKomanda implements Komanda
         
         for (Rezervacija r : postojeceRezervacije)
         {
-        	if (r.getOznakaAranzmana() == oznaka)
-        	{
-        		System.out.println("Osoba " + ime + " " + prezime + " već ima rezervaciju za aranžman " + oznaka + ".");
-				return;
-        	}
-        	
-        	if (r.getDatumVrijeme().equals(datumVrijeme))
-        	{
-        		System.out.println("Osoba " + ime + " " + prezime + " već ima rezervaciju u terminu " + FormaterZaIspise.fmtDatumVrijeme(datumVrijeme, r.getDatumVrijemeRaw()) + ".");
-				return;
-        	}
+        	if (r.getStatus() != StatusRezervacije.OTKAZANA)
+			{
+        		if (r.getOznakaAranzmana() == oznaka)
+            	{
+            		System.out.println("Osoba " + ime + " " + prezime + " već ima rezervaciju za aranžman " + oznaka + ".");
+    				return;
+            	}
+            	
+            	if (r.getDatumVrijeme().equals(datumVrijeme))
+            	{
+            		System.out.println("Osoba " + ime + " " + prezime + " već ima rezervaciju u terminu " + FormaterZaIspise.fmtDatumVrijeme(datumVrijeme, r.getDatumVrijemeRaw()) + ".");
+    				return;
+            	}
+			}
         }
         
         try 

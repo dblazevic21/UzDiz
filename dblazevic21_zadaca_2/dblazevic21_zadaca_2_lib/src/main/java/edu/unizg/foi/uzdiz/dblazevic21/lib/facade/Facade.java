@@ -6,11 +6,27 @@ import java.util.List;
 
 public class Facade
 {
+    private static volatile Facade INSTANCE;
     private final CsvUcitajSingleton csvHandler;
 
-    
-    public Facade() {
+    private Facade()
+    {
         this.csvHandler = CsvUcitajSingleton.getInstance();
+    }
+
+    public static Facade getInstance()
+    {
+        if (INSTANCE == null)
+        {
+            synchronized (Facade.class)
+            {
+                if (INSTANCE == null)
+                {
+                    INSTANCE = new Facade();
+                }
+            }
+        }
+        return INSTANCE;
     }
 
     public List<List<String>> ucitajAranzmane(String putanja)
@@ -19,13 +35,13 @@ public class Facade
         return csvHandler.getAranzmani();
     }
 
-    public List<List<String>> ucitajRezervacije(String putanja) 
+    public List<List<String>> ucitajRezervacije(String putanja)
     {
         csvHandler.ucitajRezervacije(putanja);
         return csvHandler.getRezervacije();
     }
 
-    public int getBrojGresaka() 
+    public int getBrojGresaka()
     {
         return CsvUcitajSingleton.brojGreske;
     }
