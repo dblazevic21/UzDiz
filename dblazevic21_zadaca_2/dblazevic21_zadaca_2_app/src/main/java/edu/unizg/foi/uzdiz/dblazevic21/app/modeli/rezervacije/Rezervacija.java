@@ -2,7 +2,7 @@ package edu.unizg.foi.uzdiz.dblazevic21.app.modeli.rezervacije;
 
 import java.time.LocalDateTime;
 
-import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.PrimljenaConcreteState;
+import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.NovaConcreteState;
 import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.RezervacijeState;
 
 public class Rezervacija 
@@ -25,7 +25,7 @@ public class Rezervacija
         this.oznakaAranzmana = oznakaAranzmana;
         this.datumVrijeme = datumVrijeme;
         this.datumVrijemeRaw = null;
-        this.status = new PrimljenaConcreteState();
+        this.status = new NovaConcreteState();
     }
 
     public Rezervacija(long redniBroj, String ime, String prezime, int oznakaAranzmana, String datumVrijemeRaw) 
@@ -36,7 +36,7 @@ public class Rezervacija
         this.oznakaAranzmana = oznakaAranzmana;
         this.datumVrijeme = null;
         this.datumVrijemeRaw = datumVrijemeRaw;
-        this.status = new PrimljenaConcreteState();
+        this.status = new NovaConcreteState();
     }
 
     public long getRedniBroj() 
@@ -144,4 +144,3 @@ public class Rezervacija
     	this.otkazanoAt = otkazanoAt; 
     }
 }
-

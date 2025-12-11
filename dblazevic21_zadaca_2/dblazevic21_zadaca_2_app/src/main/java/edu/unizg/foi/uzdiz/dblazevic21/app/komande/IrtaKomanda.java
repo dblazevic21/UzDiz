@@ -7,13 +7,17 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import edu.unizg.foi.uzdiz.dblazevic21.app.enumeracije.StatusRezervacije;
 import edu.unizg.foi.uzdiz.dblazevic21.app.ispis.FormaterZaIspise;
 import edu.unizg.foi.uzdiz.dblazevic21.app.ispis.StatusFormater;
 import edu.unizg.foi.uzdiz.dblazevic21.app.ispis.TablicaPrinter;
 import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.aranzmani.Aranzmani;
 import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.rezervacije.Rezervacija;
 import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.rezervacije.Rezervacije;
+import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.AktivnaConcreteState;
+import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.NaCekanjuConcreteState;
+import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.OtkazanaConcreteState;
+import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.PrimljenaConcreteState;
+import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.RezervacijeState;
 
 public class IrtaKomanda implements Komanda 
 {
@@ -75,11 +79,17 @@ public class IrtaKomanda implements Komanda
         boolean dodajOtkazan = flags.contains("O");
 
         List<Rezervacija> zaIspis = ulaz.stream()
-                .filter(r -> (dodajPA && (r.getStatus() == StatusRezervacije.PRIMLJENA || r.getStatus() == StatusRezervacije.AKTIVNA))
-                        || (dodajČekaj && r.getStatus() == StatusRezervacije.NA_CEKANJU)
-                        || (dodajOtkazan && r.getStatus() == StatusRezervacije.OTKAZANA))
+                .filter(r -> {
+                    RezervacijeState status = r.getStatus();
+                    boolean isPrimljenaAktivna = (status instanceof PrimljenaConcreteState || status instanceof AktivnaConcreteState);
+                    boolean isNaCekanju = (status instanceof NaCekanjuConcreteState);
+                    boolean isOtkazana = (status instanceof OtkazanaConcreteState);
+                    
+                    return (dodajPA && isPrimljenaAktivna)
+                            || (dodajČekaj && isNaCekanju)
+                            || (dodajOtkazan && isOtkazana);
+                })
                 .collect(Collectors.toList());
-
         if (zaIspis.isEmpty()) 
         {
             System.out.println("Nema rezervacija koje zadovoljavaju kriterij za aranžman " + oznaka + ".");

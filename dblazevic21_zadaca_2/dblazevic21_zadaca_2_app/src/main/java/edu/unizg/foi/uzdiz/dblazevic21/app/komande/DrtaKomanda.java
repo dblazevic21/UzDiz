@@ -108,4 +108,3 @@ public class DrtaKomanda implements Komanda
         }
 	}
 }
-

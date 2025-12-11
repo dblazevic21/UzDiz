@@ -8,10 +8,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
 
-import edu.unizg.foi.uzdiz.dblazevic21.app.enumeracije.StatusRezervacije;
 import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.aranzmani.Aranzmani;
 import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.AktivnaConcreteState;
 import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.NaCekanjuConcreteState;
+import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.OdgodenaConcreteState;
 import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.OtkazanaConcreteState;
 import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.PrimljenaConcreteState;
 
@@ -81,7 +81,7 @@ public class Rezervacije
     
     public void azurirajStatuseRezervacija(Map<Integer, Aranzmani> aranzmani)
     {
-        Map<Integer, List<Rezervacija>> rezervacijePoAranzmanu = new HashMap<>();
+    	Map<Integer, List<Rezervacija>> rezervacijePoAranzmanu = new HashMap<>();
 
         for (Rezervacija rezervacija : sveRezervacije)
         {
@@ -100,6 +100,8 @@ public class Rezervacije
             int oznakaAranzmana = entry.getKey();
             List<Rezervacija> rezervacijeZaAranzman = entry.getValue();
             Aranzmani aranzman = aranzmani.get(oznakaAranzmana);
+
+            if (aranzman == null) continue;
 
             rezervacijeZaAranzman.sort(Comparator
                     .comparing(Rezervacija::getDatumVrijeme, LDT_ORDER)
@@ -140,6 +142,81 @@ public class Rezervacije
                 }
             }
         }
+        azurirajOdgodeneRezervacije(aranzmani);
+    }
+    
+    private void azurirajOdgodeneRezervacije(Map<Integer, Aranzmani> aranzmani)
+    {
+        Map<String, List<Rezervacija>> rezervacijePoOsobi = new HashMap<>();
+
+        for (Rezervacija r : sveRezervacije)
+        {
+            if (r.getStatus() instanceof OtkazanaConcreteState)
+            {
+                continue;
+            }
+
+            String kljuc = (r.getIme() + "_" + r.getPrezime()).toLowerCase();
+            rezervacijePoOsobi
+                    .computeIfAbsent(kljuc, k -> new ArrayList<>())
+                    .add(r);
+        }
+
+        for (List<Rezervacija> rezervacijeOsobe : rezervacijePoOsobi.values())
+        {
+            if (rezervacijeOsobe.size() < 2)
+            {
+                continue;
+            }
+
+            rezervacijeOsobe.sort(Comparator
+                    .comparing(Rezervacija::getDatumVrijeme, LDT_ORDER)
+                    .thenComparingLong(Rezervacija::getRedniBroj));
+
+            for (int i = 0; i < rezervacijeOsobe.size(); i++)
+            {
+                Rezervacija trenutna = rezervacijeOsobe.get(i);
+
+                if (!(trenutna.getStatus() instanceof AktivnaConcreteState))
+                {
+                    continue;
+                }
+
+                Aranzmani aranzmanTrenutni = aranzmani.get(trenutna.getOznakaAranzmana());
+                if (aranzmanTrenutni == null) continue;
+
+                for (int j = 0; j < i; j++)
+                {
+                    Rezervacija ranija = rezervacijeOsobe.get(j);
+
+                    if (!(ranija.getStatus() instanceof AktivnaConcreteState))
+                    {
+                        continue;
+                    }
+
+                    Aranzmani aranzmanRaniji = aranzmani.get(ranija.getOznakaAranzmana());
+                    if (aranzmanRaniji == null) continue;
+
+                    if (aranzmaniSePreklapaju(aranzmanRaniji, aranzmanTrenutni))
+                    {
+                        trenutna.setStatus(new OdgodenaConcreteState());
+                        break;
+                    }
+                }
+            }
+        }
+    }
+    
+    private boolean aranzmaniSePreklapaju(Aranzmani a1, Aranzmani a2)
+    {
+        if (a1.getPocetniDatum() == null || a1.getZavrsniDatum() == null ||
+            a2.getPocetniDatum() == null || a2.getZavrsniDatum() == null)
+        {
+            return false;
+        }
+
+        return !a1.getPocetniDatum().isAfter(a2.getZavrsniDatum()) &&
+               !a2.getPocetniDatum().isAfter(a1.getZavrsniDatum());
     }
     
     public boolean otkaziRezervaciju(int oznakaAranzmana, String ime, String prezime, LocalDateTime when) 
@@ -148,10 +225,10 @@ public class Rezervacije
         String p = (prezime == null) ? "" : prezime.trim();
 
         Rezervacija cilj = sveRezervacije.stream()
-        		.filter(r -> r.getOznakaAranzmana() == oznakaAranzmana
-		                && equalsIgnorirajCase(r.getIme(), i)
-		                && equalsIgnorirajCase(r.getPrezime(), p)
-		                && !(r.getStatus() instanceof OtkazanaConcreteState))
+                .filter(r -> r.getOznakaAranzmana() == oznakaAranzmana
+                        && equalsIgnorirajCase(r.getIme(), i)
+                        && equalsIgnorirajCase(r.getPrezime(), p)
+                        && !(r.getStatus() instanceof OtkazanaConcreteState))
                 .min(Comparator
                         .comparing(Rezervacija::getDatumVrijeme, LDT_ORDER)
                         .thenComparingLong(Rezervacija::getRedniBroj))
@@ -159,22 +236,55 @@ public class Rezervacije
 
         if (cilj == null) return false;
 
+        boolean bilaAktivna = cilj.getStatus() instanceof AktivnaConcreteState;
+
         cilj.setStatus(new OtkazanaConcreteState());
         cilj.setOtkazanoAt(when != null ? when : LocalDateTime.now());
 
-        Rezervacija generirajAktivna = sveRezervacije.stream()
-                .filter(r -> r.getOznakaAranzmana() == oznakaAranzmana
-			 			&& r.getStatus() instanceof NaCekanjuConcreteState)
+        if (bilaAktivna)
+        {
+            Rezervacija generirajAktivna = sveRezervacije.stream()
+                    .filter(r -> r.getOznakaAranzmana() == oznakaAranzmana
+                            && r.getStatus() instanceof NaCekanjuConcreteState)
+                    .min(Comparator
+                            .comparing(Rezervacija::getDatumVrijeme, LDT_ORDER)
+                            .thenComparingLong(Rezervacija::getRedniBroj))
+                    .orElse(null);
+
+            if (generirajAktivna != null) 
+            {
+                generirajAktivna.setStatus(new AktivnaConcreteState());
+            }
+            promakniOdgodenuRezervaciju(i, p, cilj);
+        }
+
+        return true;
+    }
+
+    private void promakniOdgodenuRezervaciju(String ime, String prezime, Rezervacija otkazana)
+    {
+        Rezervacija odgodena = sveRezervacije.stream()
+                .filter(r -> equalsIgnorirajCase(r.getIme(), ime)
+                        && equalsIgnorirajCase(r.getPrezime(), prezime)
+                        && r.getStatus() instanceof OdgodenaConcreteState)
                 .min(Comparator
                         .comparing(Rezervacija::getDatumVrijeme, LDT_ORDER)
                         .thenComparingLong(Rezervacija::getRedniBroj))
                 .orElse(null);
 
-        if (generirajAktivna != null) 
+        if (odgodena != null)
         {
-            generirajAktivna.setStatus(new AktivnaConcreteState());
+            boolean imaPreklapanje = sveRezervacije.stream()
+                    .anyMatch(r -> equalsIgnorirajCase(r.getIme(), ime)
+                            && equalsIgnorirajCase(r.getPrezime(), prezime)
+                            && r != odgodena
+                            && r.getStatus() instanceof AktivnaConcreteState);
+
+            if (!imaPreklapanje)
+            {
+                odgodena.setStatus(new AktivnaConcreteState());
+            }
         }
-        return true;
     }
 
     private boolean equalsIgnorirajCase(String rijec1, String rijec2)
@@ -185,4 +295,3 @@ public class Rezervacije
         return prvaRijec.equalsIgnoreCase(drugaRijec);
     }
 }
-
