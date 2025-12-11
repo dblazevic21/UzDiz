@@ -20,7 +20,7 @@ public class UPripremiConcreteState implements AranzmaniState
     @Override
     public void otkazi(Aranzmani aranzman) 
     {
-        aranzman.setStatus(new OtkazanAranzmanConcreteState());
+        aranzman.setStatus(new OtkazanConcreteState());
     }
 
     @Override

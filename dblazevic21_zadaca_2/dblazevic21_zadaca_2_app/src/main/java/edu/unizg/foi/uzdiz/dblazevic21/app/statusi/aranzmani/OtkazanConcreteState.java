@@ -2,7 +2,7 @@ package edu.unizg.foi.uzdiz.dblazevic21.app.statusi.aranzmani;
 
 import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.aranzmani.Aranzmani;
 
-public class OtkazanAranzmanConcreteState implements AranzmaniState 
+public class OtkazanConcreteState implements AranzmaniState 
 {
     @Override
     public void azuriraj(Aranzmani aranzman, int brojRezervacija) { }

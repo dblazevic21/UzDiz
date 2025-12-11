@@ -3,6 +3,9 @@ package edu.unizg.foi.uzdiz.dblazevic21.app.modeli.aranzmani;
 import java.time.LocalDate;
 import java.time.LocalTime;
 
+import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.aranzmani.AranzmaniState;
+import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.aranzmani.UPripremiConcreteState;
+
 public class Aranzmani 
 {
 	private int oznaka;
@@ -21,6 +24,8 @@ public class Aranzmani
 	private int brojDorucka;
 	private int brojRucka;
 	private int brojVecera;
+	
+	private AranzmaniState status;
     
 	public Aranzmani() {}
 	
@@ -59,6 +64,7 @@ public class Aranzmani
 		this.brojDorucka = brojDorucka;
 		this.brojRucka = brojRucka;
 		this.brojVecera = brojVecera;
+		this.status = new UPripremiConcreteState();
 	}
 	
 	public int getOznaka() 
@@ -220,4 +226,27 @@ public class Aranzmani
 	{
 		return this.brojVecera = brojVecera;
 	}
+	
+	public AranzmaniState getStatus() 
+	{ 
+		return status; 
+	}
+    public void setStatus(AranzmaniState status) 
+    {
+    	this.status = status; 
+    }
+    public String getStatusNaziv() 
+    { 
+    	return status.getNaziv(); 
+    }
+
+    public void azurirajStatus(int brojRezervacija) 
+    {
+        status.azuriraj(this, brojRezervacija);
+    }
+
+    public void otkazi() 
+    {
+        status.otkazi(this);
+    }
 }
