@@ -10,6 +10,13 @@ import java.util.stream.Collectors;
 
 import edu.unizg.foi.uzdiz.dblazevic21.app.enumeracije.StatusRezervacije;
 import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.aranzmani.Aranzmani;
+<<<<<<< HEAD
+=======
+import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.AktivnaConcreteState;
+import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.NaCekanjuConcreteState;
+import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.OtkazanaConcreteState;
+import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.PrimljenaConcreteState;
+>>>>>>> b893a38 (Valjda dobar state sada, prca me Linux Git najveće smeće na svitu)
 
 public class Rezervacije 
 {
@@ -81,7 +88,11 @@ public class Rezervacije
 
         for (Rezervacija rezervacija : sveRezervacije)
         {
+<<<<<<< HEAD
             if (rezervacija.getStatus() == StatusRezervacije.OTKAZANA)
+=======
+            if (rezervacija.getStatus() instanceof OtkazanaConcreteState)
+>>>>>>> b893a38 (Valjda dobar state sada, prca me Linux Git najveće smeće na svitu)
             {
                 continue;
             }
@@ -109,14 +120,22 @@ public class Rezervacije
             {
                 for (Rezervacija rezervacija : rezervacijeZaAranzman)
                 {
+<<<<<<< HEAD
                     rezervacija.setStatus(StatusRezervacije.PRIMLJENA);
+=======
+                    rezervacija.setStatus(new PrimljenaConcreteState());
+>>>>>>> b893a38 (Valjda dobar state sada, prca me Linux Git najveće smeće na svitu)
                 }
             }
             else if (brojRezervacija <= maksBrojPutnika)
             {
                 for (Rezervacija rezervacija : rezervacijeZaAranzman)
                 {
+<<<<<<< HEAD
                     rezervacija.setStatus(StatusRezervacije.AKTIVNA);
+=======
+                    rezervacija.setStatus(new AktivnaConcreteState());
+>>>>>>> b893a38 (Valjda dobar state sada, prca me Linux Git najveće smeće na svitu)
                 }
             }
             else
@@ -126,12 +145,20 @@ public class Rezervacije
                 {
                     if (aktivniCount < maksBrojPutnika)
                     {
+<<<<<<< HEAD
                         rezervacija.setStatus(StatusRezervacije.AKTIVNA);
+=======
+                        rezervacija.setStatus(new AktivnaConcreteState());
+>>>>>>> b893a38 (Valjda dobar state sada, prca me Linux Git najveće smeće na svitu)
                         aktivniCount++;
                     }
                     else
                     {
+<<<<<<< HEAD
                         rezervacija.setStatus(StatusRezervacije.NA_CEKANJU);
+=======
+                        rezervacija.setStatus(new NaCekanjuConcreteState());
+>>>>>>> b893a38 (Valjda dobar state sada, prca me Linux Git najveće smeće na svitu)
                     }
                 }
             }
@@ -144,10 +171,17 @@ public class Rezervacije
         String p = (prezime == null) ? "" : prezime.trim();
 
         Rezervacija cilj = sveRezervacije.stream()
+<<<<<<< HEAD
                 .filter(r -> r.getOznakaAranzmana() == oznakaAranzmana
                         && equalsIgnorirajCase(r.getIme(), i)
                         && equalsIgnorirajCase(r.getPrezime(), p)
                         && r.getStatus() != StatusRezervacije.OTKAZANA)
+=======
+        		.filter(r -> r.getOznakaAranzmana() == oznakaAranzmana
+		                && equalsIgnorirajCase(r.getIme(), i)
+		                && equalsIgnorirajCase(r.getPrezime(), p)
+		                && !(r.getStatus() instanceof OtkazanaConcreteState))
+>>>>>>> b893a38 (Valjda dobar state sada, prca me Linux Git najveće smeće na svitu)
                 .min(Comparator
                         .comparing(Rezervacija::getDatumVrijeme, LDT_ORDER)
                         .thenComparingLong(Rezervacija::getRedniBroj))
@@ -155,12 +189,20 @@ public class Rezervacije
 
         if (cilj == null) return false;
 
+<<<<<<< HEAD
         cilj.setStatus(StatusRezervacije.OTKAZANA);
+=======
+        cilj.setStatus(new OtkazanaConcreteState());
+>>>>>>> b893a38 (Valjda dobar state sada, prca me Linux Git najveće smeće na svitu)
         cilj.setOtkazanoAt(when != null ? when : LocalDateTime.now());
 
         Rezervacija generirajAktivna = sveRezervacije.stream()
                 .filter(r -> r.getOznakaAranzmana() == oznakaAranzmana
+<<<<<<< HEAD
                         && r.getStatus() == StatusRezervacije.NA_CEKANJU)
+=======
+			 			&& r.getStatus() instanceof NaCekanjuConcreteState)
+>>>>>>> b893a38 (Valjda dobar state sada, prca me Linux Git najveće smeće na svitu)
                 .min(Comparator
                         .comparing(Rezervacija::getDatumVrijeme, LDT_ORDER)
                         .thenComparingLong(Rezervacija::getRedniBroj))
@@ -168,7 +210,11 @@ public class Rezervacije
 
         if (generirajAktivna != null) 
         {
+<<<<<<< HEAD
             generirajAktivna.setStatus(StatusRezervacije.AKTIVNA);
+=======
+            generirajAktivna.setStatus(new AktivnaConcreteState());
+>>>>>>> b893a38 (Valjda dobar state sada, prca me Linux Git najveće smeće na svitu)
         }
         return true;
     }
