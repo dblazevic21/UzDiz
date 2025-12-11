@@ -109,11 +109,14 @@ public class TuristickaAgencija
                         dtRaw.contains(" ") ? dtRaw.split(" ", 2)[1] : ""
                 );
 
+<<<<<<< HEAD
                 if (jeDuplikatRezervacije(rez, ime, prezime, oznakaAranzmana, datumVrijeme, dtRaw))
                 {
                     continue;
                 }
 
+=======
+>>>>>>> refs/remotes/origin/main
                 if (datumVrijeme != null)
                 {
                     rez.dodajRezervaciju(ime, prezime, oznakaAranzmana, datumVrijeme);
@@ -132,6 +135,7 @@ public class TuristickaAgencija
         rez.azurirajStatuseRezervacija(aranzmani);
     }
 
+<<<<<<< HEAD
     private boolean jeDuplikatRezervacije(Rezervacije rez, String ime, String prezime, 
             int oznakaAranzmana, LocalDateTime datumVrijeme, String dtRaw)
     {
@@ -173,6 +177,8 @@ public class TuristickaAgencija
         return prvaRijec.equalsIgnoreCase(drugaRijec);
     }
 
+=======
+>>>>>>> refs/remotes/origin/main
     private int uInt(String s)
     {
         try
