@@ -1,252 +1,318 @@
 package edu.unizg.foi.uzdiz.dblazevic21.app.modeli.aranzmani;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
 
+import edu.unizg.foi.uzdiz.dblazevic21.app.composite.TuristickiElement;
+import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.rezervacije.Rezervacija;
 import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.aranzmani.AranzmaniState;
 import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.aranzmani.UPripremiConcreteState;
+import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.rezervacije.AktivnaConcreteState;
+import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.rezervacije.NaCekanjuConcreteState;
+import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.rezervacije.OtkazanaConcreteState;
+import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.rezervacije.PrimljenaConcreteState;
 
-public class Aranzmani 
+public class Aranzmani implements TuristickiElement
 {
-	private int oznaka;
-	private String naziv;
-	private String program;
-	private LocalDate pocetniDatum;
-	private LocalDate zavrsniDatum;
-	private LocalTime vrijemeKretanja;
-	private LocalTime vrijemePovratka;
-	private float cijena;
-	private int minBrojPutnika;
-	private int maksBrojPutnika;
-	private int brojNocenja;
-	private float doplataSobe;
-	private String prijevoz;
-	private int brojDorucka;
-	private int brojRucka;
-	private int brojVecera;
-	
-	private AranzmaniState status;
+    private final int oznaka;
+    private final String naziv;
+    private final String program;
+    private final LocalDate pocetniDatum;
+    private final LocalDate zavrsniDatum;
+    private final LocalTime vrijemeKretanja;
+    private final LocalTime vrijemePovratka;
+    private final float cijena;
+    private final int minBrojPutnika;
+    private final int maksBrojPutnika;
+    private final int brojNocenja;
+    private final float doplataSobe;
+    private final String prijevoz;
+    private final int brojDorucka;
+    private final int brojRucka;
+    private final int brojVecera;
+
+    private AranzmaniState status;
     
-	public Aranzmani() {}
-	
-	public Aranzmani(
-			int oznaka,
-			String naziv, 
-			String program, 
-			LocalDate pocetniDatum, 
-			LocalDate zavrsniDatum,
-			LocalTime vrijemeKretanja, 
-			LocalTime vrijemePovratka, 
-			float cijena, 
-			int minBrojPutnika, 
-			int maksBrojPutnika,
-			int brojNocenja, 
-			float doplataSobe, 
-			String prijevoz, 
-			int brojDorucka, 
-			int brojRucka, 
-			int brojVecera
-			) 
-	{
-		this.oznaka = oznaka;
-		this.naziv = naziv;
-		this.program = program;
-		this.pocetniDatum = pocetniDatum;
-		this.zavrsniDatum = zavrsniDatum;
-		this.vrijemeKretanja = vrijemeKretanja;
-		this.vrijemePovratka = vrijemePovratka;
-		this.cijena = cijena;
-		this.minBrojPutnika = minBrojPutnika;
-		this.maksBrojPutnika = maksBrojPutnika;
-		this.brojNocenja = brojNocenja;
-		this.doplataSobe = doplataSobe;
-		this.prijevoz = prijevoz;
-		this.brojDorucka = brojDorucka;
-		this.brojRucka = brojRucka;
-		this.brojVecera = brojVecera;
-		this.status = new UPripremiConcreteState();
-	}
-	
-	public int getOznaka() 
-	{
-		return oznaka;
-	}
-	
-	public int setOznaka(int oznaka) 
-	{
-		return this.oznaka = oznaka;
-	}
-	
-	public String getNaziv()
-	{
-		return naziv;
-	}
-	
-	public String setNaziv(String naziv) 
-	{
-		return this.naziv = naziv;
-	}
-	
-	public String getProgram() 
-	{
-		return program;
-	}
-	
-	public String setProgram(String program) 
-	{
-		return this.program = program;
-	}
-	
-	public LocalDate getPocetniDatum() 
-	{
-		return pocetniDatum;
-	}
-	
-	public LocalDate setPocetniDatum(LocalDate pocetniDatum) 
-	{
-		return this.pocetniDatum = pocetniDatum;
-	}
-	
-	public LocalDate getZavrsniDatum() 
-	{
-		return zavrsniDatum;
-	}
-	
-	public LocalDate setZavrsniDatum(LocalDate zavrsniDatum) 
-	{
-		return this.zavrsniDatum = zavrsniDatum;
-	}
-	
-	public LocalTime getVrijemeKretanja() 
-	{
-		return vrijemeKretanja;
-	}
-	
-	public LocalTime setVrijemeKretanja(LocalTime vrijemeKretanja) 
-	{
-		return this.vrijemeKretanja = vrijemeKretanja;
-	}
-	
-	public LocalTime getVrijemePovratka() 
-	{
-		return vrijemePovratka;
-	}
-	
-	public LocalTime setVrijemePovratka(LocalTime vrijemePovratka) 
-	{
-		return this.vrijemePovratka = vrijemePovratka;
-	}
-	
-	public float getCijena() 
-	{
-		return cijena;
-	}
-	
-	public float setCijena(float cijena) 
-	{
-		return this.cijena = cijena;
-	}
-	
-	public int getMinBrojPutnika() 
-	{
-		return minBrojPutnika;
-	}
-	
-	public int setMinBrojPutnika(int minBrojPutnika) 
-	{
-		return this.minBrojPutnika = minBrojPutnika;
-	}
-	
-	public int getMaksBrojPutnika() 
-	{
-		return maksBrojPutnika;
-	}
-	
-	public int setMaksBrojPutnika(int maksBrojPutnika) 
-	{
-		return this.maksBrojPutnika = maksBrojPutnika;
-	}
-	
-	public int getBrojNocenja() 
-	{
-		return brojNocenja;
-	}
-	
-	public int setBrojNocenja(int brojNocenja) 
-	{
-		return this.brojNocenja = brojNocenja;
-	}
-	
-	public float getDoplataSobe() 
-	{
-		return doplataSobe;
-	}
-	
-	public float setDoplataSobe(float doplataSobe) 
-	{
-		return this.doplataSobe = doplataSobe;
-	}
-	
-	public String getPrijevoz() 
-	{
-		return prijevoz;
-	}
-	
-	public String setPrijevoz(String prijevoz) 
-	{
-		return this.prijevoz = prijevoz;
-	}
-	
-	public int getBrojDorucka() 
-	{
-		return brojDorucka;
-	}
-	
-	public int setBrojDorucka(int brojDorucka) 
-	{
-		return this.brojDorucka = brojDorucka;
-	}
-	
-	public int getBrojRucka() 
-	{
-		return brojRucka;
-	}
-	
-	public int setBrojRucka(int brojRucka) 
-	{
-		return this.brojRucka = brojRucka;
-	}
-	
-	public int getBrojVecera() 
-	{
-		return brojVecera;
-	}
-	
-	public int setBrojVecera(int brojVecera) 
-	{
-		return this.brojVecera = brojVecera;
-	}
-	
-	public AranzmaniState getStatus() 
-	{ 
-		return status; 
-	}
-    public void setStatus(AranzmaniState status) 
+    private final List<Rezervacija> rezervacije = new ArrayList<>();
+    private long brojacRezervacija = 0;
+    
+    private static final Comparator<LocalDateTime> LDT_ORDER = 
+        Comparator.nullsLast(Comparator.<LocalDateTime>naturalOrder());
+
+    public Aranzmani(int oznaka, String naziv, String program, LocalDate pocetniDatum,
+                     LocalDate zavrsniDatum, LocalTime vrijemeKretanja, LocalTime vrijemePovratka,
+                     float cijena, int minBrojPutnika, int maksBrojPutnika, int brojNocenja,
+                     float doplataSobe, String prijevoz, int brojDorucka, int brojRucka, int brojVecera) 
     {
-    	this.status = status; 
+        this.oznaka = oznaka;
+        this.naziv = naziv;
+        this.program = program;
+        this.pocetniDatum = pocetniDatum;
+        this.zavrsniDatum = zavrsniDatum;
+        this.vrijemeKretanja = vrijemeKretanja;
+        this.vrijemePovratka = vrijemePovratka;
+        this.cijena = cijena;
+        this.minBrojPutnika = minBrojPutnika;
+        this.maksBrojPutnika = maksBrojPutnika;
+        this.brojNocenja = brojNocenja;
+        this.doplataSobe = doplataSobe;
+        this.prijevoz = prijevoz;
+        this.brojDorucka = brojDorucka;
+        this.brojRucka = brojRucka;
+        this.brojVecera = brojVecera;
+        this.status = new UPripremiConcreteState();
     }
-    public String getStatusNaziv() 
-    { 
-    	return status.getNaziv(); 
+    
+    @Override
+    public String getOpis() 
+    {
+        return "Aranžman: " + naziv + " (" + oznaka + ") - " + rezervacije.size() + " rezervacija";
     }
 
-    public void azurirajStatus(int brojRezervacija) 
+    @Override
+    public int getBrojOsoba() 
     {
+        return (int) rezervacije.stream()
+                .filter(r -> !(r.getStatus() instanceof OtkazanaConcreteState))
+                .count();
+    }
+
+    public void dodajRezervaciju(String ime, String prezime, LocalDateTime datumVrijeme) 
+    {
+        Rezervacija r = new Rezervacija(++brojacRezervacija, ime, prezime, this.oznaka, datumVrijeme);
+        rezervacije.add(r);
+        azurirajStatuseRezervacija();
+    }
+
+    public void dodajRezervaciju(String ime, String prezime, String datumVrijemeRaw) 
+    {
+        Rezervacija r = new Rezervacija(++brojacRezervacija, ime, prezime, this.oznaka, datumVrijemeRaw);
+        rezervacije.add(r);
+        azurirajStatuseRezervacija();
+    }
+    
+    public void dodajRezervaciju(Rezervacija rezervacija)
+    {
+        rezervacije.add(rezervacija);
+    }
+
+    public boolean ukloniRezervaciju(String ime, String prezime) 
+    {
+        Rezervacija cilj = rezervacije.stream()
+                .filter(r -> equalsIgnorirajCase(r.getIme(), ime)
+                        && equalsIgnorirajCase(r.getPrezime(), prezime)
+                        && !(r.getStatus() instanceof OtkazanaConcreteState))
+                .min(Comparator
+                        .comparing(Rezervacija::getDatumVrijeme, LDT_ORDER)
+                        .thenComparingLong(Rezervacija::getRedniBroj))
+                .orElse(null);
+
+        if (cilj == null) 
+        {
+            return false;
+        }
+
+        boolean bilaAktivna = cilj.getStatus() instanceof AktivnaConcreteState;
+        
+        cilj.setStatus(new OtkazanaConcreteState());
+        cilj.setOtkazanoAt(LocalDateTime.now());
+
+        if (bilaAktivna) 
+        {
+            promovirajSaCekanja();
+        }
+        
+        azurirajStatuseRezervacija();
+        return true;
+    }
+
+    public List<Rezervacija> getRezervacije() 
+    {
+        return new ArrayList<>(rezervacije);
+    }
+
+    public List<Rezervacija> getAktivneRezervacije() 
+    {
+        return rezervacije.stream()
+                .filter(r -> !(r.getStatus() instanceof OtkazanaConcreteState))
+                .sorted(Comparator
+                        .comparing(Rezervacija::getDatumVrijeme, LDT_ORDER)
+                        .thenComparingLong(Rezervacija::getRedniBroj))
+                .collect(Collectors.toList());
+    }
+
+    public void azurirajStatuseRezervacija() 
+    {
+        List<Rezervacija> aktivneRez = rezervacije.stream()
+                .filter(r -> !(r.getStatus() instanceof OtkazanaConcreteState))
+                .sorted(Comparator
+                        .comparing(Rezervacija::getDatumVrijeme, LDT_ORDER)
+                        .thenComparingLong(Rezervacija::getRedniBroj))
+                .collect(Collectors.toList());
+
+        int brojRezervacija = aktivneRez.size();
+
+        if (brojRezervacija < minBrojPutnika) 
+        {
+            for (Rezervacija r : aktivneRez) 
+            {
+                r.setStatus(new PrimljenaConcreteState());
+            }
+        } 
+        else if (brojRezervacija <= maksBrojPutnika) 
+        {
+            for (Rezervacija r : aktivneRez) 
+            {
+                r.setStatus(new AktivnaConcreteState());
+            }
+        } 
+        else 
+        {
+            int aktivniCount = 0;
+            for (Rezervacija r : aktivneRez) 
+            {
+                if (aktivniCount < maksBrojPutnika) 
+                {
+                    r.setStatus(new AktivnaConcreteState());
+                    aktivniCount++;
+                } 
+                else 
+                {
+                    r.setStatus(new NaCekanjuConcreteState());
+                }
+            }
+        }
+        
         status.azuriraj(this, brojRezervacija);
     }
 
-    public void otkazi() 
+    private void promovirajSaCekanja() 
     {
-        status.otkazi(this);
+        Rezervacija naCekanju = rezervacije.stream()
+                .filter(r -> r.getStatus() instanceof NaCekanjuConcreteState)
+                .min(Comparator
+                        .comparing(Rezervacija::getDatumVrijeme, LDT_ORDER)
+                        .thenComparingLong(Rezervacija::getRedniBroj))
+                .orElse(null);
+
+        if (naCekanju != null) 
+        {
+            naCekanju.setStatus(new AktivnaConcreteState());
+        }
+    }
+
+    public boolean imaRezervaciju(String ime, String prezime) 
+    {
+        return rezervacije.stream()
+                .anyMatch(r -> equalsIgnorirajCase(r.getIme(), ime)
+                        && equalsIgnorirajCase(r.getPrezime(), prezime)
+                        && !(r.getStatus() instanceof OtkazanaConcreteState));
+    }
+
+    private boolean equalsIgnorirajCase(String rijec1, String rijec2) 
+    {
+        String prvaRijec = (rijec1 == null) ? "" : rijec1.trim();
+        String drugaRijec = (rijec2 == null) ? "" : rijec2.trim();
+        return prvaRijec.equalsIgnoreCase(drugaRijec);
+    }
+    
+    public int getOznaka() 
+    { 
+        return oznaka; 
+    }
+    
+    public String getNaziv() 
+    { 
+        return naziv; 
+    }
+    
+    public String getProgram() 
+    { 
+        return program; 
+    }
+    
+    public LocalDate getPocetniDatum() 
+    { 
+        return pocetniDatum; 
+    }
+    
+    public LocalDate getZavrsniDatum() 
+    { 
+        return zavrsniDatum; 
+    }
+    
+    public LocalTime getVrijemeKretanja() 
+    { 
+        return vrijemeKretanja; 
+    }
+    
+    public LocalTime getVrijemePovratka() 
+    { 
+        return vrijemePovratka; 
+    }
+    
+    public float getCijena() 
+    { 
+        return cijena; 
+    }
+    
+    public int getMinBrojPutnika() 
+    { 
+        return minBrojPutnika; 
+    }
+    
+    public int getMaksBrojPutnika() 
+    { 
+        return maksBrojPutnika; 
+    }
+    
+    public int getBrojNocenja() 
+    { 
+        return brojNocenja; 
+    }
+    
+    public float getDoplataSobe() 
+    { 
+        return doplataSobe; 
+    }
+    
+    public String getPrijevoz() 
+    { 
+        return prijevoz; 
+    }
+    
+    public int getBrojDorucka() 
+    { 
+        return brojDorucka; 
+    }
+    
+    public int getBrojRucka() 
+    { 
+        return brojRucka; 
+    }
+    
+    public int getBrojVecera() 
+    { 
+        return brojVecera; 
+    }
+
+    public AranzmaniState getStatus() 
+    { 
+        return status; 
+    }
+    
+    public void setStatus(AranzmaniState status) 
+    { 
+        this.status = status; 
+    }
+    
+    public String getStatusNaziv() 
+    {
+        return status.getNaziv();
     }
 }

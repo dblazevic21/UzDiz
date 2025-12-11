@@ -1,16 +1,13 @@
 package edu.unizg.foi.uzdiz.dblazevic21.app.komande;
 
-import java.time.LocalDateTime;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.aranzmani.Aranzmani;
-import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.rezervacije.Rezervacije;
 
 public class OrtaKomanda implements Komanda 
 {
-
     private final Map<Integer, Aranzmani> aranzmani;
 
     public OrtaKomanda(Map<Integer, Aranzmani> aranzmani)
@@ -50,16 +47,17 @@ public class OrtaKomanda implements Komanda
             return;
         }
 
-        boolean ok = Rezervacije.getInstance().otkaziRezervaciju(oznaka, ime, prezime, LocalDateTime.now());
+        boolean ok = a.ukloniRezervaciju(ime, prezime);
 
         if (ok)
         {
-            Rezervacije.getInstance().azurirajStatuseRezervacija(aranzmani);
-            System.out.println("Rezervacija za osobu " + ime + " " + prezime + " na aranžman " + oznaka + " je otkazana.");
+            System.out.println("Rezervacija za osobu " + ime + " " + prezime + 
+                " na aranžman " + oznaka + " je otkazana.");
         } 
         else 
         {
-            System.out.println("Ne postoji rezervacija za osobu " + ime + " " + prezime + " na aranžman " + oznaka + ".");
+            System.out.println("Ne postoji rezervacija za osobu " + ime + " " + prezime + 
+                " na aranžman " + oznaka + ".");
         }
     }
 }

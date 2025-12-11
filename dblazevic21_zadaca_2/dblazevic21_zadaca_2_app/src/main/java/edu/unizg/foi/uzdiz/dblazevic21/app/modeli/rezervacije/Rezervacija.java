@@ -2,10 +2,11 @@ package edu.unizg.foi.uzdiz.dblazevic21.app.modeli.rezervacije;
 
 import java.time.LocalDateTime;
 
+import edu.unizg.foi.uzdiz.dblazevic21.app.composite.TuristickiElement;
 import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.rezervacije.NovaConcreteState;
 import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.rezervacije.RezervacijeState;
 
-public class Rezervacija 
+public class Rezervacija implements TuristickiElement
 {
     private final long redniBroj;
     private final String ime;
@@ -39,29 +40,46 @@ public class Rezervacija
         this.status = new NovaConcreteState();
     }
 
+    @Override
+    public String getOpis() 
+    {
+        return "Rezervacija: " + ime + " " + prezime + " [" + status.getNaziv() + "]";
+    }
+
+    @Override
+    public int getBrojOsoba() 
+    {
+        return 1;
+    }
+
     public long getRedniBroj() 
     { 
-    	return redniBroj; 
-	}
+        return redniBroj; 
+    }
+    
     public String getIme() 
     { 
-    	return ime; 
+        return ime; 
     }
+    
     public String getPrezime() 
     { 
-    	return prezime; 
+        return prezime; 
     }
+    
     public int getOznakaAranzmana() 
     { 
-    	return oznakaAranzmana; 
+        return oznakaAranzmana; 
     }
+    
     public LocalDateTime getDatumVrijeme() 
     { 
-    	return datumVrijeme; 
+        return datumVrijeme; 
     }
+    
     public String getDatumVrijemeRaw() 
     { 
-    	return datumVrijemeRaw; 
+        return datumVrijemeRaw; 
     }
 
     public void obradi() 
@@ -137,10 +155,11 @@ public class Rezervacija
 
     public LocalDateTime getOtkazanoAt() 
     { 
-    	return otkazanoAt; 
+        return otkazanoAt; 
     }
+    
     public void setOtkazanoAt(LocalDateTime otkazanoAt) 
     { 
-    	this.otkazanoAt = otkazanoAt; 
+        this.otkazanoAt = otkazanoAt; 
     }
 }
