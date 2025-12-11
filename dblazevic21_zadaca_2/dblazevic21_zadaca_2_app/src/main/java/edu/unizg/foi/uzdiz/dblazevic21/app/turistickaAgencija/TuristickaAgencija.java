@@ -206,7 +206,4 @@ public class TuristickaAgencija
         return aranzmani;
     }
 }
-<<<<<<< HEAD
 
-=======
->>>>>>> b893a38 (Valjda dobar state sada, prca me Linux Git najveće smeće na svitu)

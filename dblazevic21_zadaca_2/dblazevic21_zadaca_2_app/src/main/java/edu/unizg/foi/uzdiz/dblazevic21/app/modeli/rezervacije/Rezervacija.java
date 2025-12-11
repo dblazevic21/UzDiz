@@ -2,12 +2,8 @@ package edu.unizg.foi.uzdiz.dblazevic21.app.modeli.rezervacije;
 
 import java.time.LocalDateTime;
 
-<<<<<<< HEAD
-import edu.unizg.foi.uzdiz.dblazevic21.app.enumeracije.StatusRezervacije;
-=======
 import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.PrimljenaConcreteState;
 import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.RezervacijeState;
->>>>>>> b893a38 (Valjda dobar state sada, prca me Linux Git najveće smeće na svitu)
 
 public class Rezervacija 
 {
@@ -18,11 +14,7 @@ public class Rezervacija
     private final LocalDateTime datumVrijeme;
     private final String datumVrijemeRaw;
 
-<<<<<<< HEAD
-    private StatusRezervacije status;
-=======
     private RezervacijeState status;
->>>>>>> b893a38 (Valjda dobar state sada, prca me Linux Git najveće smeće na svitu)
     private LocalDateTime otkazanoAt;
 
     public Rezervacija(long redniBroj, String ime, String prezime, int oznakaAranzmana, LocalDateTime datumVrijeme) 
@@ -33,11 +25,7 @@ public class Rezervacija
         this.oznakaAranzmana = oznakaAranzmana;
         this.datumVrijeme = datumVrijeme;
         this.datumVrijemeRaw = null;
-<<<<<<< HEAD
-        this.status = StatusRezervacije.PRIMLJENA;
-=======
         this.status = new PrimljenaConcreteState();
->>>>>>> b893a38 (Valjda dobar state sada, prca me Linux Git najveće smeće na svitu)
     }
 
     public Rezervacija(long redniBroj, String ime, String prezime, int oznakaAranzmana, String datumVrijemeRaw) 
@@ -48,11 +36,7 @@ public class Rezervacija
         this.oznakaAranzmana = oznakaAranzmana;
         this.datumVrijeme = null;
         this.datumVrijemeRaw = datumVrijemeRaw;
-<<<<<<< HEAD
-        this.status = StatusRezervacije.PRIMLJENA;
-=======
         this.status = new PrimljenaConcreteState();
->>>>>>> b893a38 (Valjda dobar state sada, prca me Linux Git najveće smeće na svitu)
     }
 
     public long getRedniBroj() 
@@ -80,15 +64,6 @@ public class Rezervacija
     	return datumVrijemeRaw; 
     }
 
-<<<<<<< HEAD
-    public StatusRezervacije getStatus() 
-    { 
-    	return status; 
-    }
-    public void setStatus(StatusRezervacije status) 
-    { 
-    	this.status = status; 
-=======
     public void obradi() 
     {
         status.obradi(this);
@@ -158,7 +133,6 @@ public class Rezervacija
     public boolean isOtkazana() 
     {
         return "OTKAZANA".equals(status.getNaziv());
->>>>>>> b893a38 (Valjda dobar state sada, prca me Linux Git najveće smeće na svitu)
     }
 
     public LocalDateTime getOtkazanoAt() 
@@ -170,3 +144,4 @@ public class Rezervacija
     	this.otkazanoAt = otkazanoAt; 
     }
 }
+

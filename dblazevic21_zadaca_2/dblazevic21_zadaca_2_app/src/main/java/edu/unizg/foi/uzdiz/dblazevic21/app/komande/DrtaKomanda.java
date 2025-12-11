@@ -6,18 +6,11 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-<<<<<<< HEAD
-import edu.unizg.foi.uzdiz.dblazevic21.app.enumeracije.StatusRezervacije;
-=======
->>>>>>> b893a38 (Valjda dobar state sada, prca me Linux Git najveće smeće na svitu)
 import edu.unizg.foi.uzdiz.dblazevic21.app.ispis.FormaterZaIspise;
 import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.aranzmani.Aranzmani;
 import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.rezervacije.Rezervacija;
 import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.rezervacije.Rezervacije;
-<<<<<<< HEAD
-=======
 import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.OtkazanaConcreteState;
->>>>>>> b893a38 (Valjda dobar state sada, prca me Linux Git najveće smeće na svitu)
 import edu.unizg.foi.uzdiz.dblazevic21.app.utils.DatumParser;
 import edu.unizg.foi.uzdiz.dblazevic21.app.utils.GramatikaIJezikApp;
 
@@ -87,11 +80,7 @@ public class DrtaKomanda implements Komanda
         
         for (Rezervacija r : postojeceRezervacije)
         {
-<<<<<<< HEAD
-        	if (r.getStatus() != StatusRezervacije.OTKAZANA)
-=======
         	if (r.getStatus() instanceof OtkazanaConcreteState)
->>>>>>> b893a38 (Valjda dobar state sada, prca me Linux Git najveće smeće na svitu)
 			{
         		if (r.getOznakaAranzmana() == oznaka)
             	{
@@ -119,3 +108,4 @@ public class DrtaKomanda implements Komanda
         }
 	}
 }
+
