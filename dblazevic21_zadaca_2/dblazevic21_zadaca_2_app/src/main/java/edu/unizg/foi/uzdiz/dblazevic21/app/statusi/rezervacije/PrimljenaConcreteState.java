@@ -1,8 +1,8 @@
-package edu.unizg.foi.uzdiz.dblazevic21.app.statusi;
+package edu.unizg.foi.uzdiz.dblazevic21.app.statusi.rezervacije;
 
 import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.rezervacije.Rezervacija;
 
-public class AktivnaConcreteState implements RezervacijeState
+public class PrimljenaConcreteState implements RezervacijeState 
 {
 	@Override
     public void obradi(Rezervacija rezervacija) { }
@@ -14,7 +14,10 @@ public class AktivnaConcreteState implements RezervacijeState
     }
 
     @Override
-    public void aktiviraj(Rezervacija rezervacija) { }
+    public void aktiviraj(Rezervacija rezervacija) 
+    {
+        rezervacija.setStatus(new AktivnaConcreteState());
+    }
 
     @Override
     public void staviNaCekanje(Rezervacija rezervacija) 
@@ -31,7 +34,6 @@ public class AktivnaConcreteState implements RezervacijeState
     @Override
     public String getNaziv() 
     {
-        return "AKTIVNA";
+        return "PRIMLJENA";
     }
-
 }

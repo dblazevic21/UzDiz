@@ -9,11 +9,11 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.aranzmani.Aranzmani;
-import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.AktivnaConcreteState;
-import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.NaCekanjuConcreteState;
-import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.OdgodenaConcreteState;
-import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.OtkazanaConcreteState;
-import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.PrimljenaConcreteState;
+import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.rezervacije.AktivnaConcreteState;
+import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.rezervacije.NaCekanjuConcreteState;
+import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.rezervacije.OdgodenaConcreteState;
+import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.rezervacije.OtkazanaConcreteState;
+import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.rezervacije.PrimljenaConcreteState;
 
 public class Rezervacije 
 {

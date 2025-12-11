@@ -13,11 +13,11 @@ import edu.unizg.foi.uzdiz.dblazevic21.app.ispis.TablicaPrinter;
 import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.aranzmani.Aranzmani;
 import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.rezervacije.Rezervacija;
 import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.rezervacije.Rezervacije;
-import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.AktivnaConcreteState;
-import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.NaCekanjuConcreteState;
-import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.OtkazanaConcreteState;
-import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.PrimljenaConcreteState;
-import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.RezervacijeState;
+import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.rezervacije.AktivnaConcreteState;
+import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.rezervacije.NaCekanjuConcreteState;
+import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.rezervacije.OtkazanaConcreteState;
+import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.rezervacije.PrimljenaConcreteState;
+import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.rezervacije.RezervacijeState;
 
 public class IrtaKomanda implements Komanda 
 {

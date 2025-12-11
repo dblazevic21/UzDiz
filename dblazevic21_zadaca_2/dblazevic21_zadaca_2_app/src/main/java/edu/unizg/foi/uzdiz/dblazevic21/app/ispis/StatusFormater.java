@@ -1,6 +1,6 @@
 package edu.unizg.foi.uzdiz.dblazevic21.app.ispis;
 
-import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.RezervacijeState;
+import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.rezervacije.RezervacijeState;
 
 public class StatusFormater 
 {

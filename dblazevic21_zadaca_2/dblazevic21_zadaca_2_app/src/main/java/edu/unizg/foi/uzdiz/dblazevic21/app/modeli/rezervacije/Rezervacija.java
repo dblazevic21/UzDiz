@@ -2,8 +2,8 @@ package edu.unizg.foi.uzdiz.dblazevic21.app.modeli.rezervacije;
 
 import java.time.LocalDateTime;
 
-import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.NovaConcreteState;
-import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.RezervacijeState;
+import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.rezervacije.NovaConcreteState;
+import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.rezervacije.RezervacijeState;
 
 public class Rezervacija 
 {

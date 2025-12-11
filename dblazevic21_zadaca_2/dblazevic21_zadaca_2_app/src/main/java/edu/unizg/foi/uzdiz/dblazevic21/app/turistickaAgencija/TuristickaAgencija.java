@@ -13,7 +13,7 @@ import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.aranzmani.AranzmaniBuilderConc
 import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.aranzmani.AranzmaniDirector;
 import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.rezervacije.Rezervacija;
 import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.rezervacije.Rezervacije;
-import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.OtkazanaConcreteState;
+import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.rezervacije.OtkazanaConcreteState;
 import edu.unizg.foi.uzdiz.dblazevic21.app.utils.DatumParser;
 import edu.unizg.foi.uzdiz.dblazevic21.app.utils.GramatikaIJezikApp;
 
