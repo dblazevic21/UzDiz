@@ -44,6 +44,16 @@ public class Rezervacija implements TuristickiElement
         this.status = new NovaConcreteState();
         this.otkazanoAt = null;
     }
+    
+    public String getDatumVrijemeRaw() 
+    {
+        if (datumVrijeme == null) 
+        {
+            return "";
+        }
+        return datumVrijeme.format(java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm"));
+    }
+
 
     @Override
     public String getOpis()

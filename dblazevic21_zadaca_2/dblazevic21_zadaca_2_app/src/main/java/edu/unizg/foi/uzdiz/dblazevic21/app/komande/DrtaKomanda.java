@@ -74,31 +74,31 @@ public class DrtaKomanda implements Komanda
         provjeriIDodajRezervaciju(ime, prezime, oznaka, datumVrijeme);
     }
 
-	public void provjeriIDodajRezervaciju(String ime, String prezime, int oznaka, LocalDateTime datumVrijeme) 
-	{
-		List<Rezervacija> postojeceRezervacije = Rezervacije.getInstance().getZaOsobu(ime,  prezime);
+    public void provjeriIDodajRezervaciju(String ime, String prezime, int oznaka, LocalDateTime datumVrijeme) 
+    {
+        List<Rezervacija> postojeceRezervacije = Rezervacije.getInstance().getZaOsobu(ime, prezime, aranzmani);
         
         for (Rezervacija r : postojeceRezervacije)
         {
-        	if (r.getStatus() instanceof OtkazanaConcreteState)
-			{
-        		if (r.getOznakaAranzmana() == oznaka)
-            	{
-            		System.out.println("Osoba " + ime + " " + prezime + " već ima rezervaciju za aranžman " + oznaka + ".");
-    				return;
-            	}
-            	
-            	if (r.getDatumVrijeme().equals(datumVrijeme))
-            	{
-            		System.out.println("Osoba " + ime + " " + prezime + " već ima rezervaciju u terminu " + FormaterZaIspise.fmtDatumVrijeme(datumVrijeme, r.getDatumVrijemeRaw()) + ".");
-    				return;
-            	}
-			}
+            if (!(r.getStatus() instanceof OtkazanaConcreteState))
+            {
+                if (r.getOznakaAranzmana() == oznaka)
+                {
+                    System.out.println("Osoba " + ime + " " + prezime + " već ima rezervaciju za aranžman " + oznaka + ".");
+                    return;
+                }
+                
+                if (r.getDatumVrijeme() != null && r.getDatumVrijeme().equals(datumVrijeme))
+                {
+                    System.out.println("Osoba " + ime + " " + prezime + " već ima rezervaciju u terminu " + FormaterZaIspise.fmtDatumVrijeme(datumVrijeme, r.getDatumVrijemeRaw()) + ".");
+                    return;
+                }
+            }
         }
         
         try 
         {
-            Rezervacije.getInstance().dodajRezervaciju(ime, prezime, oznaka, datumVrijeme);
+            Rezervacije.getInstance().dodajRezervaciju(ime, prezime, oznaka, datumVrijeme, aranzmani);
             Rezervacije.getInstance().azurirajStatuseRezervacija(aranzmani);
             System.out.println("Rezervacija za osobu " + ime + " " + prezime + " na aranžman " + oznaka + " je dodana.");
         } 
@@ -106,5 +106,6 @@ public class DrtaKomanda implements Komanda
         {
             System.out.println("Greška prilikom dodavanja rezervacije: " + e.getMessage());
         }
-	}
+    }
+
 }
