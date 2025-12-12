@@ -53,9 +53,11 @@ public class IroKomanda implements Komanda
         }
 
         int[] sirine = {22, 22, 35, 17};
+        
+        boolean[] desno = {false, true, false, false};
 
         TablicaPrinter.printajSeperatorTabliceMulti(sirine);
-        TablicaPrinter.printajRedTabliceMulti(sirine,
+        TablicaPrinter.printajRedTabliceMultiAlign(sirine, desno,
                 "Datum i vrijeme", "Oznaka aranžmana", "Naziv aranžmana", "Vrsta");
         TablicaPrinter.printajSeperatorTabliceMulti(sirine);
 
@@ -66,7 +68,7 @@ public class IroKomanda implements Komanda
             String naziv = (a == null) ? "-" : FormaterZaIspise.val(a.getNaziv());
             String datumVrijeme = FormaterZaIspise.fmtDatumVrijeme(r.getDatumVrijeme(), r.getDatumVrijemeRaw());
             String vrsta = StatusFormater.statusOznaka(r.getStatus());
-            TablicaPrinter.printajRedTabliceMulti(sirine,
+            TablicaPrinter.printajRedTabliceMultiAlign(sirine, desno,
                     datumVrijeme,
                     String.valueOf(oznakaAranzmana),
                     FormaterZaIspise.izrezi(naziv, sirine[2]),

@@ -92,8 +92,10 @@ public class ItapKomanda implements Komanda
 
         int[] w = {7, 35, 14, 14, 12, 16, 10, 18, 18};
 
+    	boolean[] desno = {true, false, false, false, false, false, true, true, true};
+        
         TablicaPrinter.printajSeperatorTabliceMulti(w);
-        TablicaPrinter.printajRedTabliceMulti(w,
+        TablicaPrinter.printajRedTabliceMultiAlign(w, desno,
                 "Oznaka", "Naziv", "Početni datum", "Završni datum",
                 "Kretanje", "Povratak", "Cijena", "Min br. putnika", "Maks br. putnika"
         );
@@ -101,7 +103,7 @@ public class ItapKomanda implements Komanda
 
         for (Aranzmani a : lista)
         {
-            TablicaPrinter.printajRedTabliceMulti(w,
+            TablicaPrinter.printajRedTabliceMultiAlign(w, desno,
                     String.valueOf(a.getOznaka()),
                     FormaterZaIspise.izrezi(a.getNaziv(), 35),
                     FormaterZaIspise.fmtDatum(a.getPocetniDatum()),
