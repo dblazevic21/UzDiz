@@ -9,6 +9,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import edu.unizg.foi.uzdiz.dblazevic21.app.ispis.FormaterZaIspise;
+import edu.unizg.foi.uzdiz.dblazevic21.app.ispis.StatusFormater;
 import edu.unizg.foi.uzdiz.dblazevic21.app.ispis.TablicaPrinter;
 import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.aranzmani.Aranzmani;
 import edu.unizg.foi.uzdiz.dblazevic21.app.utils.DatumParser;
@@ -91,7 +92,7 @@ public class ItakKomanda implements Komanda
                     || a.getPocetniDatum().isAfter(dO));
         }
 
-        int[] w = {7, 35, 14, 14, 12, 16, 10, 18, 18};
+        int[] w = {7, 35, 14, 14, 12, 16, 10, 18, 18, 18};
         boolean[] desno = {
                 true,
                 false,
@@ -101,13 +102,14 @@ public class ItakKomanda implements Komanda
                 false,
                 true, 
                 true, 
-                true
+                true,
+                false
         };
 
         TablicaPrinter.printajSeperatorTabliceMulti(w);
         TablicaPrinter.printajRedTabliceMultiAlign(w, desno,
                 "Oznaka", "Naziv", "Početni datum", "Završni datum",
-                "Kretanje", "Povratak", "Cijena", "Min br. putnika", "Maks br. putnika"
+                "Kretanje", "Povratak", "Cijena", "Min br. putnika", "Maks br. putnika", "Status"
         );
         TablicaPrinter.printajSeperatorTabliceMulti(w);
 
@@ -126,7 +128,9 @@ public class ItakKomanda implements Komanda
                     FormaterZaIspise.fmtVrijeme(a.getVrijemePovratka()),
                     FormaterZaIspise.fmtCijena(a.getCijena()),
                     String.valueOf(a.getMinBrojPutnika()),
-                    String.valueOf(a.getMaksBrojPutnika()));
+                    String.valueOf(a.getMaksBrojPutnika()),
+                    StatusFormater.statusOznakaAranzmana(a.getStatus())
+                    );
         }
         TablicaPrinter.printajSeperatorTabliceMulti(w);
     }

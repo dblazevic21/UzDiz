@@ -38,8 +38,8 @@ public class Aranzmani implements TuristickiElement
     private AranzmaniState status;
 
     private final List<Rezervacija> rezervacije = new ArrayList<>();
-    
-    private static final Comparator<LocalDateTime> LDT_ORDER = 
+
+    private static final Comparator<LocalDateTime> LDT_ORDER =
             Comparator.nullsLast(Comparator.<LocalDateTime>naturalOrder());
 
     public Aranzmani()
@@ -50,7 +50,8 @@ public class Aranzmani implements TuristickiElement
     @Override
     public String getOpis()
     {
-        return oznaka + " - " + naziv + " (" + pocetniDatum + " - " + zavrsniDatum + ")";
+        return oznaka + " - " + naziv + " (" + pocetniDatum + " - " + zavrsniDatum + ") [" +
+               (status != null ? status.getNaziv() : "") + "]";
     }
 
     @Override
@@ -161,6 +162,19 @@ public class Aranzmani implements TuristickiElement
                     rezervacija.setStatus(new NaCekanjuConcreteState());
                 }
             }
+        }
+
+        if (status != null)
+        {
+            status.azuriraj(this, brojRezervacija);
+        }
+    }
+
+    public void otkaziAranzman()
+    {
+        if (status != null)
+        {
+            status.otkazi(this);
         }
     }
 

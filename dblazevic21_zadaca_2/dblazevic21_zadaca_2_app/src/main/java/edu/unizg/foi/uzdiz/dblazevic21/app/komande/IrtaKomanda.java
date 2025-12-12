@@ -15,46 +15,54 @@ import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.rezervacije.Rezervacija;
 import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.rezervacije.Rezervacije;
 import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.rezervacije.AktivnaConcreteState;
 import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.rezervacije.NaCekanjuConcreteState;
+import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.rezervacije.OdgodenaConcreteState;
 import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.rezervacije.OtkazanaConcreteState;
 import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.rezervacije.PrimljenaConcreteState;
 import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.rezervacije.RezervacijeState;
 
-public class IrtaKomanda implements Komanda 
+public class IrtaKomanda implements Komanda
 {
 
     private final Map<Integer, Aranzmani> aranzmani;
 
-    public IrtaKomanda(Map<Integer, Aranzmani> aranzmani) 
+    public IrtaKomanda(Map<Integer, Aranzmani> aranzmani)
     {
         this.aranzmani = aranzmani;
     }
 
     @Override
-    public String getNaziv() 
+    public String getNaziv()
     {
         return "IRTA";
     }
 
     @Override
-    public void izvrsi(String unos) 
+    public void izvrsi(String unos)
     {
         String trimmed = (unos == null) ? "" : unos.trim();
-        Pattern p = Pattern.compile("^IRTA\\s+(\\d+)(?:\\s+([PAČO]+))?$",
-                Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
+
+        Pattern p = Pattern.compile(
+                "^IRTA\\s+(\\d+)(?:\\s+(PA|Č|O|PAČO|ODO))?$",
+                Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE
+        );
 
         Matcher m = p.matcher(trimmed);
-        if (!m.matches()) 
+        if (!m.matches())
         {
-            System.out.println("Nepoznata komanda. Upotrijebite: IRTA [oznaka] [PA|Č|O|PAČO]");
+            System.out.println("Nepoznata komanda. Upotrijebite: IRTA oznaka [PA|Č|O|PAČO|ODO]");
             return;
         }
 
         int oznaka = Integer.parseInt(m.group(1));
         String flags = (m.group(2) == null) ? "PA" : m.group(2).toUpperCase(Locale.ROOT);
 
-        if (!flags.matches("[PAČO]+")) 
+        if (!(flags.equals("PA")
+                || flags.equals("Č")
+                || flags.equals("O")
+                || flags.equals("PAČO")
+                || flags.equals("ODO")))
         {
-            System.out.println("Greška: neispravni filteri. Dozvoljeni su samo PA, Č, O.");
+            System.out.println("Greška: neispravni filteri. Dozvoljeni su samo PA, Č, O, PAČO ili ODO.");
             return;
         }
 
@@ -66,7 +74,7 @@ public class IrtaKomanda implements Komanda
         }
 
         List<Rezervacija> ulaz = Rezervacije.getInstance().getZaAranzman(oznaka);
-        if (ulaz.isEmpty()) 
+        if (ulaz.isEmpty())
         {
             System.out.println("Nema rezervacija za aranžman " + oznaka + ".");
             return;
@@ -74,45 +82,55 @@ public class IrtaKomanda implements Komanda
 
         Rezervacije.getInstance().azurirajStatuseRezervacija(aranzmani);
 
-        boolean dodajPA = flags.contains("PA");
-        boolean dodajČekaj = flags.contains("Č");
-        boolean dodajOtkazan = flags.contains("O");
+        boolean dodajPA = flags.equals("PA") || flags.equals("PAČO");
+        boolean dodajČekaj = flags.equals("Č") || flags.equals("PAČO");
+        boolean dodajOtkazan = flags.equals("O") || flags.equals("PAČO") || flags.equals("ODO");
+        boolean dodajOdgođen = flags.equals("ODO");
 
         List<Rezervacija> zaIspis = ulaz.stream()
                 .filter(r -> {
                     RezervacijeState status = r.getStatus();
-                    boolean isPrimljenaAktivna = (status instanceof PrimljenaConcreteState || status instanceof AktivnaConcreteState);
+                    boolean isPrimljenaAktivna =
+                            (status instanceof PrimljenaConcreteState || status instanceof AktivnaConcreteState);
                     boolean isNaCekanju = (status instanceof NaCekanjuConcreteState);
                     boolean isOtkazana = (status instanceof OtkazanaConcreteState);
-                    
+                    boolean isOdgođena = (status instanceof OdgodenaConcreteState);
+
                     return (dodajPA && isPrimljenaAktivna)
                             || (dodajČekaj && isNaCekanju)
-                            || (dodajOtkazan && isOtkazana);
+                            || (dodajOtkazan && isOtkazana)
+                            || (dodajOdgođen && isOdgođena);
                 })
                 .collect(Collectors.toList());
-        if (zaIspis.isEmpty()) 
+
+        if (zaIspis.isEmpty())
         {
             System.out.println("Nema rezervacija koje zadovoljavaju kriterij za aranžman " + oznaka + ".");
             return;
         }
 
-        int[] sirine = dodajOtkazan ? new int[]{20, 20, 22, 14, 35} : new int[]{20, 20, 22, 14};
+        boolean trebaOtkazStupac = flags.equals("O") || flags.equals("PAČO") || flags.equals("ODO");
+        int[] sirine = trebaOtkazStupac
+                ? new int[]{20, 20, 22, 14, 35}
+                : new int[]{20, 20, 22, 14};
 
-        TablicaPrinter.printajTablicuZaglavlje(sirine, dodajOtkazan);
+        TablicaPrinter.printajTablicuZaglavlje(sirine, trebaOtkazStupac);
 
-        for (Rezervacija r : zaIspis) 
+        for (Rezervacija r : zaIspis)
         {
             String ime = r.getIme();
             String prezime = r.getPrezime();
             String datumVrijeme = FormaterZaIspise.fmtDatumVrijeme(r.getDatumVrijeme(), r.getDatumVrijemeRaw());
             String vrsta = StatusFormater.statusOznaka(r.getStatus());
 
-            if (dodajOtkazan) 
+            if (trebaOtkazStupac)
             {
-                String otk = (r.getOtkazanoAt() == null) ? "-" : FormaterZaIspise.fmtDatumVrijeme(r.getOtkazanoAt(), null);
+                String otk = (r.getOtkazanoAt() == null)
+                        ? "-"
+                        : FormaterZaIspise.fmtDatumVrijeme(r.getOtkazanoAt(), null);
                 TablicaPrinter.printajTablicuRedak(sirine, ime, prezime, datumVrijeme, vrsta, otk);
             }
-            else 
+            else
             {
                 TablicaPrinter.printajTablicuRedak(sirine, ime, prezime, datumVrijeme, vrsta);
             }

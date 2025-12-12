@@ -132,7 +132,13 @@ public class Rezervacije
     	cilj.setStatus(new OtkazanaConcreteState());
     	cilj.setOtkazanoAt(when != null ? when : LocalDateTime.now());
     	
-    	if (bilaAktivna)
+    	return jeLiAktivnaRezervacija(aranzmani, i, p, aranzman, cilj, bilaAktivna);
+    }
+
+	public boolean jeLiAktivnaRezervacija(Map<Integer, Aranzmani> aranzmani, String i, String p, Aranzmani aranzman,
+			Rezervacija cilj, boolean bilaAktivna) 
+	{
+		if (bilaAktivna)
     	{
     		Rezervacija generirajAktivna = aranzman.getRezervacije().stream()
     				.filter(r -> r.getStatus() instanceof NaCekanjuConcreteState)
@@ -164,7 +170,7 @@ public class Rezervacije
     	}
     	
     	return true;
-    }
+	}
     
     private boolean imaAktivnuRezervacijuKojaSePrklapa(String ime, String prezime, 
                               Aranzmani trenutniAranzman,
@@ -246,7 +252,8 @@ public class Rezervacije
                         continue;
                     }
 
-                    if (!aranzmaniSePreklapaju(a0, aj)) {
+                    if (!aranzmaniSePreklapaju(a0, aj)) 
+                    {
                         break;
                     }
 
@@ -321,24 +328,22 @@ public class Rezervacije
 
     public boolean dodajRezervaciju(String ime, String prezime, int oznakaAranzmana, 
             LocalDateTime datumVrijeme, Map<Integer, Aranzmani> aranzmani) 
-{
-Aranzmani aranzman = aranzmani.get(oznakaAranzmana);
-if (aranzman == null) 
-{
-return false;
-}
+    {
+    	Aranzmani aranzman = aranzmani.get(oznakaAranzmana);
+    	if (aranzman == null) 
+    	{
+    		return false;
+    	}
 
-Rezervacija novaRezervacija = kreirajRezervaciju(ime, prezime, oznakaAranzmana, datumVrijeme);
-aranzman.dodajRezervaciju(novaRezervacija);
+    	Rezervacija novaRezervacija = kreirajRezervaciju(ime, prezime, oznakaAranzmana, datumVrijeme);
+    	aranzman.dodajRezervaciju(novaRezervacija);
 
-// Prvo ažuriraj statuse na temelju kapaciteta (PRIMLJENA/AKTIVNA/NA_ČEKANJU)
-aranzman.azurirajStatuseRezervacija();
+    	aranzman.azurirajStatuseRezervacija();
 
-// Zatim ažuriraj ODGOĐENE na temelju preklapanja
-azurirajOdgodeneRezervacije(aranzmani);
+    	azurirajOdgodeneRezervacije(aranzmani);
 
-return true;
-}
+    	return true;
+    }
 
 
     private void promakniOdgodenuRezervaciju(String ime, String prezime, 
