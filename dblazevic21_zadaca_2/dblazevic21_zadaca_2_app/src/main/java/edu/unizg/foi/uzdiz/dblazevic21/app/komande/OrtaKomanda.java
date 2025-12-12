@@ -10,7 +10,6 @@ import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.rezervacije.Rezervacije;
 
 public class OrtaKomanda implements Komanda 
 {
-
     private final Map<Integer, Aranzmani> aranzmani;
 
     public OrtaKomanda(Map<Integer, Aranzmani> aranzmani)
@@ -50,7 +49,7 @@ public class OrtaKomanda implements Komanda
             return;
         }
 
-        boolean ok = Rezervacije.getInstance().otkaziRezervaciju(oznaka, ime, prezime, LocalDateTime.now());
+        boolean ok = Rezervacije.getInstance().otkaziRezervaciju(oznaka, ime, prezime, LocalDateTime.now(), aranzmani);
 
         if (ok)
         {

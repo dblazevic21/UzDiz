@@ -1,146 +1,130 @@
 package edu.unizg.foi.uzdiz.dblazevic21.app.modeli.rezervacije;
 
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.Collections;
+import java.util.List;
 
+import edu.unizg.foi.uzdiz.dblazevic21.app.composite.TuristickiElement;
 import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.rezervacije.NovaConcreteState;
 import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.rezervacije.RezervacijeState;
+import edu.unizg.foi.uzdiz.dblazevic21.app.utils.DatumParser;
 
-public class Rezervacija  
+public class Rezervacija implements TuristickiElement
 {
     private final long redniBroj;
     private final String ime;
     private final String prezime;
     private final int oznakaAranzmana;
     private final LocalDateTime datumVrijeme;
-    private final String datumVrijemeRaw;
-
     private RezervacijeState status;
     private LocalDateTime otkazanoAt;
 
-    public Rezervacija(long redniBroj, String ime, String prezime, int oznakaAranzmana, LocalDateTime datumVrijeme) 
+    public Rezervacija(long redniBroj, String ime, String prezime, int oznakaAranzmana, LocalDateTime datumVrijeme)
     {
         this.redniBroj = redniBroj;
         this.ime = ime;
         this.prezime = prezime;
         this.oznakaAranzmana = oznakaAranzmana;
         this.datumVrijeme = datumVrijeme;
-        this.datumVrijemeRaw = null;
         this.status = new NovaConcreteState();
+        this.otkazanoAt = null;
     }
 
-    public Rezervacija(long redniBroj, String ime, String prezime, int oznakaAranzmana, String datumVrijemeRaw) 
+    public Rezervacija(long redniBroj, String ime, String prezime, int oznakaAranzmana, String dtRaw)
     {
         this.redniBroj = redniBroj;
         this.ime = ime;
         this.prezime = prezime;
         this.oznakaAranzmana = oznakaAranzmana;
-        this.datumVrijeme = null;
-        this.datumVrijemeRaw = datumVrijemeRaw;
+        this.datumVrijeme = DatumParser.normalizirajDatumIVrijeme(
+                dtRaw.split(" ")[0],
+                dtRaw.contains(" ") ? dtRaw.split(" ", 2)[1] : ""
+        );
         this.status = new NovaConcreteState();
+        this.otkazanoAt = null;
     }
 
-    public long getRedniBroj() 
-    { 
-    	return redniBroj; 
-	}
-    public String getIme() 
-    { 
-    	return ime; 
-    }
-    public String getPrezime() 
-    { 
-    	return prezime; 
-    }
-    public int getOznakaAranzmana() 
-    { 
-    	return oznakaAranzmana; 
-    }
-    public LocalDateTime getDatumVrijeme() 
-    { 
-    	return datumVrijeme; 
-    }
-    public String getDatumVrijemeRaw() 
-    { 
-    	return datumVrijemeRaw; 
-    }
-
-    public void obradi() 
+    @Override
+    public String getOpis()
     {
-        status.obradi(this);
+        DateTimeFormatter fmt = DateTimeFormatter.ofPattern("dd.MM.yyyy. HH:mm:ss");
+        String dtStr = (datumVrijeme != null) ? datumVrijeme.format(fmt) : "-";
+        return ime + " " + prezime + " | " + dtStr + " | " + status.getNaziv();
     }
 
-    public void otkazi() 
+    @Override
+    public int getBrojOsoba()
     {
-        status.otkazi(this);
-        this.otkazanoAt = LocalDateTime.now();
+        return 1;
     }
 
-    public void aktiviraj() 
+    @Override
+    public List<TuristickiElement> getDjeca()
     {
-        status.aktiviraj(this);
+        return Collections.emptyList();
     }
 
-    public void staviNaCekanje() 
+    @Override
+    public void dodajDijete(TuristickiElement element)
     {
-        status.staviNaCekanje(this);
+        throw new UnsupportedOperationException("Rezervacija je leaf - ne može imati djecu.");
     }
 
-    public void odgodi() 
+    @Override
+    public void ukloniDijete(TuristickiElement element)
     {
-        status.odgodi(this);
+        throw new UnsupportedOperationException("Rezervacija je leaf - ne može imati djecu.");
     }
 
-    public void setStatus(RezervacijeState status) 
+    @Override
+    public boolean isLeaf()
     {
-        this.status = status;
+        return true;
     }
 
-    public RezervacijeState getStatus() 
+    public long getRedniBroj()
+    {
+        return redniBroj;
+    }
+
+    public String getIme()
+    {
+        return ime;
+    }
+
+    public String getPrezime()
+    {
+        return prezime;
+    }
+
+    public int getOznakaAranzmana()
+    {
+        return oznakaAranzmana;
+    }
+
+    public LocalDateTime getDatumVrijeme()
+    {
+        return datumVrijeme;
+    }
+
+    public RezervacijeState getStatus()
     {
         return status;
     }
 
-    public String getStatusNaziv() 
+    public void setStatus(RezervacijeState status)
     {
-        return status.getNaziv();
+        this.status = status;
     }
 
-    public boolean isNova() 
+    public LocalDateTime getOtkazanoAt()
     {
-        return "NOVA".equals(status.getNaziv());
+        return otkazanoAt;
     }
 
-    public boolean isPrimljena() 
+    public void setOtkazanoAt(LocalDateTime otkazanoAt)
     {
-        return "PRIMLJENA".equals(status.getNaziv());
-    }
-
-    public boolean isAktivna() 
-    {
-        return "AKTIVNA".equals(status.getNaziv());
-    }
-
-    public boolean isNaCekanju() 
-    {
-        return "NA ČEKANJU".equals(status.getNaziv());
-    }
-
-    public boolean isOdgodena() 
-    {
-        return "ODGOĐENA".equals(status.getNaziv());
-    }
-
-    public boolean isOtkazana() 
-    {
-        return "OTKAZANA".equals(status.getNaziv());
-    }
-
-    public LocalDateTime getOtkazanoAt() 
-    { 
-    	return otkazanoAt; 
-    }
-    public void setOtkazanoAt(LocalDateTime otkazanoAt) 
-    { 
-    	this.otkazanoAt = otkazanoAt; 
+        this.otkazanoAt = otkazanoAt;
     }
 }

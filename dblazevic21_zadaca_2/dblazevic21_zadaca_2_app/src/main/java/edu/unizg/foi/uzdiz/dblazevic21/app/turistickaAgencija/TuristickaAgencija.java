@@ -100,7 +100,8 @@ public class TuristickaAgencija
                 int oznakaAranzmana = uInt(stupci.get(2));
                 String dtRaw = GramatikaIJezikApp.makniNavodnike(stupci.get(3));
 
-                if (!aranzmani.containsKey(oznakaAranzmana))
+                Aranzmani aranzman = aranzmani.get(oznakaAranzmana);
+                if (aranzman == null)
                 {
                     continue;
                 }
@@ -110,19 +111,22 @@ public class TuristickaAgencija
                         dtRaw.contains(" ") ? dtRaw.split(" ", 2)[1] : ""
                 );
 
-                if (jeDuplikatRezervacije(rez, ime, prezime, oznakaAranzmana, datumVrijeme, dtRaw))
+                if (jeDuplikatRezervacije(aranzman, ime, prezime))
                 {
                     continue;
                 }
 
+                Rezervacija novaRezervacija;
                 if (datumVrijeme != null)
                 {
-                    rez.dodajRezervaciju(ime, prezime, oznakaAranzmana, datumVrijeme);
+                    novaRezervacija = rez.kreirajRezervaciju(ime, prezime, oznakaAranzmana, datumVrijeme);
                 }
                 else
                 {
-                    rez.dodajRezervaciju(ime, prezime, oznakaAranzmana, dtRaw);
+                    novaRezervacija = rez.kreirajRezervaciju(ime, prezime, oznakaAranzmana, dtRaw);
                 }
+                
+                aranzman.dodajRezervaciju(novaRezervacija);
             }
             catch (Exception e)
             {
@@ -133,15 +137,10 @@ public class TuristickaAgencija
         rez.azurirajStatuseRezervacija(aranzmani);
     }
 
-    private boolean jeDuplikatRezervacije(Rezervacije rez, String ime, String prezime, int oznakaAranzmana, LocalDateTime datumVrijeme, String dtRaw)
+    private boolean jeDuplikatRezervacije(Aranzmani aranzman, String ime, String prezime)
     {
-        for (Rezervacija r : rez.getSveRezervacije())
+        for (Rezervacija r : aranzman.getRezervacije())
         {
-            if (r.getOznakaAranzmana() != oznakaAranzmana)
-            {
-                continue;
-            }
-            
             if (!equalsIgnorirajCase(r.getIme(), ime) || !equalsIgnorirajCase(r.getPrezime(), prezime))
             {
                 continue;
