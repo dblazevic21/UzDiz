@@ -92,61 +92,7 @@ public class Rezervacije
         azurirajOdgodeneRezervacije(aranzmani);
     }
     
-    private void azurirajOdgodeneRezervacije(Map<Integer, Aranzmani> aranzmani) {
-        Map<String, List<Rezervacija>> rezervacijePoOsobi = new HashMap<>();
-
-        for (Aranzmani aranzman : aranzmani.values()) {
-            for (Rezervacija r : aranzman.getRezervacije()) {
-                if (r.getStatus() instanceof OtkazanaConcreteState) {
-                    continue;
-                }
-
-                String kljuc = (r.getIme() + "_" + r.getPrezime()).toLowerCase();
-                rezervacijePoOsobi
-                        .computeIfAbsent(kljuc, k -> new ArrayList<>())
-                        .add(r);
-            }
-        }
-
-        for (List<Rezervacija> rezervacijeOsobe : rezervacijePoOsobi.values()) {
-            if (rezervacijeOsobe.size() < 2) {
-                continue;
-            }
-
-            rezervacijeOsobe.sort(Comparator
-                    .comparing(Rezervacija::getDatumVrijeme, LDT_ORDER)
-                    .thenComparingLong(Rezervacija::getRedniBroj));
-
-            for (int i = 0; i < rezervacijeOsobe.size(); i++) {
-                Rezervacija trenutna = rezervacijeOsobe.get(i);
-
-                if (trenutna.getStatus() instanceof OtkazanaConcreteState) {
-                    continue;
-                }
-
-                Aranzmani aranzmanTrenutni = aranzmani.get(trenutna.getOznakaAranzmana());
-                if (aranzmanTrenutni == null) continue;
-
-                for (int j = 0; j < i; j++) {
-                    Rezervacija ranija = rezervacijeOsobe.get(j);
-
-                    if (ranija.getStatus() instanceof OtkazanaConcreteState) {
-                        continue;
-                    }
-
-                    Aranzmani aranzmanRaniji = aranzmani.get(ranija.getOznakaAranzmana());
-                    if (aranzmanRaniji == null) continue;
-
-                    if (aranzmaniSePreklapaju(aranzmanRaniji, aranzmanTrenutni)) {
-                        if (ranija.getStatus() instanceof AktivnaConcreteState) {
-                            trenutna.setStatus(new OdgodenaConcreteState());
-                        }
-                        break;
-                    }
-                }
-            }
-        }
-    }
+   
 
     
     private boolean aranzmaniSePreklapaju(Aranzmani a1, Aranzmani a2)
@@ -162,48 +108,152 @@ public class Rezervacije
     }
     
     public boolean otkaziRezervaciju(int oznakaAranzmana, String ime, String prezime, 
-                                      LocalDateTime when, Map<Integer, Aranzmani> aranzmani) 
+            LocalDateTime when, Map<Integer, Aranzmani> aranzmani) 
     {
-        String i = (ime == null) ? "" : ime.trim();
-        String p = (prezime == null) ? "" : prezime.trim();
+    	String i = (ime == null) ? "" : ime.trim();
+    	String p = (prezime == null) ? "" : prezime.trim();
 
-        Aranzmani aranzman = aranzmani.get(oznakaAranzmana);
-        if (aranzman == null) return false;
+    	Aranzmani aranzman = aranzmani.get(oznakaAranzmana);
+    	if (aranzman == null) return false;
 
-        Rezervacija cilj = aranzman.getRezervacije().stream()
-                .filter(r -> equalsIgnorirajCase(r.getIme(), i)
-                        && equalsIgnorirajCase(r.getPrezime(), p)
-                        && !(r.getStatus() instanceof OtkazanaConcreteState))
-                .min(Comparator
-                        .comparing(Rezervacija::getDatumVrijeme, LDT_ORDER)
-                        .thenComparingLong(Rezervacija::getRedniBroj))
-                .orElse(null);
-
-        if (cilj == null) return false;
-
-        boolean bilaAktivna = cilj.getStatus() instanceof AktivnaConcreteState;
-
-        cilj.setStatus(new OtkazanaConcreteState());
-        cilj.setOtkazanoAt(when != null ? when : LocalDateTime.now());
-
-        if (bilaAktivna)
-        {
-            Rezervacija generirajAktivna = aranzman.getRezervacije().stream()
-                    .filter(r -> r.getStatus() instanceof NaCekanjuConcreteState)
-                    .min(Comparator
-                            .comparing(Rezervacija::getDatumVrijeme, LDT_ORDER)
-                            .thenComparingLong(Rezervacija::getRedniBroj))
-                    .orElse(null);
-
-            if (generirajAktivna != null) 
-            {
-                generirajAktivna.setStatus(new AktivnaConcreteState());
-            }
-            promakniOdgodenuRezervaciju(i, p, cilj, aranzmani);
-        }
-
-        return true;
+    	Rezervacija cilj = aranzman.getRezervacije().stream()
+    			.filter(r -> equalsIgnorirajCase(r.getIme(), i)
+    					&& equalsIgnorirajCase(r.getPrezime(), p)
+    					&& !(r.getStatus() instanceof OtkazanaConcreteState))
+    			.min(Comparator
+    					.comparing(Rezervacija::getDatumVrijeme, LDT_ORDER)
+    					.thenComparingLong(Rezervacija::getRedniBroj))
+    			.orElse(null);
+    	
+    	if (cilj == null) return false;
+    	
+    	boolean bilaAktivna = cilj.getStatus() instanceof AktivnaConcreteState;
+    	
+    	cilj.setStatus(new OtkazanaConcreteState());
+    	cilj.setOtkazanoAt(when != null ? when : LocalDateTime.now());
+    	
+    	if (bilaAktivna)
+    	{
+    		Rezervacija generirajAktivna = aranzman.getRezervacije().stream()
+    				.filter(r -> r.getStatus() instanceof NaCekanjuConcreteState)
+    				.min(Comparator
+    						.comparing(Rezervacija::getDatumVrijeme, LDT_ORDER)
+    						.thenComparingLong(Rezervacija::getRedniBroj))
+    				.orElse(null);
+    		
+    		if (generirajAktivna != null) 
+    		{
+    			boolean imaAktivnuKojaSePreklapaju = imaAktivnuRezervacijuKojaSePrklapa(
+    					generirajAktivna.getIme(), 
+    					generirajAktivna.getPrezime(), 
+    					aranzman, 
+    					aranzmani
+    					);
+    			
+    			if (imaAktivnuKojaSePreklapaju)
+    			{
+    				generirajAktivna.setStatus(new OdgodenaConcreteState());
+    			}
+    			else
+    			{
+    				generirajAktivna.setStatus(new AktivnaConcreteState());
+    			}
+    		}
+    		
+    		promakniOdgodenuRezervaciju(i, p, cilj, aranzmani);
+    	}
+    	
+    	return true;
     }
+    
+    private boolean imaAktivnuRezervacijuKojaSePrklapa(String ime, String prezime, 
+                              Aranzmani trenutniAranzman,
+                              Map<Integer, Aranzmani> aranzmani)
+    {
+    	for (Aranzmani a : aranzmani.values())
+    	{
+    		if (a.getOznaka() == trenutniAranzman.getOznaka())
+    		{
+    			continue;
+    		}
+    		
+    		if (!aranzmaniSePreklapaju(a, trenutniAranzman))
+    		{
+    			continue;
+    		}
+    		
+    		for (Rezervacija r : a.getRezervacije())
+    		{
+    			if (equalsIgnorirajCase(r.getIme(), ime) 
+    					&& equalsIgnorirajCase(r.getPrezime(), prezime)
+    					&& r.getStatus() instanceof AktivnaConcreteState)
+    			{
+    				return true;
+    			}
+    		}
+    	}
+    	return false;
+    }
+    
+    private void azurirajOdgodeneRezervacije(Map<Integer, Aranzmani> aranzmani) {
+	    	Map<String, List<Rezervacija>> rezervacijePoOsobi = new HashMap<>();
+	
+	    for (Aranzmani aranzman : aranzmani.values()) {
+	        for (Rezervacija r : aranzman.getRezervacije()) {
+	            if (r.getStatus() instanceof OtkazanaConcreteState) {
+	                continue;
+	            }
+	
+	            String kljuc = (r.getIme() + "_" + r.getPrezime()).toLowerCase();
+	            rezervacijePoOsobi
+	                    .computeIfAbsent(kljuc, k -> new ArrayList<>())
+	                    .add(r);
+	        }
+	    }
+	
+	    for (List<Rezervacija> rezervacijeOsobe : rezervacijePoOsobi.values()) {
+	        if (rezervacijeOsobe.size() < 2) {
+	            continue;
+	        }
+	
+	        rezervacijeOsobe.sort(Comparator
+	                .comparing((Rezervacija r) -> {
+	                    Aranzmani a = aranzmani.get(r.getOznakaAranzmana());
+	                    return a != null ? a.getPocetniDatum() : null;
+	                }, Comparator.nullsLast(Comparator.naturalOrder()))
+	                .thenComparingLong(Rezervacija::getRedniBroj));
+	
+	        for (int i = 0; i < rezervacijeOsobe.size(); i++) {
+	            Rezervacija trenutna = rezervacijeOsobe.get(i);
+	
+	            if (trenutna.getStatus() instanceof OtkazanaConcreteState) {
+	                continue;
+	            }
+	
+	            Aranzmani aranzmanTrenutni = aranzmani.get(trenutna.getOznakaAranzmana());
+	            if (aranzmanTrenutni == null) continue;
+	
+	            for (int j = 0; j < i; j++) {
+	                Rezervacija ranija = rezervacijeOsobe.get(j);
+	
+	                if (ranija.getStatus() instanceof OtkazanaConcreteState) {
+	                    continue;
+	                }
+	
+	                Aranzmani aranzmanRaniji = aranzmani.get(ranija.getOznakaAranzmana());
+	                if (aranzmanRaniji == null) continue;
+	
+	                if (aranzmaniSePreklapaju(aranzmanRaniji, aranzmanTrenutni)) {
+	                    if (ranija.getStatus() instanceof AktivnaConcreteState) {
+	                        trenutna.setStatus(new OdgodenaConcreteState());
+	                    }
+	                    break;
+	                }
+	            }
+	        }
+	    }
+	}
+
     
     public List<Rezervacija> getZaOsobu(String ime, String prezime)
     {
@@ -247,38 +297,26 @@ public class Rezervacije
         return true;
     }
 
-    public boolean dodajRezervaciju(String ime, String prezime, int oznakaAranzmana, LocalDateTime datumVrijeme, Map<Integer, Aranzmani> aranzmani) 
-    {
-        Aranzmani aranzman = aranzmani.get(oznakaAranzmana);
-        if (aranzman == null) 
-        {
-            return false;
-        }
+    public boolean dodajRezervaciju(String ime, String prezime, int oznakaAranzmana, 
+            LocalDateTime datumVrijeme, Map<Integer, Aranzmani> aranzmani) 
+{
+Aranzmani aranzman = aranzmani.get(oznakaAranzmana);
+if (aranzman == null) 
+{
+return false;
+}
 
-        boolean imaPreklapanje = aranzmani.values().stream()
-                .flatMap(a -> a.getRezervacije().stream())
-                .anyMatch(r -> r.getIme().equalsIgnoreCase(ime.trim())
-                        && r.getPrezime().equalsIgnoreCase(prezime.trim())
-                        && aranzmaniSePreklapaju(aranzman, aranzmani.get(r.getOznakaAranzmana()))
-                        && r.getStatus() instanceof AktivnaConcreteState);
+Rezervacija novaRezervacija = kreirajRezervaciju(ime, prezime, oznakaAranzmana, datumVrijeme);
+aranzman.dodajRezervaciju(novaRezervacija);
 
-        Rezervacija novaRezervacija = kreirajRezervaciju(ime, prezime, oznakaAranzmana, datumVrijeme);
+// Prvo ažuriraj statuse na temelju kapaciteta (PRIMLJENA/AKTIVNA/NA_ČEKANJU)
+aranzman.azurirajStatuseRezervacija();
 
-        if (imaPreklapanje) 
-        {
-            novaRezervacija.setStatus(new OdgodenaConcreteState());
-        } 
-        else 
-        {
-            novaRezervacija.setStatus(new AktivnaConcreteState());
-        }
+// Zatim ažuriraj ODGOĐENE na temelju preklapanja
+azurirajOdgodeneRezervacije(aranzmani);
 
-        aranzman.dodajRezervaciju(novaRezervacija);
-        azurirajStatuseRezervacija(aranzmani);
-        return true;
-    }
-
-
+return true;
+}
 
 
     private void promakniOdgodenuRezervaciju(String ime, String prezime, 
