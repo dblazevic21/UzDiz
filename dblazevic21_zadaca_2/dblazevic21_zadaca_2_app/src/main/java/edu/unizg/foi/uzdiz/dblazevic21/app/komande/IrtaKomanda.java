@@ -1,5 +1,6 @@
 package edu.unizg.foi.uzdiz.dblazevic21.app.komande;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -8,6 +9,7 @@ import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 import edu.unizg.foi.uzdiz.dblazevic21.app.ispis.FormaterZaIspise;
+import edu.unizg.foi.uzdiz.dblazevic21.app.ispis.IspisKonfiguracija;
 import edu.unizg.foi.uzdiz.dblazevic21.app.ispis.StatusFormater;
 import edu.unizg.foi.uzdiz.dblazevic21.app.ispis.TablicaPrinter;
 import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.aranzmani.Aranzmani;
@@ -102,6 +104,11 @@ public class IrtaKomanda implements Komanda
                             || (dodajOdgođen && isOdgođena);
                 })
                 .collect(Collectors.toList());
+        
+        if (IspisKonfiguracija.jeObrnutoKronoloski())
+        {
+            Collections.reverse(zaIspis);
+        }
 
         if (zaIspis.isEmpty())
         {

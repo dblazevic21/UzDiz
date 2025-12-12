@@ -54,10 +54,16 @@ public class OrtaKomanda implements Komanda
         if (ok)
         {
             Rezervacije.getInstance().azurirajStatuseRezervacija(aranzmani);
+            System.out.println();
+            System.out.println(unos);
+            System.out.println();
             System.out.println("Rezervacija za osobu " + ime + " " + prezime + " na aranžman " + oznaka + " je otkazana.");
         } 
         else 
         {
+        	System.out.println();
+            System.out.println(unos);
+            System.out.println();
             System.out.println("Ne postoji rezervacija za osobu " + ime + " " + prezime + " na aranžman " + oznaka + ".");
         }
     }

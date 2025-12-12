@@ -66,7 +66,10 @@ public class DrtaKomanda implements Komanda
             System.out.println("Aranžman s oznakom " + oznaka + " ne postoji.");
             return;
         }
-
+        
+        System.out.println();
+        System.out.println(unos);
+        System.out.println();
         provjeriIDodajRezervaciju(ime, prezime, oznaka, datumVrijeme);
     }
 

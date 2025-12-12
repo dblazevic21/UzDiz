@@ -2,6 +2,7 @@ package edu.unizg.foi.uzdiz.dblazevic21.app.komande;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -9,6 +10,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import edu.unizg.foi.uzdiz.dblazevic21.app.ispis.FormaterZaIspise;
+import edu.unizg.foi.uzdiz.dblazevic21.app.ispis.IspisKonfiguracija;
 import edu.unizg.foi.uzdiz.dblazevic21.app.ispis.StatusFormater;
 import edu.unizg.foi.uzdiz.dblazevic21.app.ispis.TablicaPrinter;
 import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.aranzmani.Aranzmani;
@@ -90,6 +92,11 @@ public class ItakKomanda implements Komanda
             lista.removeIf(a -> a == null || a.getPocetniDatum() == null
                     || a.getPocetniDatum().isBefore(od)
                     || a.getPocetniDatum().isAfter(dO));
+        }
+        
+        if (IspisKonfiguracija.jeObrnutoKronoloski()) 
+        {
+            Collections.reverse(lista);
         }
 
         int[] w = {7, 35, 14, 14, 12, 16, 10, 18, 18, 18};

@@ -1,8 +1,5 @@
 package edu.unizg.foi.uzdiz.dblazevic21.app.komande;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -44,81 +41,11 @@ public class ItapKomanda implements Komanda
         if (pogodeniOznaka.matches())
         {
             int oznaka = Integer.parseInt(pogodeniOznaka.group(1));
+            System.out.println();
+            System.out.println(unos);
             ispisiAranzmanDetaljno(oznaka);
             return;
         }
-
-        Pattern uzorakCijene = Pattern.compile("^ITAP\\s+([0-9]+[\\.,]?[0-9]*)\\s+([0-9]+[\\.,]?[0-9]*)$",
-                Pattern.CASE_INSENSITIVE);
-        Matcher pogodeniCijene = uzorakCijene.matcher(izrezan);
-        if (pogodeniCijene.matches())
-        {
-            Float min = FormaterZaIspise.parseCijenu(pogodeniCijene.group(1));
-            Float max = FormaterZaIspise.parseCijenu(pogodeniCijene.group(2));
-
-            if (min == null || max == null)
-            {
-                System.out.println("Neispravna cijena.");
-                return;
-            }
-            if (max < min)
-            {
-                System.out.println("Greška: maksimalna cijena manja od minimalne.");
-                return;
-            }
-            ispisiAranzmanePoCijeni(min, max);
-            return;
-        }
-
-        System.out.println("Nepoznata komanda. Upotrijebite: ITAP [min max] ili ITAP [oznaka]");
-    }
-
-    private void ispisiAranzmanePoCijeni(Float min, Float max)
-    {
-        List<Aranzmani> lista = new ArrayList<>(aranzmani.values());
-        lista.sort(Comparator
-                .comparing(Aranzmani::getCijena)
-                .thenComparing(Aranzmani::getOznaka));
-
-        if (min != null && max != null)
-        {
-            lista.removeIf(a -> a == null || a.getCijena() < min || a.getCijena() > max);
-        }
-
-        if (lista.isEmpty())
-        {
-            System.out.println("Nema aranžmana u zadanom rasponu cijena.");
-            return;
-        }
-
-        int[] w = {7, 35, 14, 14, 12, 16, 10, 18, 18, 18};
-
-    	boolean[] desno = {true, false, false, false, false, false, true, true, true};
-        
-        TablicaPrinter.printajSeperatorTabliceMulti(w);
-        TablicaPrinter.printajRedTabliceMultiAlign(w, desno,
-                "Oznaka", "Naziv", "Početni datum", "Završni datum",
-                "Kretanje", "Povratak", "Cijena", "Min br. putnika", "Maks br. putnika", "Status"
-        );
-        TablicaPrinter.printajSeperatorTabliceMulti(w);
-
-        for (Aranzmani a : lista)
-        {
-            TablicaPrinter.printajRedTabliceMultiAlign(w, desno,
-                    String.valueOf(a.getOznaka()),
-                    FormaterZaIspise.izrezi(a.getNaziv(), 35),
-                    FormaterZaIspise.fmtDatum(a.getPocetniDatum()),
-                    FormaterZaIspise.fmtDatum(a.getZavrsniDatum()),
-                    FormaterZaIspise.fmtVrijeme(a.getVrijemeKretanja()),
-                    FormaterZaIspise.fmtVrijeme(a.getVrijemePovratka()),
-                    FormaterZaIspise.fmtCijena(a.getCijena()),
-                    String.valueOf(a.getMinBrojPutnika()),
-                    String.valueOf(a.getMaksBrojPutnika()),
-                    StatusFormater.statusOznakaAranzmana(a.getStatus())
-                    );
-        }
-
-        TablicaPrinter.printajSeperatorTabliceMulti(w);
     }
 
     private void ispisiAranzmanDetaljno(int oznaka)
@@ -134,6 +61,7 @@ public class ItapKomanda implements Komanda
         final int w2 = 90;
 
         System.out.println("Detalji turističkog aranžmana");
+        System.out.println();
         TablicaPrinter.printajSeperatorTablice(w1, w2);
         TablicaPrinter.printajRedTablice("Polje", "Vrijednost", w1, w2);
         TablicaPrinter.printajSeperatorTablice(w1, w2);
