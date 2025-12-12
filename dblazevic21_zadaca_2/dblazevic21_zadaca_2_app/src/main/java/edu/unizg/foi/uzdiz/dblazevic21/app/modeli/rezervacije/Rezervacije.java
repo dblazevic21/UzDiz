@@ -195,13 +195,13 @@ public class Rezervacije
     	return false;
     }
     
-    private void azurirajOdgodeneRezervacije(Map<Integer, Aranzmani> aranzmani) 
+    private void azurirajOdgodeneRezervacije(Map<Integer, Aranzmani> aranzmani)
     {
         Map<String, List<Rezervacija>> rezervacijePoOsobi = new HashMap<>();
 
         for (Aranzmani aranzman : aranzmani.values()) 
         {
-            for (Rezervacija r : aranzman.getRezervacije()) 
+            for (Rezervacija r : aranzman.getRezervacije())
             {
                 if (r.getStatus() instanceof OtkazanaConcreteState) 
                 {
@@ -214,7 +214,7 @@ public class Rezervacije
             }
         }
 
-        for (List<Rezervacija> rezervacijeOsobe : rezervacijePoOsobi.values()) 
+        for (List<Rezervacija> rezervacijeOsobe : rezervacijePoOsobi.values())
         {
             if (rezervacijeOsobe.size() < 2) 
             {
@@ -235,7 +235,7 @@ public class Rezervacije
             {
                 Rezervacija r0 = rezervacijeOsobe.get(i);
                 Aranzmani a0 = aranzmani.get(r0.getOznakaAranzmana());
-                if (a0 == null || r0.getStatus() instanceof OtkazanaConcreteState)
+                if (a0 == null || r0.getStatus() instanceof OtkazanaConcreteState) 
                 {
                     i++;
                     continue;
@@ -249,13 +249,13 @@ public class Rezervacije
                 {
                     Rezervacija rj = rezervacijeOsobe.get(j);
                     Aranzmani aj = aranzmani.get(rj.getOznakaAranzmana());
-                    if (aj == null || rj.getStatus() instanceof OtkazanaConcreteState)
+                    if (aj == null || rj.getStatus() instanceof OtkazanaConcreteState) 
                     {
                         j++;
                         continue;
                     }
 
-                    if (!aranzmaniSePreklapaju(a0, aj))
+                    if (!aranzmaniSePreklapaju(a0, aj)) 
                     {
                         break;
                     }
@@ -266,18 +266,20 @@ public class Rezervacije
 
                 if (overlapGroup.size() > 1) 
                 {
-                    Rezervacija najranija = overlapGroup.get(0);
+                    List<Rezervacija> aktivneUGrupi = overlapGroup.stream()
+                            .filter(r -> r.getStatus() instanceof AktivnaConcreteState)
+                            .sorted(Comparator
+                                    .comparing(Rezervacija::getDatumVrijeme, LDT_ORDER)
+                                    .thenComparingLong(Rezervacija::getRedniBroj))
+                            .collect(Collectors.toList());
 
-                    if (!(najranija.getStatus() instanceof OtkazanaConcreteState)) 
+                    if (!aktivneUGrupi.isEmpty()) 
                     {
-                        najranija.setStatus(new AktivnaConcreteState());
-                    }
+                        Rezervacija najranijaAktivna = aktivneUGrupi.get(0);
 
-                    for (int k = 1; k < overlapGroup.size(); k++) 
-                    {
-                        Rezervacija rk = overlapGroup.get(k);
-                        if (!(rk.getStatus() instanceof OtkazanaConcreteState))
+                        for (int k = 1; k < aktivneUGrupi.size(); k++) 
                         {
+                            Rezervacija rk = aktivneUGrupi.get(k);
                             rk.setStatus(new OdgodenaConcreteState());
                         }
                     }
@@ -287,6 +289,7 @@ public class Rezervacije
             }
         }
     }
+
 
 
     
