@@ -195,16 +195,13 @@ public class Rezervacije
     	return false;
     }
     
-    private void azurirajOdgodeneRezervacije(Map<Integer, Aranzmani> aranzmani)
+    private void azurirajOdgodeneRezervacije(Map<Integer, Aranzmani> aranzmani) 
     {
         Map<String, List<Rezervacija>> rezervacijePoOsobi = new HashMap<>();
 
-        for (Aranzmani aranzman : aranzmani.values()) 
-        {
-            for (Rezervacija r : aranzman.getRezervacije())
-            {
-                if (r.getStatus() instanceof OtkazanaConcreteState) 
-                {
+        for (Aranzmani aranzman : aranzmani.values()) {
+            for (Rezervacija r : aranzman.getRezervacije()) {
+                if (r.getStatus() instanceof OtkazanaConcreteState) {
                     continue;
                 }
                 String kljuc = (r.getIme() + "_" + r.getPrezime()).toLowerCase();
@@ -214,10 +211,8 @@ public class Rezervacije
             }
         }
 
-        for (List<Rezervacija> rezervacijeOsobe : rezervacijePoOsobi.values())
-        {
-            if (rezervacijeOsobe.size() < 2) 
-            {
+        for (List<Rezervacija> rezervacijeOsobe : rezervacijePoOsobi.values()) {
+            if (rezervacijeOsobe.size() < 2) {
                 continue;
             }
 
@@ -231,12 +226,10 @@ public class Rezervacije
             int n = rezervacijeOsobe.size();
             int i = 0;
 
-            while (i < n) 
-            {
+            while (i < n) {
                 Rezervacija r0 = rezervacijeOsobe.get(i);
                 Aranzmani a0 = aranzmani.get(r0.getOznakaAranzmana());
-                if (a0 == null || r0.getStatus() instanceof OtkazanaConcreteState) 
-                {
+                if (a0 == null || r0.getStatus() instanceof OtkazanaConcreteState) {
                     i++;
                     continue;
                 }
@@ -245,18 +238,15 @@ public class Rezervacije
                 overlapGroup.add(r0);
                 int j = i + 1;
 
-                while (j < n) 
-                {
+                while (j < n) {
                     Rezervacija rj = rezervacijeOsobe.get(j);
                     Aranzmani aj = aranzmani.get(rj.getOznakaAranzmana());
-                    if (aj == null || rj.getStatus() instanceof OtkazanaConcreteState) 
-                    {
+                    if (aj == null || rj.getStatus() instanceof OtkazanaConcreteState) {
                         j++;
                         continue;
                     }
 
-                    if (!aranzmaniSePreklapaju(a0, aj)) 
-                    {
+                    if (!aranzmaniSePreklapaju(a0, aj)) {
                         break;
                     }
 
@@ -264,32 +254,26 @@ public class Rezervacije
                     j++;
                 }
 
-                if (overlapGroup.size() > 1) 
-                {
-                    List<Rezervacija> aktivneUGrupi = overlapGroup.stream()
-                            .filter(r -> r.getStatus() instanceof AktivnaConcreteState)
-                            .sorted(Comparator
-                                    .comparing(Rezervacija::getDatumVrijeme, LDT_ORDER)
-                                    .thenComparingLong(Rezervacija::getRedniBroj))
-                            .collect(Collectors.toList());
+                if (overlapGroup.size() > 1) {
+                    overlapGroup.sort(Comparator
+                            .comparing(Rezervacija::getDatumVrijeme, LDT_ORDER)
+                            .thenComparingLong(Rezervacija::getRedniBroj));
 
-                    if (!aktivneUGrupi.isEmpty()) 
-                    {
-                        Rezervacija najranijaAktivna = aktivneUGrupi.get(0);
+                    Rezervacija najranija = overlapGroup.get(0);
 
-                        for (int k = 1; k < aktivneUGrupi.size(); k++) 
-                        {
-                            Rezervacija rk = aktivneUGrupi.get(k);
+                    for (int k = 1; k < overlapGroup.size(); k++) {
+                        Rezervacija rk = overlapGroup.get(k);
+                        if (!(rk.getStatus() instanceof OtkazanaConcreteState)) {
                             rk.setStatus(new OdgodenaConcreteState());
                         }
                     }
+
                 }
 
                 i = j;
             }
         }
     }
-
 
 
     
