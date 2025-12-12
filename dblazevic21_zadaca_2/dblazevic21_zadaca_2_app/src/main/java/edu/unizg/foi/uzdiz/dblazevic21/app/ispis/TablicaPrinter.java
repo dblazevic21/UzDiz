@@ -14,25 +14,35 @@ public class TablicaPrinter {
         }
         System.out.println(sb);
     }
-
-    public static void printajRedTabliceMulti(int[] widths, String... cells) 
+    
+    public static void printajRedTabliceMultiAlign(int[] widths, boolean[] rightAlign, String... cells)
     {
         StringBuilder fmt = new StringBuilder("|");
-        for (int w : widths)
+        for (int i = 0; i < widths.length; i++)
         {
-    		fmt.append(" %-" + w + "s |");
+            int w = widths[i];
+            boolean right = (rightAlign != null && i < rightAlign.length && rightAlign[i]);
+            fmt.append(right ? " %" + w + "s |" : " %-" + w + "s |");
         }
         fmt.append("%n");
 
         Object[] out = new Object[widths.length];
-        
-        for (int i = 0; i < widths.length; i++) 
+
+        for (int i = 0; i < widths.length; i++)
         {
             String v = (i < cells.length && cells[i] != null && !cells[i].isBlank()) ? cells[i] : "-";
             out[i] = v;
         }
         System.out.printf(fmt.toString(), out);
     }
+
+
+    public static void printajRedTabliceMulti(int[] widths, String... cells)
+    {
+        boolean[] align = new boolean[widths.length];
+        printajRedTabliceMultiAlign(widths, align, cells);
+    }
+
 
     public static List<String> wrapajTekst(String text, int width) 
     {

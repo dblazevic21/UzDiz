@@ -1,5 +1,7 @@
 package edu.unizg.foi.uzdiz.dblazevic21.app.ispis;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -34,10 +36,26 @@ public class FormaterZaIspise
         return "-";
     }
     
-    public static String fmtCijena(float c) 
+    public static String fmtBroj(long n)
     {
-        return String.format(Locale.ROOT, "%.2f", c);
+        DecimalFormat df = new DecimalFormat("#,##0", 
+                DecimalFormatSymbols.getInstance(Locale.ROOT));
+        df.setGroupingUsed(true);
+        df.setGroupingSize(3);
+        return df.format(n);
     }
+
+    public static String fmtCijena(float c)
+    {
+    	DecimalFormatSymbols sym =  DecimalFormatSymbols.getInstance(Locale.ROOT);
+        sym.setDecimalSeparator('.');
+        sym.setGroupingSeparator('.');
+        DecimalFormat df = new  DecimalFormat("#,##0.00", sym);
+        df.setGroupingUsed(true);
+        df.setGroupingSize(3);
+        return df.format(c);
+    }
+
     
     public static Float parseCijenu(String s)
     {

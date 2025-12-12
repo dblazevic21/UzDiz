@@ -37,6 +37,10 @@ public class ItakKomanda implements Komanda
 
         if (izrezano.equalsIgnoreCase("ITAK"))
         {
+        	System.out.println();
+        	System.out.println(unos);
+            System.out.println("Popis turističkih aranžmana");
+            System.out.println();
             ispisiAranzmane(null, null);
             return;
         }
@@ -62,6 +66,10 @@ public class ItakKomanda implements Komanda
                 System.out.println("Greška: završni datum je prije početnog.");
                 return;
             }
+            System.out.println();
+            System.out.println(unos);
+            System.out.println("Popis turističkih aranžmana");
+            System.out.println();
             ispisiAranzmane(od, dO);
             return;
         }
@@ -84,21 +92,32 @@ public class ItakKomanda implements Komanda
         }
 
         int[] w = {7, 35, 14, 14, 12, 16, 10, 18, 18};
+        boolean[] desno = {
+                true,
+                false,
+                false,
+                false,
+                false,
+                false,
+                true, 
+                true, 
+                true
+        };
 
         TablicaPrinter.printajSeperatorTabliceMulti(w);
-        TablicaPrinter.printajRedTabliceMulti(w,
+        TablicaPrinter.printajRedTabliceMultiAlign(w, desno,
                 "Oznaka", "Naziv", "Početni datum", "Završni datum",
                 "Kretanje", "Povratak", "Cijena", "Min br. putnika", "Maks br. putnika"
         );
         TablicaPrinter.printajSeperatorTabliceMulti(w);
 
-        for (Aranzmani a : lista) 
+        for (Aranzmani a : lista)
         {
             if (a == null) 
-            {
-                continue;
-            }
-            TablicaPrinter.printajRedTabliceMulti(w,
+        	{
+        		continue;
+        	}
+            TablicaPrinter.printajRedTabliceMultiAlign(w, desno,
                     String.valueOf(a.getOznaka()),
                     FormaterZaIspise.izrezi(a.getNaziv(), 35),
                     FormaterZaIspise.fmtDatum(a.getPocetniDatum()),
