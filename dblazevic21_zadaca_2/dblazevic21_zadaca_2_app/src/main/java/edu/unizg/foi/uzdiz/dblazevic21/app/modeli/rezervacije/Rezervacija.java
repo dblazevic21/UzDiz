@@ -16,7 +16,7 @@ public class Rezervacija implements TuristickiElement
     private final String ime;
     private final String prezime;
     private final int oznakaAranzmana;
-    private final LocalDateTime datumVrijeme;
+    private LocalDateTime datumVrijeme;
     private RezervacijeState status;
     private LocalDateTime otkazanoAt;
 
@@ -106,6 +106,11 @@ public class Rezervacija implements TuristickiElement
     public String getPrezime()
     {
         return prezime;
+    }
+    
+    public void setDatumVrijeme(LocalDateTime datumVrijeme) 
+    {
+        this.datumVrijeme = datumVrijeme;
     }
 
     public int getOznakaAranzmana()

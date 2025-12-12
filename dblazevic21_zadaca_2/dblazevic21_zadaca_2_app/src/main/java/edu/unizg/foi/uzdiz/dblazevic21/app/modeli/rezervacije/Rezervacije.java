@@ -11,9 +11,9 @@ import java.util.stream.Collectors;
 import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.aranzmani.Aranzmani;
 import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.rezervacije.AktivnaConcreteState;
 import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.rezervacije.NaCekanjuConcreteState;
+import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.rezervacije.NovaConcreteState;
 import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.rezervacije.OdgodenaConcreteState;
 import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.rezervacije.OtkazanaConcreteState;
-import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.rezervacije.PrimljenaConcreteState;
 import edu.unizg.foi.uzdiz.dblazevic21.app.turistickaAgencija.TuristickaAgencija;
 
 public class Rezervacije 
@@ -93,16 +93,12 @@ public class Rezervacije
         azurirajOdgodeneRezervacije(aranzmani);
     }
     
-    private void azurirajOdgodeneRezervacije(Map<Integer, Aranzmani> aranzmani)
-    {
+    private void azurirajOdgodeneRezervacije(Map<Integer, Aranzmani> aranzmani) {
         Map<String, List<Rezervacija>> rezervacijePoOsobi = new HashMap<>();
 
-        for (Aranzmani aranzman : aranzmani.values())
-        {
-            for (Rezervacija r : aranzman.getRezervacije())
-            {
-                if (r.getStatus() instanceof OtkazanaConcreteState)
-                {
+        for (Aranzmani aranzman : aranzmani.values()) {
+            for (Rezervacija r : aranzman.getRezervacije()) {
+                if (r.getStatus() instanceof OtkazanaConcreteState) {
                     continue;
                 }
 
@@ -113,10 +109,8 @@ public class Rezervacije
             }
         }
 
-        for (List<Rezervacija> rezervacijeOsobe : rezervacijePoOsobi.values())
-        {
-            if (rezervacijeOsobe.size() < 2)
-            {
+        for (List<Rezervacija> rezervacijeOsobe : rezervacijePoOsobi.values()) {
+            if (rezervacijeOsobe.size() < 2) {
                 continue;
             }
 
@@ -124,41 +118,31 @@ public class Rezervacije
                     .comparing(Rezervacija::getDatumVrijeme, LDT_ORDER)
                     .thenComparingLong(Rezervacija::getRedniBroj));
 
-            for (int i = 0; i < rezervacijeOsobe.size(); i++)
-            {
+            for (int i = 0; i < rezervacijeOsobe.size(); i++) {
                 Rezervacija trenutna = rezervacijeOsobe.get(i);
 
-                if (trenutna.getStatus() instanceof OtkazanaConcreteState ||
-                    trenutna.getStatus() instanceof OdgodenaConcreteState)
-                {
+                if (trenutna.getStatus() instanceof OtkazanaConcreteState) {
                     continue;
                 }
 
                 Aranzmani aranzmanTrenutni = aranzmani.get(trenutna.getOznakaAranzmana());
                 if (aranzmanTrenutni == null) continue;
 
-                for (int j = 0; j < i; j++)
-                {
+                for (int j = 0; j < i; j++) {
                     Rezervacija ranija = rezervacijeOsobe.get(j);
 
-                    if (ranija.getStatus() instanceof OtkazanaConcreteState ||
-                        ranija.getStatus() instanceof OdgodenaConcreteState)
-                    {
+                    if (ranija.getStatus() instanceof OtkazanaConcreteState) {
                         continue;
                     }
 
                     Aranzmani aranzmanRaniji = aranzmani.get(ranija.getOznakaAranzmana());
                     if (aranzmanRaniji == null) continue;
 
-                    if (aranzmaniSePreklapaju(aranzmanRaniji, aranzmanTrenutni))
-                    {
-                        if (ranija.getStatus() instanceof AktivnaConcreteState ||
-                            ranija.getStatus() instanceof PrimljenaConcreteState ||
-                            ranija.getStatus() instanceof NaCekanjuConcreteState)
-                        {
+                    if (aranzmaniSePreklapaju(aranzmanRaniji, aranzmanTrenutni)) {
+                        if (ranija.getStatus() instanceof AktivnaConcreteState) {
                             trenutna.setStatus(new OdgodenaConcreteState());
-                            break;
                         }
+                        break;
                     }
                 }
             }
@@ -264,31 +248,38 @@ public class Rezervacije
         return true;
     }
 
-    public boolean dodajRezervaciju(String ime, String prezime, int oznakaAranzmana, 
-            LocalDateTime datumVrijeme, Map<Integer, Aranzmani> aranzmani)
+    public boolean dodajRezervaciju(String ime, String prezime, int oznakaAranzmana, LocalDateTime datumVrijeme, Map<Integer, Aranzmani> aranzmani) 
     {
-    	Aranzmani aranzman = aranzmani.get(oznakaAranzmana);
-    	if (aranzman == null)
-    	{
-    		return false;
-    	}
+        Aranzmani aranzman = aranzmani.get(oznakaAranzmana);
+        if (aranzman == null) 
+        {
+            return false;
+        }
 
-    	for (Rezervacija r : aranzman.getRezervacije())
-    	{
-    		if (equalsIgnorirajCase(r.getIme(), ime) 
-    				&& equalsIgnorirajCase(r.getPrezime(), prezime)
-    				&& !(r.getStatus() instanceof OtkazanaConcreteState))
-    		{
-    			return false;
-    		}
-    	}
+        boolean imaPreklapanje = aranzmani.values().stream()
+                .flatMap(a -> a.getRezervacije().stream())
+                .anyMatch(r -> r.getIme().equalsIgnoreCase(ime.trim())
+                        && r.getPrezime().equalsIgnoreCase(prezime.trim())
+                        && aranzmaniSePreklapaju(aranzman, aranzmani.get(r.getOznakaAranzmana()))
+                        && r.getStatus() instanceof AktivnaConcreteState);
 
-    	Rezervacija novaRezervacija = kreirajRezervaciju(ime, prezime, oznakaAranzmana, datumVrijeme);
-    	aranzman.dodajRezervaciju(novaRezervacija);
-    	azurirajStatuseRezervacija(aranzmani);
+        Rezervacija novaRezervacija = kreirajRezervaciju(ime, prezime, oznakaAranzmana, datumVrijeme);
 
-    	return true;
+        if (imaPreklapanje) 
+        {
+            novaRezervacija.setStatus(new OdgodenaConcreteState());
+        } 
+        else 
+        {
+            novaRezervacija.setStatus(new AktivnaConcreteState());
+        }
+
+        aranzman.dodajRezervaciju(novaRezervacija);
+        azurirajStatuseRezervacija(aranzmani);
+        return true;
     }
+
+
 
 
     private void promakniOdgodenuRezervaciju(String ime, String prezime, 

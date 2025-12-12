@@ -1,16 +1,12 @@
 package edu.unizg.foi.uzdiz.dblazevic21.app.komande;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import edu.unizg.foi.uzdiz.dblazevic21.app.ispis.FormaterZaIspise;
 import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.aranzmani.Aranzmani;
-import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.rezervacije.Rezervacija;
 import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.rezervacije.Rezervacije;
-import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.rezervacije.OtkazanaConcreteState;
 import edu.unizg.foi.uzdiz.dblazevic21.app.utils.DatumParser;
 import edu.unizg.foi.uzdiz.dblazevic21.app.utils.GramatikaIJezikApp;
 
@@ -76,26 +72,6 @@ public class DrtaKomanda implements Komanda
 
     public void provjeriIDodajRezervaciju(String ime, String prezime, int oznaka, LocalDateTime datumVrijeme) 
     {
-        List<Rezervacija> postojeceRezervacije = Rezervacije.getInstance().getZaOsobu(ime, prezime, aranzmani);
-        
-        for (Rezervacija r : postojeceRezervacije)
-        {
-            if (!(r.getStatus() instanceof OtkazanaConcreteState))
-            {
-                if (r.getOznakaAranzmana() == oznaka)
-                {
-                    System.out.println("Osoba " + ime + " " + prezime + " već ima rezervaciju za aranžman " + oznaka + ".");
-                    return;
-                }
-                
-                if (r.getDatumVrijeme() != null && r.getDatumVrijeme().equals(datumVrijeme))
-                {
-                    System.out.println("Osoba " + ime + " " + prezime + " već ima rezervaciju u terminu " + FormaterZaIspise.fmtDatumVrijeme(datumVrijeme, r.getDatumVrijemeRaw()) + ".");
-                    return;
-                }
-            }
-        }
-        
         try 
         {
             Rezervacije.getInstance().dodajRezervaciju(ime, prezime, oznaka, datumVrijeme, aranzmani);
