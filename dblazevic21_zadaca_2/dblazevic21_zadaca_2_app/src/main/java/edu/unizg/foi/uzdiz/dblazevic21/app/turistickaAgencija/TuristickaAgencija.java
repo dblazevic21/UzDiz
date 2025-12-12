@@ -3,7 +3,6 @@ package edu.unizg.foi.uzdiz.dblazevic21.app.turistickaAgencija;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -13,6 +12,7 @@ import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.aranzmani.AranzmaniBuilder;
 import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.aranzmani.AranzmaniBuilderConcrete;
 import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.aranzmani.AranzmaniDirector;
 import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.rezervacije.Rezervacija;
+import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.rezervacije.Rezervacije;
 import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.rezervacije.OtkazanaConcreteState;
 import edu.unizg.foi.uzdiz.dblazevic21.app.utils.DatumParser;
 import edu.unizg.foi.uzdiz.dblazevic21.app.utils.GramatikaIJezikApp;
@@ -89,6 +89,8 @@ public class TuristickaAgencija
 
     public void ucitajRezervacije(List<List<String>> podaci)
     {
+        Rezervacije rez = Rezervacije.getInstance();
+
         for (List<String> stupci : podaci)
         {
             try
@@ -98,13 +100,7 @@ public class TuristickaAgencija
                 int oznakaAranzmana = uInt(stupci.get(2));
                 String dtRaw = GramatikaIJezikApp.makniNavodnike(stupci.get(3));
 
-                Aranzmani aranzman = aranzmani.get(oznakaAranzmana);
-                if (aranzman == null)
-                {
-                    continue;
-                }
-
-                if (aranzman.imaRezervaciju(ime, prezime))
+                if (!aranzmani.containsKey(oznakaAranzmana))
                 {
                     continue;
                 }
@@ -114,13 +110,18 @@ public class TuristickaAgencija
                         dtRaw.contains(" ") ? dtRaw.split(" ", 2)[1] : ""
                 );
 
+                if (jeDuplikatRezervacije(rez, ime, prezime, oznakaAranzmana, datumVrijeme, dtRaw))
+                {
+                    continue;
+                }
+
                 if (datumVrijeme != null)
                 {
-                    aranzman.dodajRezervaciju(ime, prezime, datumVrijeme);
+                    rez.dodajRezervaciju(ime, prezime, oznakaAranzmana, datumVrijeme);
                 }
                 else
                 {
-                    aranzman.dodajRezervaciju(ime, prezime, dtRaw);
+                    rez.dodajRezervaciju(ime, prezime, oznakaAranzmana, dtRaw);
                 }
             }
             catch (Exception e)
@@ -129,103 +130,36 @@ public class TuristickaAgencija
             }
         }
 
-        azurirajOdgodeneRezervacije();
+        rez.azurirajStatuseRezervacija(aranzmani);
     }
 
-    private void azurirajOdgodeneRezervacije()
+    private boolean jeDuplikatRezervacije(Rezervacije rez, String ime, String prezime, int oznakaAranzmana, LocalDateTime datumVrijeme, String dtRaw)
     {
-        Map<String, List<Rezervacija>> rezervacijePoOsobi = new HashMap<>();
-
-        for (Aranzmani a : aranzmani.values())
+        for (Rezervacija r : rez.getSveRezervacije())
         {
-            for (Rezervacija r : a.getRezervacije())
-            {
-                if (r.getStatus() instanceof OtkazanaConcreteState)
-                {
-                    continue;
-                }
-
-                String kljuc = (r.getIme() + "_" + r.getPrezime()).toLowerCase();
-                rezervacijePoOsobi
-                        .computeIfAbsent(kljuc, k -> new ArrayList<>())
-                        .add(r);
-            }
-        }
-
-        for (List<Rezervacija> rezervacijeOsobe : rezervacijePoOsobi.values())
-        {
-            if (rezervacijeOsobe.size() < 2)
+            if (r.getOznakaAranzmana() != oznakaAranzmana)
             {
                 continue;
             }
-
-            for (int i = 0; i < rezervacijeOsobe.size(); i++)
+            
+            if (!equalsIgnorirajCase(r.getIme(), ime) || !equalsIgnorirajCase(r.getPrezime(), prezime))
             {
-                Rezervacija trenutna = rezervacijeOsobe.get(i);
-                Aranzmani aranzmanTrenutni = aranzmani.get(trenutna.getOznakaAranzmana());
-                
-                if (aranzmanTrenutni == null) continue;
-
-                for (int j = 0; j < i; j++)
-                {
-                    Rezervacija ranija = rezervacijeOsobe.get(j);
-                    Aranzmani aranzmanRaniji = aranzmani.get(ranija.getOznakaAranzmana());
-                    
-                    if (aranzmanRaniji == null) continue;
-
-                    if (aranzmaniSePreklapaju(aranzmanRaniji, aranzmanTrenutni))
-                    {
-                        trenutna.odgodi();
-                        break;
-                    }
-                }
+                continue;
+            }
+            
+            if (!(r.getStatus() instanceof OtkazanaConcreteState))
+            {
+                return true;
             }
         }
-    }
-
-    private boolean aranzmaniSePreklapaju(Aranzmani a1, Aranzmani a2)
-    {
-        if (a1.getPocetniDatum() == null || a1.getZavrsniDatum() == null ||
-            a2.getPocetniDatum() == null || a2.getZavrsniDatum() == null)
-        {
-            return false;
-        }
-
-        return !a1.getPocetniDatum().isAfter(a2.getZavrsniDatum()) &&
-               !a2.getPocetniDatum().isAfter(a1.getZavrsniDatum());
-    }
-
-    public List<Rezervacija> getSveRezervacije()
-    {
-        List<Rezervacija> sve = new ArrayList<>();
-        for (Aranzmani a : aranzmani.values())
-        {
-            sve.addAll(a.getRezervacije());
-        }
-        return sve;
-    }
-
-    public List<Rezervacija> getRezervacijeZaOsobu(String ime, String prezime)
-    {
-        List<Rezervacija> rezultat = new ArrayList<>();
-        for (Aranzmani a : aranzmani.values())
-        {
-            for (Rezervacija r : a.getRezervacije())
-            {
-                if (equalsIgnorirajCase(r.getIme(), ime) && 
-                    equalsIgnorirajCase(r.getPrezime(), prezime))
-                {
-                    rezultat.add(r);
-                }
-            }
-        }
-        return rezultat;
+        return false;
     }
 
     private boolean equalsIgnorirajCase(String rijec1, String rijec2)
     {
         String prvaRijec = (rijec1 == null) ? "" : rijec1.trim();
         String drugaRijec = (rijec2 == null) ? "" : rijec2.trim();
+        
         return prvaRijec.equalsIgnoreCase(drugaRijec);
     }
 
