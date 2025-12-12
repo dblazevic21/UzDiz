@@ -22,6 +22,7 @@ public class KomandaConcreteCreator extends KomandaCreator
             case "IRTA" -> new IrtaKomanda(aranzmani);
             case "ITAP" -> new ItapKomanda(aranzmani);
             case "IRO"  -> new IroKomanda(aranzmani);
+            case "OTA"  -> new OtaKomanda(aranzmani);
             default     -> null;
         };
     }
@@ -36,5 +37,6 @@ public class KomandaConcreteCreator extends KomandaCreator
         registriraneKomande.add(new OrtaKomanda(aranzmani));
         registriraneKomande.add(new ItakKomanda(aranzmani));
         registriraneKomande.add(new ItapKomanda(aranzmani));
+        registriraneKomande.add(new OtaKomanda(aranzmani));
 	}
 }
