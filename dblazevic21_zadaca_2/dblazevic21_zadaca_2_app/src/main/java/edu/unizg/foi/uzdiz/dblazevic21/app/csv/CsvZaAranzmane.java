@@ -18,77 +18,92 @@ import java.util.Map;
 
 public class CsvZaAranzmane
 {
+	private static final int OCEKIVANI_STUPCI = 16;
 
-    private static final int OCEKIVANI_STUPCI = 16;
+	public void ucitaj(String putanja, Map<Integer, Aranzmani> aranzmani) 
+	{
+	    Facade facade = Facade.getInstance();
 
-    public void ucitaj(String putanja, Map<Integer, Aranzmani> aranzmani) 
-    {
-        Facade facade = Facade.getInstance();
+	    try (BufferedReader br = Files.newBufferedReader(Paths.get(putanja), StandardCharsets.UTF_8)) 
+	    {
+	        String linija = br.readLine();
+	        if (linija == null) 
+	        {
+	            return;
+	        }
 
-        try (BufferedReader br = Files.newBufferedReader(Paths.get(putanja), StandardCharsets.UTF_8)) 
-        {
-            String linija = br.readLine();
-            if (linija == null) 
-            {
-                return;
-            }
+	        int brojLinije = 1;
+	        while ((linija = br.readLine()) != null) 
+	        {
+	            brojLinije++;
 
-            int brojLinije = 1;
-            while ((linija = br.readLine()) != null) 
-            {
-                brojLinije++;
+	            String raw = linija;
+	            linija = linija.trim();
+	            if (linija.isEmpty()) 
+	            {
+	                continue;
+	            }
 
-                String raw = linija;
-                linija = linija.trim();
-                if (linija.isEmpty()) 
-                {
-                    continue;
-                }
+	            List<String> stupci = CsvParserApp.parseCsvLiniju(linija);
+	            if (stupci.size() != OCEKIVANI_STUPCI)
+	            {
+	                facade.getBrojGresaka();
+	                IspisiGreskuApp.ispisiGresku(
+	                    facade.getBrojGresaka(),
+	                    brojLinije,
+	                    raw,
+	                    List.of("Očekivano " + OCEKIVANI_STUPCI + " stupaca, dobiveno " + stupci.size()),
+	                    putanja
+	                );
+	                continue;
+	            }
 
-                List<String> stupci = CsvParserApp.parseCsvLiniju(linija);
-                if (stupci.size() != OCEKIVANI_STUPCI)
-                {
-                    facade.getBrojGresaka();
-                    IspisiGreskuApp.ispisiGresku(
-                        facade.getBrojGresaka(),
-                        brojLinije,
-                        raw,
-                        List.of("Očekivano " + OCEKIVANI_STUPCI + " stupaca, dobiveno " + stupci.size()),
-                        putanja
-                    );
-                    continue;
-                }
+	            try
+	            {
+	                Aranzmani a = parseAranzman(stupci);
+	                int oznaka = a.getOznaka();
 
-                try
-                {
-                    Aranzmani a = parseAranzman(stupci);
-                    aranzmani.put(a.getOznaka(), a);
-                }
-                catch (Exception e)
-                {
-                    facade.getBrojGresaka();
-                    IspisiGreskuApp.ispisiGresku(
-                        facade.getBrojGresaka(),
-                        brojLinije,
-                        raw,
-                        List.of("Greška pri parsiranju aranžmana: " + e.getMessage()),
-                        putanja
-                    );
-                }
-            }
-        } 
-        catch (IOException e)
-        {
-            facade.getBrojGresaka();
-            IspisiGreskuApp.ispisiGresku(
-                facade.getBrojGresaka(),
-                0,
-                "",
-                List.of("Greška pri čitanju datoteke: " + e.getMessage()),
-                putanja
-            );
-        }
-    }
+	                if (aranzmani.containsKey(oznaka))
+	                {
+	                    facade.getBrojGresaka();
+	                    IspisiGreskuApp.ispisiDuplikatAranzmana(
+	                        facade.getBrojGresaka(),
+	                        brojLinije,
+	                        raw,
+	                        oznaka,
+	                        putanja
+	                    );
+	                    continue;
+	                }
+
+	                aranzmani.put(oznaka, a);
+	            }
+	            catch (Exception e)
+	            {
+	                facade.getBrojGresaka();
+	                IspisiGreskuApp.ispisiGresku(
+	                    facade.getBrojGresaka(),
+	                    brojLinije,
+	                    raw,
+	                    List.of("Greška pri parsiranju aranžmana: " + e.getMessage()),
+	                    putanja
+	                );
+	            }
+	        }
+	    } 
+	    catch (IOException e)
+	    {
+	        facade.getBrojGresaka();
+	        IspisiGreskuApp.ispisiGresku(
+	            facade.getBrojGresaka(),
+	            0,
+	            "",
+	            List.of("Greška pri čitanju datoteke: " + e.getMessage()),
+	            putanja
+	        );
+	    }
+	}
+
 
     private Aranzmani parseAranzman(List<String> s)
     {

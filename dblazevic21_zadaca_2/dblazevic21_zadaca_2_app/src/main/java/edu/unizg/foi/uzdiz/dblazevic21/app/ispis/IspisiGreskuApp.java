@@ -110,4 +110,16 @@ public class IspisiGreskuApp
 			}
 		}
 	}
+	
+	public static void ispisiDuplikatAranzmana(int rbGreske, int brojLinije, String sadrzaj, int oznaka, String putanja) 
+	{
+	    ispisiGresku(
+	        rbGreske,
+	        brojLinije,
+	        sadrzaj,
+	        List.of("Aranžman s oznakom " + oznaka + " već postoji i bit će ignoriran."),
+	        putanja
+	    );
+	}
+
 }
