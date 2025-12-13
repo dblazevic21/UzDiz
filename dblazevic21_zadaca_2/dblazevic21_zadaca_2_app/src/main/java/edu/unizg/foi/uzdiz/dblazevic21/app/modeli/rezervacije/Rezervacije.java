@@ -91,8 +91,17 @@ public class Rezervacije
         
         azurirajOdgodeneRezervacije(aranzmani);
     }
-    
-   
+
+    public void ocistiSve() 
+    {
+        Map<Integer, Aranzmani> aranzmani = TuristickaAgencija.getInstance().getAranzmani();
+
+        for (Aranzmani a : aranzmani.values())
+        {
+            a.ocistiRezervacije();
+        }
+        brojac = 0;
+    }
 
     
     private boolean aranzmaniSePreklapaju(Aranzmani a1, Aranzmani a2)

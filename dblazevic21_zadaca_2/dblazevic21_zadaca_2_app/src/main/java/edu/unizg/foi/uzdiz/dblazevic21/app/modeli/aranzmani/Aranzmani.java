@@ -177,6 +177,16 @@ public class Aranzmani implements TuristickiElement
             status.otkazi(this);
         }
     }
+    
+    public void ocistiRezervacije()
+    {
+        this.rezervacije.clear();
+    }
+
+    public void resetirajStatusRezervacija()
+    {
+        this.rezervacije.clear();
+    }
 
     public int getOznaka()
     {

@@ -16,10 +16,10 @@ public class IpKomanda implements Komanda
     @Override
     public void izvrsi(String unos)
     {
-        String trimmed = (unos == null) ? "" : unos.trim();
+        String odrezan = (unos == null) ? "" : unos.trim();
 
         Pattern p = Pattern.compile("^IP(?:\\s+([NS]))?$", Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
-        Matcher m = p.matcher(trimmed);
+        Matcher m = p.matcher(odrezan);
 
         if (!m.matches())
         {
@@ -28,9 +28,13 @@ public class IpKomanda implements Komanda
         }
 
         String arg = m.group(1);
-        char mode = (arg == null) ? 'N' : Character.toUpperCase(arg.charAt(0));
+        char odabir = (arg == null) ? 'N' : Character.toUpperCase(arg.charAt(0));
 
-        switch (mode)
+        System.out.println();
+        System.out.println(unos);
+        System.out.println();
+        
+        switch (odabir)
         {
             case 'N' -> {
                 IspisKonfiguracija.setNacin(IspisKonfiguracija.NacinSortiranja.N);

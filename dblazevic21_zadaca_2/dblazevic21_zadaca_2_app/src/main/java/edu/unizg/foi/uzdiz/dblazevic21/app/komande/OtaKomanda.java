@@ -44,6 +44,9 @@ public class OtaKomanda implements Komanda
         Aranzmani aranzman = aranzmani.get(oznaka);
         if (aranzman == null)
         {
+        	System.out.println();
+            System.out.println(unos);
+            System.out.println();
             System.out.println("Aranžman s oznakom " + oznaka + " ne postoji.");
             return;
         }
@@ -52,6 +55,9 @@ public class OtaKomanda implements Komanda
         if (rezervacije.isEmpty())
         {
             aranzman.otkaziAranzman();
+            System.out.println();
+            System.out.println(unos);
+            System.out.println();
             System.out.println("Aranžman " + oznaka + " je otkazan (nije bilo rezervacija).");
             return;
         }
@@ -66,7 +72,7 @@ public class OtaKomanda implements Komanda
             {
                 r.setOtkazanoAt(sada);
             }
-            catch (NoSuchMethodError | UnsupportedOperationException e)
+            catch (Exception e)
             {
             	
             }

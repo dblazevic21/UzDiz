@@ -24,6 +24,7 @@ public class KomandaConcreteCreator extends KomandaCreator
             case "IRO"  -> new IroKomanda(aranzmani);
             case "OTA"  -> new OtaKomanda(aranzmani);
             case "IP"   -> new IpKomanda();
+            case "BP"   -> new BpKomanda(aranzmani);
             default     -> null;
         };
     }
@@ -40,5 +41,6 @@ public class KomandaConcreteCreator extends KomandaCreator
         registriraneKomande.add(new ItapKomanda(aranzmani));
         registriraneKomande.add(new OtaKomanda(aranzmani));
         registriraneKomande.add(new IpKomanda());
+        registriraneKomande.add(new BpKomanda(aranzmani));
 	}
 }
