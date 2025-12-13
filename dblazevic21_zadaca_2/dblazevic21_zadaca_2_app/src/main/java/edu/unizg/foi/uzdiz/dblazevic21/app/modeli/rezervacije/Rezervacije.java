@@ -15,6 +15,7 @@ import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.rezervacije.NaCekanjuConcrete
 import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.rezervacije.OdgodenaConcreteState;
 import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.rezervacije.OtkazanaConcreteState;
 import edu.unizg.foi.uzdiz.dblazevic21.app.turistickaAgencija.TuristickaAgencija;
+import edu.unizg.foi.uzdiz.dblazevic21.app.utils.GramatikaIJezikApp;
 
 public class Rezervacije 
 {
@@ -75,8 +76,8 @@ public class Rezervacije
         List<Rezervacija> sve = getSveRezervacije(aranzmani);
         
         return sve.stream()
-                .filter(r -> equalsIgnorirajCase(r.getIme(), imeIzrezano)
-                          && equalsIgnorirajCase(r.getPrezime(), prezimeIzrezano))
+                .filter(r -> GramatikaIJezikApp.equalsIgnorirajCase(r.getIme(), imeIzrezano)
+                          && GramatikaIJezikApp.equalsIgnorirajCase(r.getPrezime(), prezimeIzrezano))
                 .sorted(Comparator
                         .comparing(Rezervacija::getDatumVrijeme, LDT_ORDER)
                         .thenComparingLong(Rezervacija::getRedniBroj))
@@ -127,8 +128,8 @@ public class Rezervacije
     	if (aranzman == null) return false;
 
     	Rezervacija cilj = aranzman.getRezervacije().stream()
-    			.filter(r -> equalsIgnorirajCase(r.getIme(), i)
-    					&& equalsIgnorirajCase(r.getPrezime(), p)
+    			.filter(r -> GramatikaIJezikApp.equalsIgnorirajCase(r.getIme(), i)
+    					&& GramatikaIJezikApp.equalsIgnorirajCase(r.getPrezime(), p)
     					&& !(r.getStatus() instanceof OtkazanaConcreteState))
     			.min(Comparator
     					.comparing(Rezervacija::getDatumVrijeme, LDT_ORDER)
@@ -200,8 +201,8 @@ public class Rezervacije
     		
     		for (Rezervacija r : a.getRezervacije())
     		{
-    			if (equalsIgnorirajCase(r.getIme(), ime) 
-    					&& equalsIgnorirajCase(r.getPrezime(), prezime)
+    			if (GramatikaIJezikApp.equalsIgnorirajCase(r.getIme(), ime) 
+    					&& GramatikaIJezikApp.equalsIgnorirajCase(r.getPrezime(), prezime)
     					&& r.getStatus() instanceof AktivnaConcreteState)
     			{
     				return true;
@@ -375,8 +376,8 @@ public class Rezervacije
 
     	for (Rezervacija r : aranzman.getRezervacije())
     	{
-    		if (equalsIgnorirajCase(r.getIme(), ime)
-    				&& equalsIgnorirajCase(r.getPrezime(), prezime)
+    		if (GramatikaIJezikApp.equalsIgnorirajCase(r.getIme(), ime)
+    				&& GramatikaIJezikApp.equalsIgnorirajCase(r.getPrezime(), prezime)
     				&& Objects.equals(r.getDatumVrijeme(), datumVrijeme)
     				&& !(r.getStatus() instanceof OtkazanaConcreteState))
     		{
@@ -401,8 +402,8 @@ public class Rezervacije
 
         for (Rezervacija r : aranzman.getRezervacije())
         {
-            if (equalsIgnorirajCase(r.getIme(), ime)
-                    && equalsIgnorirajCase(r.getPrezime(), prezime)
+            if (GramatikaIJezikApp.equalsIgnorirajCase(r.getIme(), ime)
+                    && GramatikaIJezikApp.equalsIgnorirajCase(r.getPrezime(), prezime)
                     && Objects.equals(r.getDatumVrijeme(), datumVrijeme)
                     && !(r.getStatus() instanceof OtkazanaConcreteState))
             {
@@ -422,8 +423,8 @@ public class Rezervacije
         List<Rezervacija> sve = getSveRezervacije(aranzmani);
         
         Rezervacija odgodena = sve.stream()
-                .filter(r -> equalsIgnorirajCase(r.getIme(), ime)
-                        && equalsIgnorirajCase(r.getPrezime(), prezime)
+                .filter(r -> GramatikaIJezikApp.equalsIgnorirajCase(r.getIme(), ime)
+                        && GramatikaIJezikApp.equalsIgnorirajCase(r.getPrezime(), prezime)
                         && r.getStatus() instanceof OdgodenaConcreteState)
                 .min(Comparator
                         .comparing(Rezervacija::getDatumVrijeme, LDT_ORDER)
@@ -433,8 +434,8 @@ public class Rezervacije
         if (odgodena != null)
         {
             boolean imaPreklapanje = sve.stream()
-                    .anyMatch(r -> equalsIgnorirajCase(r.getIme(), ime)
-                            && equalsIgnorirajCase(r.getPrezime(), prezime)
+                    .anyMatch(r -> GramatikaIJezikApp.equalsIgnorirajCase(r.getIme(), ime)
+                            && GramatikaIJezikApp.equalsIgnorirajCase(r.getPrezime(), prezime)
                             && r != odgodena
                             && r.getStatus() instanceof AktivnaConcreteState);
 
@@ -443,13 +444,5 @@ public class Rezervacije
                 odgodena.setStatus(new AktivnaConcreteState());
             }
         }
-    }
-
-    private boolean equalsIgnorirajCase(String rijec1, String rijec2)
-    {
-        String prvaRijec = (rijec1 == null) ? "" : rijec1.trim();
-        String drugaRijec = (rijec2 == null) ? "" : rijec2.trim();
-        
-        return prvaRijec.equalsIgnoreCase(drugaRijec);
     }
 }
