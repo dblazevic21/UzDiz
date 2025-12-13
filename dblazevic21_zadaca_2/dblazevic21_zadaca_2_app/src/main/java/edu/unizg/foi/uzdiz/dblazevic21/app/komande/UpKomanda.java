@@ -1,11 +1,14 @@
 package edu.unizg.foi.uzdiz.dblazevic21.app.komande;
 
+import java.util.List;
+import java.util.Map;
+
 import edu.unizg.foi.uzdiz.dblazevic21.app.csv.CsvZaAranzmane;
 import edu.unizg.foi.uzdiz.dblazevic21.app.csv.CsvZaRezervacije;
-import edu.unizg.foi.uzdiz.dblazevic21.app.turistickaAgencija.TuristickaAgencija;
+import edu.unizg.foi.uzdiz.dblazevic21.app.ispis.IspisiGreskuApp;
 import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.aranzmani.Aranzmani;
-
-import java.util.Map;
+import edu.unizg.foi.uzdiz.dblazevic21.app.turistickaAgencija.TuristickaAgencija;
+import edu.unizg.foi.uzdiz.dblazevic21.lib.facade.Facade;
 
 public class UpKomanda implements Komanda
 {
@@ -18,13 +21,22 @@ public class UpKomanda implements Komanda
     @Override
     public void izvrsi(String unos)
     {
+        Facade facade = Facade.getInstance();
         String odrezan = (unos == null) ? "" : unos.trim();
+
         if (odrezan.isEmpty())
         {
-            System.out.println("Greška: nedostaje argument. Očekivano: UP [A|R] nazivDatoteke");
+            int rb = facade.getBrojGresaka();
+            IspisiGreskuApp.ispisiGresku(
+                rb,
+                0,
+                odrezan,
+                List.of("Nedostaje argument. Očekivano: UP [A|R] nazivDatoteke"),
+                "konzola"
+            );
             return;
         }
-        
+
         if (odrezan.toUpperCase().startsWith("UP"))
         {
             odrezan = odrezan.substring(2).trim();
@@ -32,14 +44,28 @@ public class UpKomanda implements Komanda
 
         if (odrezan.isEmpty())
         {
-            System.out.println("Greška: nedostaje oznaka tipa (A ili R) i naziv datoteke.");
+            int rb = facade.getBrojGresaka();
+            IspisiGreskuApp.ispisiGresku(
+                rb,
+                0,
+                odrezan,
+                List.of("Nedostaje oznaka tipa (A ili R) i naziv datoteke."),
+                "konzola"
+            );
             return;
         }
 
         String[] dijelovi = odrezan.split("\\s+", 2);
         if (dijelovi.length < 2)
         {
-            System.out.println("Greška: nedostaje naziv datoteke. Očekivano: UP [A|R] nazivDatoteke");
+            int rb = facade.getBrojGresaka();
+            IspisiGreskuApp.ispisiGresku(
+                rb,
+                0,
+                odrezan,
+                List.of("Nedostaje naziv datoteke. Očekivano: UP [A|R] nazivDatoteke"),
+                "konzola"
+            );
             return;
         }
 
@@ -48,16 +74,24 @@ public class UpKomanda implements Komanda
 
         if (nazivDatoteke.isEmpty())
         {
-            System.out.println("Greška: naziv datoteke je prazan.");
+            int rb = facade.getBrojGresaka();
+            IspisiGreskuApp.ispisiGresku(
+                rb,
+                0,
+                odrezan,
+                List.of("Naziv datoteke je prazan."),
+                "konzola"
+            );
             return;
         }
 
-        izvrsiKomandu(tip, nazivDatoteke);
+        izvrsiKomandu(tip, nazivDatoteke, unos);
     }
 
-	public void izvrsiKomandu(String tip, String nazivDatoteke)
-	{
-		Map<Integer, Aranzmani> aranzmani = TuristickaAgencija
+    public void izvrsiKomandu(String tip, String nazivDatoteke, String unos)
+    {
+        Facade facade = Facade.getInstance();
+        Map<Integer, Aranzmani> aranzmani = TuristickaAgencija
                 .getInstance()
                 .getAranzmani();
 
@@ -78,13 +112,27 @@ public class UpKomanda implements Komanda
                     break;
 
                 default:
-                    System.out.println("Greška: nepoznat tip \"" + tip + "\". Dozvoljeno: A (aranžmani), R (rezervacije).");
+                    int rb = facade.getBrojGresaka();
+                    IspisiGreskuApp.ispisiGresku(
+                        rb,
+                        0,
+                        unos,
+                        List.of("Nepoznat tip \"" + tip + "\". Dozvoljeno: A (aranžmani), R (rezervacije)."),
+                        "konzola"
+                    );
                     break;
             }
         }
         catch (Exception e)
         {
-            System.out.println("Greška pri učitavanju iz datoteke \"" + nazivDatoteke + "\": " + e.getMessage());
+            int rb = facade.getBrojGresaka();
+            IspisiGreskuApp.ispisiGresku(
+                rb,
+                0,
+                unos,
+                List.of("Greška pri učitavanju iz datoteke \"" + nazivDatoteke + "\": " + e.getMessage()),
+                nazivDatoteke
+            );
         }
-	}
+    }
 }

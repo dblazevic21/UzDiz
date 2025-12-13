@@ -6,6 +6,7 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 
 import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.aranzmani.Aranzmani;
@@ -372,14 +373,46 @@ public class Rezervacije
     		return false;
     	}
 
+    	for (Rezervacija r : aranzman.getRezervacije())
+    	{
+    		if (equalsIgnorirajCase(r.getIme(), ime)
+    				&& equalsIgnorirajCase(r.getPrezime(), prezime)
+    				&& Objects.equals(r.getDatumVrijeme(), datumVrijeme)
+    				&& !(r.getStatus() instanceof OtkazanaConcreteState))
+    		{
+    			return false;
+    		}
+    	}
+
     	Rezervacija novaRezervacija = kreirajRezervaciju(ime, prezime, oznakaAranzmana, datumVrijeme);
     	aranzman.dodajRezervaciju(novaRezervacija);
-
-    	aranzman.azurirajStatuseRezervacija();
-
-    	azurirajOdgodeneRezervacije(aranzmani);
-
+    	
     	return true;
+    }
+
+    public boolean dodajRezervacijuBezStatusa(String ime, String prezime, int oznakaAranzmana,
+                                               LocalDateTime datumVrijeme, Map<Integer, Aranzmani> aranzmani)
+    {
+        Aranzmani aranzman = aranzmani.get(oznakaAranzmana);
+        if (aranzman == null)
+        {
+            return false;
+        }
+
+        for (Rezervacija r : aranzman.getRezervacije())
+        {
+            if (equalsIgnorirajCase(r.getIme(), ime)
+                    && equalsIgnorirajCase(r.getPrezime(), prezime)
+                    && Objects.equals(r.getDatumVrijeme(), datumVrijeme)
+                    && !(r.getStatus() instanceof OtkazanaConcreteState))
+            {
+                return false;
+            }
+        }
+
+        Rezervacija nova = kreirajRezervaciju(ime, prezime, oznakaAranzmana, datumVrijeme);
+        aranzman.dodajRezervaciju(nova);
+        return true;
     }
 
 

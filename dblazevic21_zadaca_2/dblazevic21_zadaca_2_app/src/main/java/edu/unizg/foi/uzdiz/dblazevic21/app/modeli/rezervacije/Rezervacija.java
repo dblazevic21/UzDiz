@@ -52,7 +52,7 @@ public class Rezervacija implements TuristickiElement
         {
             return "";
         }
-        return datumVrijeme.format(java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm"));
+        return datumVrijeme.format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm"));
     }
 
     @Override

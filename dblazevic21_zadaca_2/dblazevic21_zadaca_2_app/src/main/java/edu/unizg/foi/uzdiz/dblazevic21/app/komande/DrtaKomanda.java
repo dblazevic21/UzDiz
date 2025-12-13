@@ -77,9 +77,18 @@ public class DrtaKomanda implements Komanda
     {
         try 
         {
-            Rezervacije.getInstance().dodajRezervaciju(ime, prezime, oznaka, datumVrijeme, aranzmani);
+            boolean ok = Rezervacije.getInstance()
+                    .dodajRezervaciju(ime, prezime, oznaka, datumVrijeme, aranzmani);
+            if (!ok)
+            {
+                System.out.println("Rezervacija nije dodana (neispravan aranžman ili duplikat).");
+                return;
+            }
+
             Rezervacije.getInstance().azurirajStatuseRezervacija(aranzmani);
-            System.out.println("Rezervacija za osobu " + ime + " " + prezime + " na aranžman " + oznaka + " je dodana.");
+
+            System.out.println("Rezervacija za osobu " + ime + " " + prezime
+                    + " na aranžman " + oznaka + " je dodana.");
         } 
         catch (Exception e)
         {

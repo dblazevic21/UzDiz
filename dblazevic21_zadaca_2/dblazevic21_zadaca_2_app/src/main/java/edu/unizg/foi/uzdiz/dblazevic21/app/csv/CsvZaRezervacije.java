@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Map;
 
 import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.aranzmani.Aranzmani;
-import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.rezervacije.Rezervacija;
 import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.rezervacije.Rezervacije;
 import edu.unizg.foi.uzdiz.dblazevic21.app.utils.CsvParserApp;
 import edu.unizg.foi.uzdiz.dblazevic21.lib.facade.Facade;
@@ -21,8 +20,6 @@ public class CsvZaRezervacije
         List<List<String>> rezervacijePodaci = facade.ucitajRezervacije(putanja);
 
         Rezervacije rezervacije = Rezervacije.getInstance();
-
-        List<Rezervacija> existingReservations = rezervacije.getSveRezervacije(aranzmani);
 
         int brojLinije = 1;
         for (List<String> stupci : rezervacijePodaci) 
@@ -48,7 +45,7 @@ public class CsvZaRezervacije
                     continue;
                 }
 
-                boolean ok = rezervacije.dodajRezervaciju(ime, prezime, oznaka, dt, aranzmani);
+                boolean ok = rezervacije.dodajRezervacijuBezStatusa(ime, prezime, oznaka, dt, aranzmani);
                 if (!ok) 
                 {
                     facade.getBrojGresaka();
@@ -60,18 +57,6 @@ public class CsvZaRezervacije
             }
         }
 
-        for (Rezervacija existing : existingReservations) 
-        {
-            rezervacije.dodajRezervaciju(
-                existing.getIme(),
-                existing.getPrezime(),
-                existing.getOznakaAranzmana(),
-                existing.getDatumVrijeme(),
-                aranzmani
-            );
-        }
-
         rezervacije.azurirajStatuseRezervacija(aranzmani);
     }
-
 }
