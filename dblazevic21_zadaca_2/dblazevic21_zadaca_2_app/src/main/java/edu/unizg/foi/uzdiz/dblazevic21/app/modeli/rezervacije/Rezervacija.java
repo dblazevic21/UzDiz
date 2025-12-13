@@ -4,6 +4,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 
 import edu.unizg.foi.uzdiz.dblazevic21.app.composite.TuristickiElement;
 import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.rezervacije.NovaConcreteState;
@@ -52,6 +53,24 @@ public class Rezervacija implements TuristickiElement
             return "";
         }
         return datumVrijeme.format(java.time.format.DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm"));
+    }
+
+    @Override
+    public boolean equals(Object obj)
+    {
+        if (this == obj) return true;
+        if (obj == null || getClass() != obj.getClass()) return false;
+        Rezervacija that = (Rezervacija) obj;
+        return oznakaAranzmana == that.oznakaAranzmana &&
+               Objects.equals(ime, that.ime) &&
+               Objects.equals(prezime, that.prezime) &&
+               Objects.equals(datumVrijeme, that.datumVrijeme);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return Objects.hash(ime, prezime, oznakaAranzmana, datumVrijeme);
     }
 
 

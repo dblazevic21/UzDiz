@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.aranzmani.Aranzmani;
+import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.rezervacije.Rezervacija;
 import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.rezervacije.Rezervacije;
 import edu.unizg.foi.uzdiz.dblazevic21.app.utils.CsvParserApp;
 import edu.unizg.foi.uzdiz.dblazevic21.lib.facade.Facade;
@@ -14,19 +15,21 @@ public class CsvZaRezervacije
 
     private static final int OCEKIVANI_STUPCI = 4;
 
-    public void ucitaj(String putanja, Map<Integer, Aranzmani> aranzmani)
+    public void ucitaj(String putanja, Map<Integer, Aranzmani> aranzmani) 
     {
         Facade facade = Facade.getInstance();
         List<List<String>> rezervacijePodaci = facade.ucitajRezervacije(putanja);
 
-        Rezervacije rezervacije = Rezervacije.getInstance(); 
+        Rezervacije rezervacije = Rezervacije.getInstance();
+
+        List<Rezervacija> existingReservations = rezervacije.getSveRezervacije(aranzmani);
 
         int brojLinije = 1;
-        for (List<String> stupci : rezervacijePodaci)
+        for (List<String> stupci : rezervacijePodaci) 
         {
             brojLinije++;
 
-            if (stupci.size() != OCEKIVANI_STUPCI)
+            if (stupci.size() != OCEKIVANI_STUPCI) 
             {
                 facade.getBrojGresaka();
                 continue;
@@ -46,15 +49,29 @@ public class CsvZaRezervacije
                 }
 
                 boolean ok = rezervacije.dodajRezervaciju(ime, prezime, oznaka, dt, aranzmani);
-                if (!ok)
+                if (!ok) 
                 {
-                    facade.getBrojGresaka(); 
+                    facade.getBrojGresaka();
                 }
-            } 
+            }
             catch (Exception e) 
             {
-                facade.getBrojGresaka(); 
+                facade.getBrojGresaka();
             }
         }
+
+        for (Rezervacija existing : existingReservations) 
+        {
+            rezervacije.dodajRezervaciju(
+                existing.getIme(),
+                existing.getPrezime(),
+                existing.getOznakaAranzmana(),
+                existing.getDatumVrijeme(),
+                aranzmani
+            );
+        }
+
+        rezervacije.azurirajStatuseRezervacija(aranzmani);
     }
+
 }
