@@ -154,9 +154,4 @@ public class TuristickaAgencija
         }
         return false;
     }
-
-    public Map<Integer, Aranzmani> getAranzmani()
-    {
-        return aranzmani;
-    }
 }

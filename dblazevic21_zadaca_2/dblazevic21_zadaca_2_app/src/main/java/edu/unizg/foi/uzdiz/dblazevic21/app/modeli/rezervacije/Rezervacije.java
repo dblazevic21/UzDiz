@@ -14,7 +14,6 @@ import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.rezervacije.AktivnaConcreteSt
 import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.rezervacije.NaCekanjuConcreteState;
 import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.rezervacije.OdgodenaConcreteState;
 import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.rezervacije.OtkazanaConcreteState;
-import edu.unizg.foi.uzdiz.dblazevic21.app.turistickaAgencija.TuristickaAgencija;
 import edu.unizg.foi.uzdiz.dblazevic21.app.utils.GramatikaIJezikApp;
 
 public class Rezervacije 
@@ -94,11 +93,9 @@ public class Rezervacije
         azurirajOdgodeneRezervacije(aranzmani);
     }
 
-    public void ocistiSve() 
+    public void ocistiSve(Map<Integer, Aranzmani> aranzmani) 
     {
-        Map<Integer, Aranzmani> aranzmani = TuristickaAgencija.getInstance().getAranzmani();
-
-        for (Aranzmani a : aranzmani.values())
+    	for (Aranzmani a : aranzmani.values())
         {
             a.ocistiRezervacije();
         }
@@ -321,49 +318,15 @@ public class Rezervacije
         }
 	}
 
-
-    
-    public List<Rezervacija> getZaOsobu(String ime, String prezime)
-    {
-        return getZaOsobu(ime, prezime, TuristickaAgencija.getInstance().getAranzmani());
-    }
-
-    public List<Rezervacija> getZaAranzman(int oznakaAranzmana)
-    {
-        Aranzmani aranzman = TuristickaAgencija.getInstance().getAranzmani().get(oznakaAranzmana);
-        if (aranzman == null)
-        {
-            return new ArrayList<>();
-        }
-        return getZaAranzman(aranzman);
-    }
-
-    public boolean dodajRezervaciju(String ime, String prezime, int oznakaAranzmana, LocalDateTime datumVrijeme)
-    {
-        Map<Integer, Aranzmani> aranzmani = TuristickaAgencija.getInstance().getAranzmani();
-        Aranzmani aranzman = aranzmani.get(oznakaAranzmana);
-        
-        if (aranzman == null)
-        {
-            return false;
-        }
-        
-        for (Rezervacija r : aranzman.getRezervacije())
-        {
-            if (r.getIme().equalsIgnoreCase(ime.trim()) 
-                && r.getPrezime().equalsIgnoreCase(prezime.trim())
-                && !(r.getStatus() instanceof OtkazanaConcreteState))
-            {
-                return false;
-            }
-        }
-        
-        Rezervacija nova = kreirajRezervaciju(ime, prezime, oznakaAranzmana, datumVrijeme);
-        aranzman.dodajRezervaciju(nova);
-        azurirajStatuseRezervacija(aranzmani);
-        
-        return true;
-    }
+	public List<Rezervacija> getZaAranzman(int oznakaAranzmana, Map<Integer, Aranzmani> aranzmani)
+	{
+	    Aranzmani aranzman = aranzmani.get(oznakaAranzmana);
+	    if (aranzman == null)
+	    {
+	        return new ArrayList<>();
+	    }
+	    return getZaAranzman(aranzman);
+	}
 
     public boolean dodajRezervaciju(String ime, String prezime, int oznakaAranzmana, 
             LocalDateTime datumVrijeme, Map<Integer, Aranzmani> aranzmani) 

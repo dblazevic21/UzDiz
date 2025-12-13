@@ -12,6 +12,13 @@ import edu.unizg.foi.uzdiz.dblazevic21.lib.facade.Facade;
 
 public class UpKomanda implements Komanda
 {
+	private final Map<Integer, Aranzmani> aranzmani;
+
+    public UpKomanda(Map<Integer, Aranzmani> aranzmani) 
+    {
+        this.aranzmani = aranzmani;
+    }
+	
     @Override
     public String getNaziv()
     {
