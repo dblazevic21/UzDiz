@@ -8,7 +8,7 @@ import java.util.List;
 import edu.unizg.foi.uzdiz.dblazevic21.app.composite.TuristickiElement;
 import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.rezervacije.NovaConcreteState;
 import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.rezervacije.RezervacijeState;
-import edu.unizg.foi.uzdiz.dblazevic21.app.utils.DatumParser;
+import edu.unizg.foi.uzdiz.dblazevic21.app.utils.DatumParserApp;
 
 public class Rezervacija implements TuristickiElement
 {
@@ -37,7 +37,7 @@ public class Rezervacija implements TuristickiElement
         this.ime = ime;
         this.prezime = prezime;
         this.oznakaAranzmana = oznakaAranzmana;
-        this.datumVrijeme = DatumParser.normalizirajDatumIVrijeme(
+        this.datumVrijeme = DatumParserApp.normalizirajDatumIVrijeme(
                 dtRaw.split(" ")[0],
                 dtRaw.contains(" ") ? dtRaw.split(" ", 2)[1] : ""
         );

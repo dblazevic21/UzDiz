@@ -7,7 +7,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.util.Locale;
 
-public class DatumParser
+public class DatumParserApp
 {
 	public static String normalizirajDatum(String s)
     {

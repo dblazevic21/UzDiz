@@ -14,7 +14,7 @@ import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.aranzmani.AranzmaniDirector;
 import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.rezervacije.Rezervacija;
 import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.rezervacije.Rezervacije;
 import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.rezervacije.OtkazanaConcreteState;
-import edu.unizg.foi.uzdiz.dblazevic21.app.utils.DatumParser;
+import edu.unizg.foi.uzdiz.dblazevic21.app.utils.DatumParserApp;
 import edu.unizg.foi.uzdiz.dblazevic21.app.utils.GramatikaIJezikApp;
 
 public class TuristickaAgencija
@@ -54,10 +54,10 @@ public class TuristickaAgencija
                 int oznaka = uInt(stupci.get(0));
                 String naziv = GramatikaIJezikApp.makniNavodnike(stupci.get(1));
                 String program = GramatikaIJezikApp.makniNavodnike(stupci.get(2));
-                LocalDate pocetniDatum = DatumParser.parseCsvDatum(stupci.get(3));
-                LocalDate zavrsniDatum = DatumParser.parseCsvDatum(stupci.get(4));
-                LocalTime vrijemeKretanja = DatumParser.parseCsvVrijeme(stupci.get(5));
-                LocalTime vrijemePovratka = DatumParser.parseCsvVrijeme(stupci.get(6));
+                LocalDate pocetniDatum = DatumParserApp.parseCsvDatum(stupci.get(3));
+                LocalDate zavrsniDatum = DatumParserApp.parseCsvDatum(stupci.get(4));
+                LocalTime vrijemeKretanja = DatumParserApp.parseCsvVrijeme(stupci.get(5));
+                LocalTime vrijemePovratka = DatumParserApp.parseCsvVrijeme(stupci.get(6));
                 float cijena = uFloat(stupci.get(7));
                 int minBrojPutnika = uInt(stupci.get(8));
                 int maksBrojPutnika = uInt(stupci.get(9));
@@ -106,7 +106,7 @@ public class TuristickaAgencija
                     continue;
                 }
 
-                LocalDateTime datumVrijeme = DatumParser.normalizirajDatumIVrijeme(
+                LocalDateTime datumVrijeme = DatumParserApp.normalizirajDatumIVrijeme(
                         dtRaw.split(" ")[0],
                         dtRaw.contains(" ") ? dtRaw.split(" ", 2)[1] : ""
                 );

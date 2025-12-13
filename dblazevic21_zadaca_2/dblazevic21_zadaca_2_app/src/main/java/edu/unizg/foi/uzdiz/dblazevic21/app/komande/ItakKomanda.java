@@ -14,7 +14,7 @@ import edu.unizg.foi.uzdiz.dblazevic21.app.ispis.IspisKonfiguracija;
 import edu.unizg.foi.uzdiz.dblazevic21.app.ispis.StatusFormater;
 import edu.unizg.foi.uzdiz.dblazevic21.app.ispis.TablicaPrinter;
 import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.aranzmani.Aranzmani;
-import edu.unizg.foi.uzdiz.dblazevic21.app.utils.DatumParser;
+import edu.unizg.foi.uzdiz.dblazevic21.app.utils.DatumParserApp;
 
 public class ItakKomanda implements Komanda 
 {
@@ -53,11 +53,11 @@ public class ItakKomanda implements Komanda
         
         if (m.matches()) 
         {
-            String odStr = DatumParser.normalizirajDatum(m.group(1));
-            String doStr = DatumParser.normalizirajDatum(m.group(2));
+            String odStr = DatumParserApp.normalizirajDatum(m.group(1));
+            String doStr = DatumParserApp.normalizirajDatum(m.group(2));
 
-            LocalDate od = DatumParser.parseDatumZaKomandu(odStr);
-            LocalDate dO = DatumParser.parseDatumZaKomandu(doStr);
+            LocalDate od = DatumParserApp.parseDatumZaKomandu(odStr);
+            LocalDate dO = DatumParserApp.parseDatumZaKomandu(doStr);
 
             if (od == null || dO == null)
             {

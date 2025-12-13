@@ -41,6 +41,7 @@ public class BpKomanda implements Komanda
 
         System.out.println();
         System.out.println(unos);
+        System.out.println();
         switch (odabir)
         {
             case 'A' -> {

@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 
 import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.aranzmani.Aranzmani;
 import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.rezervacije.Rezervacije;
-import edu.unizg.foi.uzdiz.dblazevic21.app.utils.DatumParser;
+import edu.unizg.foi.uzdiz.dblazevic21.app.utils.DatumParserApp;
 import edu.unizg.foi.uzdiz.dblazevic21.app.utils.GramatikaIJezikApp;
 
 public class DrtaKomanda implements Komanda 
@@ -52,7 +52,7 @@ public class DrtaKomanda implements Komanda
         String datum = m.group(4).trim();
         String vrijeme = m.group(5).trim();
 
-        LocalDateTime datumVrijeme = DatumParser.normalizirajDatumIVrijeme(datum, vrijeme);
+        LocalDateTime datumVrijeme = DatumParserApp.normalizirajDatumIVrijeme(datum, vrijeme);
         
         if (datumVrijeme == null) 
         {
