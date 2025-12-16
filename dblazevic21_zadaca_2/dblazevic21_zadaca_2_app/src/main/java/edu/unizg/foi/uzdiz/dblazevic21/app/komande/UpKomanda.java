@@ -7,7 +7,7 @@ import edu.unizg.foi.uzdiz.dblazevic21.app.csv.CsvZaAranzmane;
 import edu.unizg.foi.uzdiz.dblazevic21.app.csv.CsvZaRezervacije;
 import edu.unizg.foi.uzdiz.dblazevic21.app.ispis.IspisiGreskuApp;
 import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.aranzmani.Aranzmani;
-import edu.unizg.foi.uzdiz.dblazevic21.lib.facade.Facade;
+import edu.unizg.foi.uzdiz.dblazevic21.lib.facade.TuristickaFacade;
 
 public class UpKomanda implements Komanda
 {
@@ -27,7 +27,7 @@ public class UpKomanda implements Komanda
     @Override
     public void izvrsi(String unos)
     {
-        Facade facade = Facade.getInstance();
+        TuristickaFacade facade = TuristickaFacade.getInstance();
         String odrezan = (unos == null) ? "" : unos.trim();
 
         if (odrezan.isEmpty())
@@ -96,7 +96,7 @@ public class UpKomanda implements Komanda
 
     public void izvrsiKomandu(String tip, String nazivDatoteke, String unos)
     {
-        Facade facade = Facade.getInstance();
+        TuristickaFacade facade = TuristickaFacade.getInstance();
 
         try
         {

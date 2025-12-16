@@ -16,7 +16,7 @@ import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.aranzmani.Aranzmani;
 import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.aranzmani.AranzmaniDirector;
 import edu.unizg.foi.uzdiz.dblazevic21.app.utils.CsvParserApp;
 import edu.unizg.foi.uzdiz.dblazevic21.app.utils.GramatikaIJezikApp;
-import edu.unizg.foi.uzdiz.dblazevic21.lib.facade.Facade;
+import edu.unizg.foi.uzdiz.dblazevic21.lib.facade.TuristickaFacade;
 
 public class CsvZaAranzmane
 {
@@ -64,7 +64,7 @@ public class CsvZaAranzmane
 	
 	public void ucitaj(String putanja, Map<Integer, Aranzmani> aranzmani) 
 	{
-	    Facade facade = Facade.getInstance();
+	    TuristickaFacade facade = TuristickaFacade.getInstance();
 
 	    try (BufferedReader br = Files.newBufferedReader(Paths.get(putanja), StandardCharsets.UTF_8)) 
 	    {
@@ -117,7 +117,7 @@ public class CsvZaAranzmane
 	}
 
 
-	public void upravljanjeAranzmanima(String putanja, Map<Integer, Aranzmani> aranzmani, Facade facade, int brojLinije,
+	public void upravljanjeAranzmanima(String putanja, Map<Integer, Aranzmani> aranzmani, TuristickaFacade facade, int brojLinije,
 			String raw, List<String> stupci) 
 	{
 		try

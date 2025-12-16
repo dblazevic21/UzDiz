@@ -13,7 +13,7 @@ import edu.unizg.foi.uzdiz.dblazevic21.app.komande.KomandaConcreteCreator;
 import edu.unizg.foi.uzdiz.dblazevic21.app.komande.KomandaCreator;
 import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.aranzmani.Aranzmani;
 import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.rezervacije.Rezervacije;
-import edu.unizg.foi.uzdiz.dblazevic21.lib.facade.Facade;
+import edu.unizg.foi.uzdiz.dblazevic21.lib.facade.TuristickaFacade;
 
 public class Glavna
 {
@@ -29,7 +29,7 @@ public class Glavna
 
         System.out.println("\nPokretanje programa...");
 
-        Facade facade = Facade.getInstance();
+        TuristickaFacade facade = TuristickaFacade.getInstance();
         Map<Integer, Aranzmani> aranzmani = new HashMap<>();
 
         List<List<String>> ucitaniAranzmani = new ArrayList<>();

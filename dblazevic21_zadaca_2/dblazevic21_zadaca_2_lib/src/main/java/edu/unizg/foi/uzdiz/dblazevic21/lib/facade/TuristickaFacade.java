@@ -4,25 +4,25 @@ import edu.unizg.foi.uzdiz.dblazevic21.lib.handleri.CsvUcitajSingleton;
 
 import java.util.List;
 
-public class Facade
+public class TuristickaFacade
 {
-    private static volatile Facade INSTANCE;
+    private static volatile TuristickaFacade INSTANCE;
     private final CsvUcitajSingleton csvHandler;
 
-    private Facade()
+    private TuristickaFacade()
     {
         this.csvHandler = CsvUcitajSingleton.getInstance();
     }
 
-    public static Facade getInstance()
+    public static TuristickaFacade getInstance()
     {
         if (INSTANCE == null)
         {
-            synchronized (Facade.class)
+            synchronized (TuristickaFacade.class)
             {
                 if (INSTANCE == null)
                 {
-                    INSTANCE = new Facade();
+                    INSTANCE = new TuristickaFacade();
                 }
             }
         }

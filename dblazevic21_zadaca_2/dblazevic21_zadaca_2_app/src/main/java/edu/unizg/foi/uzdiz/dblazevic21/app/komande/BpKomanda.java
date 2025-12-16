@@ -7,7 +7,7 @@ import java.util.regex.Pattern;
 import edu.unizg.foi.uzdiz.dblazevic21.app.ispis.TablicaPrinter;
 import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.aranzmani.Aranzmani;
 import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.rezervacije.Rezervacije;
-import edu.unizg.foi.uzdiz.dblazevic21.lib.facade.Facade;
+import edu.unizg.foi.uzdiz.dblazevic21.lib.facade.TuristickaFacade;
 
 public class BpKomanda implements Komanda
 {
@@ -45,14 +45,14 @@ public class BpKomanda implements Komanda
         switch (odabir)
         {
 	        case 'A' -> {
-	            Facade.getInstance().resetirajAranzmane(); 
+	            TuristickaFacade.getInstance().resetirajAranzmane(); 
 	            aranzmani.clear();
 	            Rezervacije.getInstance().ocistiSve(aranzmani);
 	            System.out.println("Obrisani svi aranžmani i sve rezervacije (BP A).");
 	        }
 	
 	        case 'R' -> {
-	            Facade.getInstance().resetirajRezervacije();
+	            TuristickaFacade.getInstance().resetirajRezervacije();
 	            Rezervacije.getInstance().ocistiRezervacije(aranzmani);
 	            aranzmani.values().forEach(Aranzmani::azurirajStatuseRezervacija);
 	            System.out.println("Obrisane sve rezervacije (BP R).");

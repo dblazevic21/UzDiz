@@ -9,7 +9,7 @@ import edu.unizg.foi.uzdiz.dblazevic21.app.ispis.IspisiGreskuApp;
 import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.aranzmani.Aranzmani;
 import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.rezervacije.Rezervacije;
 import edu.unizg.foi.uzdiz.dblazevic21.app.utils.CsvParserApp;
-import edu.unizg.foi.uzdiz.dblazevic21.lib.facade.Facade;
+import edu.unizg.foi.uzdiz.dblazevic21.lib.facade.TuristickaFacade;
 
 public class CsvZaRezervacije 
 {
@@ -60,7 +60,7 @@ public class CsvZaRezervacije
     
     public void ucitaj(List<String> putanje, Map<Integer, Aranzmani> aranzmani) 
     {
-        Facade facade = Facade.getInstance();
+        TuristickaFacade facade = TuristickaFacade.getInstance();
         Rezervacije rezervacije = Rezervacije.getInstance();
 
         for (String putanja : putanje) 

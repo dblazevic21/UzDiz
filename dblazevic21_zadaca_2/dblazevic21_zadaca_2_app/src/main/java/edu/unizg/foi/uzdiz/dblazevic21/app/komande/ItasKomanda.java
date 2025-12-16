@@ -14,7 +14,7 @@ import edu.unizg.foi.uzdiz.dblazevic21.app.ispis.TablicaPrinter;
 import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.aranzmani.Aranzmani;
 import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.rezervacije.Rezervacija;
 import edu.unizg.foi.uzdiz.dblazevic21.app.utils.DatumParserApp;
-import edu.unizg.foi.uzdiz.dblazevic21.lib.facade.Facade;
+import edu.unizg.foi.uzdiz.dblazevic21.lib.facade.TuristickaFacade;
 
 public class ItasKomanda implements Komanda
 {
@@ -35,7 +35,7 @@ public class ItasKomanda implements Komanda
 	@Override
 	public void izvrsi(String unos)
 	{
-	    Facade facade = Facade.getInstance();
+	    TuristickaFacade facade = TuristickaFacade.getInstance();
 	    String odrezan = (unos == null) ? "" : unos.trim();
 
 	    LocalDate odDatum = null;
