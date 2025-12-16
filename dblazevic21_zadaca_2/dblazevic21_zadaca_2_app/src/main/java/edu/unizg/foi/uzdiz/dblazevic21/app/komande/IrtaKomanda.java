@@ -1,5 +1,7 @@
 package edu.unizg.foi.uzdiz.dblazevic21.app.komande;
 
+import java.time.LocalDateTime;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -7,52 +9,62 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
-import edu.unizg.foi.uzdiz.dblazevic21.app.enumeracije.StatusRezervacije;
 import edu.unizg.foi.uzdiz.dblazevic21.app.ispis.FormaterZaIspise;
+import edu.unizg.foi.uzdiz.dblazevic21.app.ispis.IspisKonfiguracija;
 import edu.unizg.foi.uzdiz.dblazevic21.app.ispis.StatusFormater;
 import edu.unizg.foi.uzdiz.dblazevic21.app.ispis.TablicaPrinter;
 import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.aranzmani.Aranzmani;
 import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.rezervacije.Rezervacija;
 import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.rezervacije.Rezervacije;
+import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.rezervacije.AktivnaConcreteState;
+import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.rezervacije.NaCekanjuConcreteState;
+import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.rezervacije.OdgodenaConcreteState;
+import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.rezervacije.OtkazanaConcreteState;
+import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.rezervacije.PrimljenaConcreteState;
+import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.rezervacije.RezervacijeState;
 
-public class IrtaKomanda implements Komanda 
+public class IrtaKomanda implements Komanda
 {
-
     private final Map<Integer, Aranzmani> aranzmani;
 
-    public IrtaKomanda(Map<Integer, Aranzmani> aranzmani) 
+    public IrtaKomanda(Map<Integer, Aranzmani> aranzmani)
     {
         this.aranzmani = aranzmani;
     }
 
     @Override
-    public String getNaziv() 
+    public String getNaziv()
     {
         return "IRTA";
     }
 
     @Override
-    public void izvrsi(String unos) 
+    public void izvrsi(String unos)
     {
-        String trimmed = (unos == null) ? "" : unos.trim();
-        Pattern p = Pattern.compile("^IRTA\\s+(\\d+)(?:\\s+([PAČO]+))?$",
-                Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE);
+        String odrezan = (unos == null) ? "" : unos.trim();
 
-        Matcher m = p.matcher(trimmed);
-        if (!m.matches()) 
+        Pattern p = Pattern.compile(
+                "^IRTA\\s+(\\d+)(?:\\s+([A-ZČOD]+))?$",
+                Pattern.CASE_INSENSITIVE | Pattern.UNICODE_CASE
+        );
+
+        Matcher m = p.matcher(odrezan);
+        if (!m.matches())
         {
-            System.out.println("Nepoznata komanda. Upotrijebite: IRTA [oznaka] [PA|Č|O|PAČO]");
+            System.out.println(
+                    "Nepoznata komanda. Upotrijebite: IRTA oznaka [PA|Č|O|OD] i njihove kombinacije (npr. PAČO, ČOPA, ODO)."
+            );
             return;
         }
 
         int oznaka = Integer.parseInt(m.group(1));
-        String flags = (m.group(2) == null) ? "PA" : m.group(2).toUpperCase(Locale.ROOT);
+        String rawFlags = (m.group(2) == null)
+                ? "PA"
+                : m.group(2).toUpperCase(Locale.ROOT);
 
-        if (!flags.matches("[PAČO]+")) 
-        {
-            System.out.println("Greška: neispravni filteri. Dozvoljeni su samo PA, Č, O.");
-            return;
-        }
+        final boolean[] flags = new boolean[4];
+
+        provjeriZastavicu(rawFlags, flags);
 
         Aranzmani a = aranzmani.get(oznaka);
         if (a == null)
@@ -61,8 +73,10 @@ public class IrtaKomanda implements Komanda
             return;
         }
 
-        List<Rezervacija> ulaz = Rezervacije.getInstance().getZaAranzman(oznaka);
-        if (ulaz.isEmpty()) 
+
+        List<Rezervacija> ulaz = Rezervacije.getInstance().getZaAranzman(oznaka, aranzmani);
+
+        if (ulaz.isEmpty())
         {
             System.out.println("Nema rezervacija za aranžman " + oznaka + ".");
             return;
@@ -70,44 +84,118 @@ public class IrtaKomanda implements Komanda
 
         Rezervacije.getInstance().azurirajStatuseRezervacija(aranzmani);
 
-        boolean dodajPA = flags.contains("PA");
-        boolean dodajČekaj = flags.contains("Č");
-        boolean dodajOtkazan = flags.contains("O");
+        List<Rezervacija> zaIspis = rjesavajIspis(flags, ulaz);
 
-        List<Rezervacija> zaIspis = ulaz.stream()
-                .filter(r -> (dodajPA && (r.getStatus() == StatusRezervacije.PRIMLJENA || r.getStatus() == StatusRezervacije.AKTIVNA))
-                        || (dodajČekaj && r.getStatus() == StatusRezervacije.NA_CEKANJU)
-                        || (dodajOtkazan && r.getStatus() == StatusRezervacije.OTKAZANA))
-                .collect(Collectors.toList());
-
-        if (zaIspis.isEmpty()) 
+        if (zaIspis.isEmpty())
         {
             System.out.println("Nema rezervacija koje zadovoljavaju kriterij za aranžman " + oznaka + ".");
             return;
         }
 
-        int[] sirine = dodajOtkazan ? new int[]{20, 20, 22, 14, 35} : new int[]{20, 20, 22, 14};
+        boolean trebaOtkazStupac = flags[2] || flags[3]; 
+        int[] sirine = trebaOtkazStupac
+                ? new int[]{20, 20, 22, 14, 35}
+                : new int[]{20, 20, 22, 14};
+        
+        printajPodatke(unos, oznaka, a, zaIspis, trebaOtkazStupac, sirine);
+    }
 
-        TablicaPrinter.printajTablicuZaglavlje(sirine, dodajOtkazan);
+	public void printajPodatke(String unos, int oznaka, Aranzmani a, List<Rezervacija> zaIspis,
+			boolean trebaOtkazStupac, int[] sirine)
+	{
+		TablicaPrinter.ispisUnosa(unos);
+        System.out.println("Ispis i pregled rezervacija za aranžman " + oznaka + " - " + a.getNaziv() + ":");
+        System.out.println();
 
-        for (Rezervacija r : zaIspis) 
+        TablicaPrinter.printajTablicuZaglavlje(sirine, trebaOtkazStupac);
+
+        for (Rezervacija r : zaIspis)
         {
             String ime = r.getIme();
             String prezime = r.getPrezime();
             String datumVrijeme = FormaterZaIspise.fmtDatumVrijeme(r.getDatumVrijeme(), r.getDatumVrijemeRaw());
             String vrsta = StatusFormater.statusOznaka(r.getStatus());
 
-            if (dodajOtkazan) 
+            if (trebaOtkazStupac)
             {
-                String otk = (r.getOtkazanoAt() == null) ? "-" : FormaterZaIspise.fmtDatumVrijeme(r.getOtkazanoAt(), null);
+                String otk = (r.getOtkazanoAt() == null)
+                        ? "-"
+                        : FormaterZaIspise.fmtDatumVrijeme(r.getOtkazanoAt(), null);
                 TablicaPrinter.printajTablicuRedak(sirine, ime, prezime, datumVrijeme, vrsta, otk);
             }
-            else 
+            else
             {
                 TablicaPrinter.printajTablicuRedak(sirine, ime, prezime, datumVrijeme, vrsta);
             }
         }
 
         TablicaPrinter.printajTablicuZatvaranje(sirine);
-    }
+	}
+
+	public List<Rezervacija> rjesavajIspis(final boolean[] flags, List<Rezervacija> ulaz) 
+	{
+		List<Rezervacija> zaIspis = ulaz.stream()
+                .filter(r -> {
+                    RezervacijeState status = r.getStatus();
+                    boolean isPrimljenaAktivna =
+                            (status instanceof PrimljenaConcreteState || status instanceof AktivnaConcreteState);
+                    boolean isNaCekanju = status instanceof NaCekanjuConcreteState;
+                    boolean isOtkazana = status instanceof OtkazanaConcreteState;
+                    boolean isOdgodena = status instanceof OdgodenaConcreteState;
+
+                    return (flags[0] && isPrimljenaAktivna) 
+                            || (flags[1] && isNaCekanju)    
+                            || (flags[2] && isOtkazana)     
+                            || (flags[3] && isOdgodena);   
+                })
+                .collect(Collectors.toList());
+
+		zaIspis.sort(
+			    Comparator.comparing(
+			        Rezervacija::getDatumVrijeme,
+			        Comparator.nullsLast(
+			            IspisKonfiguracija.jeObrnutoKronoloski()
+			                ? Comparator.<LocalDateTime>reverseOrder()
+			                : Comparator.<LocalDateTime>naturalOrder()
+			        )
+			    ).thenComparingLong(Rezervacija::getRedniBroj)
+			);
+
+		return zaIspis;
+	}
+
+	public void provjeriZastavicu(String rawFlags, final boolean[] flags) 
+	{
+		String s = rawFlags;
+        while (!s.isEmpty())
+        {
+            if (s.startsWith("PA"))
+            {
+                flags[0] = true;
+                s = s.substring(2);
+            }
+            else if (s.startsWith("OD"))
+            {
+                flags[3] = true;
+                s = s.substring(2);
+            }
+            else if (s.startsWith("Č"))
+            {
+                flags[1] = true;
+                s = s.substring(1);
+            }
+            else if (s.startsWith("O"))
+            {
+                flags[2] = true;
+                s = s.substring(1);
+            }
+            else
+            {
+                System.out.println(
+                        "Greška u zastavicama: dozvoljene komande su samo PA, Č, O, OD (npr. PAČO, ČOPA, ODO)."
+                );
+                return;
+            }
+        }
+	}
 }

@@ -1,4 +1,4 @@
-package edu.unizg.foi.uzdiz.dblazevic21.app.statusi;
+package edu.unizg.foi.uzdiz.dblazevic21.app.statusi.rezervacije;
 
 import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.rezervacije.Rezervacija;
 

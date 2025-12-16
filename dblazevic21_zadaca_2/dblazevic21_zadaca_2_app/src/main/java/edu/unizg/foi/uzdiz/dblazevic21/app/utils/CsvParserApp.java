@@ -1,4 +1,4 @@
-package edu.unizg.foi.uzdiz.dblazevic21.lib.util;
+package edu.unizg.foi.uzdiz.dblazevic21.app.utils;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 
-public class CsvParser 
+public class CsvParserApp 
 {
 	
 	public static final DateTimeFormatter CSV_DATUM = new DateTimeFormatterBuilder()
@@ -59,7 +59,6 @@ public class CsvParser
             .optionalEnd()
             .toFormatter(Locale.ROOT)
     };
-
 
 
 
@@ -158,16 +157,17 @@ public class CsvParser
     public static LocalDateTime uDatumVrijeme(String s)
     {
         if (s == null) return null;
-        
         String t = s.trim();
         for (DateTimeFormatter f : CSV_DATUM_VRIJEME)
         {
             try
             {
                 return LocalDateTime.parse(t, f);
-            } 
+            }
             catch (Exception ignoriran) {}
         }
+        System.out.println("Neuspjelo parsanje datuma: '" + s + "'");
         return null;
     }
+
 }

@@ -25,4 +25,12 @@ public class GramatikaIJezikApp
 	    }
 	    return t;
 	}
+	
+	public static boolean equalsIgnorirajCase(String rijec1, String rijec2)
+    {
+        String prvaRijec = (rijec1 == null) ? "" : rijec1.trim();
+        String drugaRijec = (rijec2 == null) ? "" : rijec2.trim();
+        
+        return prvaRijec.equalsIgnoreCase(drugaRijec);
+    }
 }

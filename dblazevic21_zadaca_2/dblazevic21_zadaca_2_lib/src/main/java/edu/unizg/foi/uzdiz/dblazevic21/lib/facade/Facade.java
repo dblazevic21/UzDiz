@@ -28,6 +28,16 @@ public class Facade
         }
         return INSTANCE;
     }
+    
+    public void resetirajAranzmane()
+    {
+        csvHandler.resetirajAranzmane();
+    }
+
+    public void resetirajRezervacije()
+    {
+        csvHandler.resetirajRezervacije();
+    }
 
     public List<List<String>> ucitajAranzmane(String putanja)
     {
@@ -40,7 +50,13 @@ public class Facade
         csvHandler.ucitajRezervacije(putanja);
         return csvHandler.getRezervacije();
     }
-
+    
+    public List<List<String>> ucitajSveRezervacije(List<String> putanje) 
+    {
+        csvHandler.ucitajSveRezervacije(putanje);
+        return csvHandler.getRezervacije();
+    }
+    
     public int getBrojGresaka()
     {
         return CsvUcitajSingleton.brojGreske;

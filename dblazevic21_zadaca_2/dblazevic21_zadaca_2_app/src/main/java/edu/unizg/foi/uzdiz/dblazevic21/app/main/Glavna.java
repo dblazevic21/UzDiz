@@ -7,23 +7,19 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
+import edu.unizg.foi.uzdiz.dblazevic21.app.csv.CsvZaAranzmane;
+import edu.unizg.foi.uzdiz.dblazevic21.app.csv.CsvZaRezervacije;
 import edu.unizg.foi.uzdiz.dblazevic21.app.komande.KomandaConcreteCreator;
 import edu.unizg.foi.uzdiz.dblazevic21.app.komande.KomandaCreator;
 import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.aranzmani.Aranzmani;
-import edu.unizg.foi.uzdiz.dblazevic21.app.turistickaAgencija.TuristickaAgencija;
+import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.rezervacije.Rezervacije;
 import edu.unizg.foi.uzdiz.dblazevic21.lib.facade.Facade;
 
 public class Glavna
 {
     public static void main(String[] args)
     {
-        if (args.length == 0)
-        {
-            System.out.println("Niste unijeli argumente!");
-            System.out.println("Primjer:");
-            System.out.println("java -jar dblazevic21_zadaca_2.jar --ta DZ_2_aranzmani.csv --rta DZ_2_rezervacije.csv");
-            return;
-        }
+        if (args.length == 0) return;
 
         Map<String, List<String>> argumenti = new HashMap<>();
         provjeriKomandu(args, argumenti);
@@ -34,15 +30,54 @@ public class Glavna
         System.out.println("\nPokretanje programa...");
 
         Facade facade = Facade.getInstance();
-        TuristickaAgencija ta = TuristickaAgencija.getInstance();
+        Map<Integer, Aranzmani> aranzmani = new HashMap<>();
 
-        ucitajAranzmane(datotekeAranzmani, facade, ta);
-        ucitajRezervacije(datotekeRezervacije, facade, ta);
+        List<List<String>> ucitaniAranzmani = new ArrayList<>();
+        if (datotekeAranzmani != null)
+        {
+            for (String dat : datotekeAranzmani)
+            {
+                provjeriDatoteku(dat);
+                System.out.println("\nUčitani aranžmani iz " + dat);
+                ucitaniAranzmani.addAll(facade.ucitajAranzmane(dat));
+            }
+        }
+        else
+        {
+            System.out.println("Niste naveli datoteku aranžmana (--ta)!");
+        }
 
-        Map<Integer, Aranzmani> aranzmani = ta.getAranzmani();
+        CsvZaAranzmane csvA = new CsvZaAranzmane();
+        List<List<String>> validAranzmani = csvA.provjeri(ucitaniAranzmani);
+        csvA.dodaj(validAranzmani, aranzmani);
+
+        List<List<String>> ucitaneRezervacije = new ArrayList<>();
+        if (datotekeRezervacije != null)
+        {
+            facade.resetirajRezervacije(); 
+
+            ucitaneRezervacije = facade.ucitajSveRezervacije(datotekeRezervacije);
+
+            for (String dat : datotekeRezervacije)
+            {
+                provjeriDatoteku(dat);
+                System.out.println("\nUčitane rezervacije iz " + dat);
+            }
+
+            CsvZaRezervacije csvR = new CsvZaRezervacije();
+            List<List<String>> validRezervacije = csvR.provjeri(ucitaneRezervacije);
+            csvR.dodaj(validRezervacije, aranzmani);
+        }
+        else
+        {
+            System.out.println("Niste naveli nijednu datoteku s rezervacijama (--rta)!");
+        }
+
+        Rezervacije.getInstance().azurirajStatuseRezervacija(aranzmani);
+
         KomandaCreator komandaCreator = new KomandaConcreteCreator(aranzmani);
 
-        System.out.println("Učitano " + aranzmani.size() + " aranžmana.");
+        System.out.println("\nUčitano " + aranzmani.size() + " aranžmana.");
         System.out.println("Broj grešaka: " + facade.getBrojGresaka());
 
         pokreniInteraktivniNacin(komandaCreator);
@@ -51,7 +86,6 @@ public class Glavna
     private static void provjeriKomandu(String[] args, Map<String, List<String>> argumenti)
     {
         String currentFlag = null;
-
         for (String arg : args)
         {
             if (arg.startsWith("--"))
@@ -63,42 +97,6 @@ public class Glavna
             {
                 argumenti.get(currentFlag).add(arg);
             }
-        }
-    }
-
-    private static void ucitajAranzmane(List<String> datoteke, Facade facade, TuristickaAgencija ta)
-    {
-        if (datoteke != null)
-        {
-            for (String dat : datoteke)
-            {
-                provjeriDatoteku(dat);
-                System.out.println("\nUčitani aranžmani iz " + dat);
-                List<List<String>> podaci = facade.ucitajAranzmane(dat);
-                ta.ucitajAranzmane(podaci);
-            }
-        }
-        else
-        {
-            System.out.println("Niste naveli datoteku aranžmana (--ta)!");
-        }
-    }
-
-    private static void ucitajRezervacije(List<String> datoteke, Facade facade, TuristickaAgencija ta)
-    {
-        if (datoteke != null)
-        {
-            for (String dat : datoteke)
-            {
-                provjeriDatoteku(dat);
-                System.out.println("\nUčitane rezervacije iz " + dat);
-                List<List<String>> podaci = facade.ucitajRezervacije(dat);
-                ta.ucitajRezervacije(podaci);
-            }
-        }
-        else
-        {
-            System.out.println("Niste naveli nijednu datoteku s rezervacijama (--rta)!");
         }
     }
 

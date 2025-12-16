@@ -36,6 +36,16 @@ public class CsvUcitajSingleton
         }
         return INSTANCE;
     }
+    
+    public void resetirajAranzmane() 
+    {
+        aranzmani.clear();
+    }
+
+    public void resetirajRezervacije() 
+    {
+        rezervacije.clear();
+    }
 
     public void ucitajAranzmane(String putanja) 
     {
@@ -47,6 +57,14 @@ public class CsvUcitajSingleton
     {
         List<List<String>> rezultat = ucitajCsv(putanja, 4);
         rezervacije.addAll(rezultat);
+    }
+    
+    public void ucitajSveRezervacije(List<String> putanje) 
+    {
+        for (String putanja : putanje) 
+        {
+            ucitajRezervacije(putanja);
+        }
     }
 
     public List<List<String>> getAranzmani() 

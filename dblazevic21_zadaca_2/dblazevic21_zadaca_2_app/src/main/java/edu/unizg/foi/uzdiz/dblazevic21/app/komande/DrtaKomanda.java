@@ -1,17 +1,14 @@
 package edu.unizg.foi.uzdiz.dblazevic21.app.komande;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import edu.unizg.foi.uzdiz.dblazevic21.app.ispis.FormaterZaIspise;
+import edu.unizg.foi.uzdiz.dblazevic21.app.ispis.TablicaPrinter;
 import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.aranzmani.Aranzmani;
-import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.rezervacije.Rezervacija;
 import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.rezervacije.Rezervacije;
-import edu.unizg.foi.uzdiz.dblazevic21.app.statusi.OtkazanaConcreteState;
-import edu.unizg.foi.uzdiz.dblazevic21.app.utils.DatumParser;
+import edu.unizg.foi.uzdiz.dblazevic21.app.utils.DatumParserApp;
 import edu.unizg.foi.uzdiz.dblazevic21.app.utils.GramatikaIJezikApp;
 
 public class DrtaKomanda implements Komanda 
@@ -56,56 +53,56 @@ public class DrtaKomanda implements Komanda
         String datum = m.group(4).trim();
         String vrijeme = m.group(5).trim();
 
-        LocalDateTime datumVrijeme = DatumParser.normalizirajDatumIVrijeme(datum, vrijeme);
+        LocalDateTime datumVrijeme = DatumParserApp.normalizirajDatumIVrijeme(datum, vrijeme);
         
         if (datumVrijeme == null) 
         {
+        	TablicaPrinter.ispisUnosa(unos);
             System.out.println("Greška: neispravan format datuma i vremena. Očekivano: dd.MM.yyyy. HH:mm:ss");
             return;
         }
 
         Aranzmani a = aranzmani.get(oznaka);
-        if (a == null) 
+        if (a == null)
         {
+        	TablicaPrinter.ispisUnosa(unos);
             System.out.println("Aranžman s oznakom " + oznaka + " ne postoji.");
             return;
         }
 
+        if (a.getStatus().getNaziv().equals("OTKAZAN")) 
+        {
+        	TablicaPrinter.ispisUnosa(unos);
+            System.out.println("Nije moguće dodati rezervaciju. Aranžman je OTKAZAN.");
+            return;
+        }
+        
+        TablicaPrinter.ispisUnosa(unos);
         provjeriIDodajRezervaciju(ime, prezime, oznaka, datumVrijeme);
     }
 
-	public void provjeriIDodajRezervaciju(String ime, String prezime, int oznaka, LocalDateTime datumVrijeme) 
-	{
-		List<Rezervacija> postojeceRezervacije = Rezervacije.getInstance().getZaOsobu(ime,  prezime);
-        
-        for (Rezervacija r : postojeceRezervacije)
-        {
-        	if (r.getStatus() instanceof OtkazanaConcreteState)
-			{
-        		if (r.getOznakaAranzmana() == oznaka)
-            	{
-            		System.out.println("Osoba " + ime + " " + prezime + " već ima rezervaciju za aranžman " + oznaka + ".");
-    				return;
-            	}
-            	
-            	if (r.getDatumVrijeme().equals(datumVrijeme))
-            	{
-            		System.out.println("Osoba " + ime + " " + prezime + " već ima rezervaciju u terminu " + FormaterZaIspise.fmtDatumVrijeme(datumVrijeme, r.getDatumVrijemeRaw()) + ".");
-    				return;
-            	}
-			}
-        }
-        
+    public void provjeriIDodajRezervaciju(String ime, String prezime, int oznaka, LocalDateTime datumVrijeme) 
+    {
         try 
         {
-            Rezervacije.getInstance().dodajRezervaciju(ime, prezime, oznaka, datumVrijeme);
+            boolean ok = Rezervacije.getInstance()
+                    .dodajRezervaciju(ime, prezime, oznaka, datumVrijeme, aranzmani);
+            if (!ok)
+            {
+                System.out.println("Rezervacija nije dodana (neispravan aranžman ili duplikat).");
+                return;
+            }
+
+            
             Rezervacije.getInstance().azurirajStatuseRezervacija(aranzmani);
-            System.out.println("Rezervacija za osobu " + ime + " " + prezime + " na aranžman " + oznaka + " je dodana.");
+
+            System.out.println("Rezervacija za osobu " + ime + " " + prezime
+                    + " na aranžman " + oznaka + " je dodana.");
         } 
         catch (Exception e)
         {
             System.out.println("Greška prilikom dodavanja rezervacije: " + e.getMessage());
         }
-	}
-}
+    }
 
+}

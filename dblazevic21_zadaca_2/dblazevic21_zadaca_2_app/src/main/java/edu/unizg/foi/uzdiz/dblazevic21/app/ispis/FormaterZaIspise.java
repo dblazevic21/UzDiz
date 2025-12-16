@@ -1,5 +1,7 @@
 package edu.unizg.foi.uzdiz.dblazevic21.app.ispis;
 
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -11,6 +13,14 @@ public class FormaterZaIspise
     private static final DateTimeFormatter datumIspis = DateTimeFormatter.ofPattern("dd.MM.yyyy.");
     private static final DateTimeFormatter vrijemeIspis = DateTimeFormatter.ofPattern("HH:mm:ss");
 
+    private static final DateTimeFormatter FULL_DATETIME = DateTimeFormatter.ofPattern("dd.MM.yyyy. HH:mm:ss");
+
+    public static String fmtDatumVrijeme(LocalDateTime dt) 
+    {
+        if (dt == null) return "-";
+        return dt.format(FULL_DATETIME);
+    }
+    
     public static String fmtDatum(LocalDate d) 
     {
         return (d == null) ? "-" : d.format(datumIspis);
@@ -34,10 +44,28 @@ public class FormaterZaIspise
         return "-";
     }
     
-    public static String fmtCijena(float c) 
+    public static String fmtBroj(long n)
     {
-        return String.format(Locale.ROOT, "%.2f", c);
+        DecimalFormatSymbols decimalniFormat = DecimalFormatSymbols.getInstance(Locale.ROOT);
+        decimalniFormat.setDecimalSeparator('.');
+        decimalniFormat.setGroupingSeparator('.');
+        DecimalFormat df = new DecimalFormat("#,##0", decimalniFormat);
+        df.setGroupingUsed(true);
+        df.setGroupingSize(3);
+        return df.format(n);
     }
+
+    public static String fmtCijena(float c)
+    {
+        DecimalFormatSymbols decimalniFormat = DecimalFormatSymbols.getInstance(Locale.ROOT);
+        decimalniFormat.setDecimalSeparator('.');
+        decimalniFormat.setGroupingSeparator('.');
+        DecimalFormat df = new DecimalFormat("#,##0.00", decimalniFormat);
+        df.setGroupingUsed(true);
+        df.setGroupingSize(3);
+        return df.format(c);
+    }
+
     
     public static Float parseCijenu(String s)
     {

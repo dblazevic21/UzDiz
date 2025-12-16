@@ -2,6 +2,7 @@ package edu.unizg.foi.uzdiz.dblazevic21.app.komande;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -9,9 +10,11 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 import edu.unizg.foi.uzdiz.dblazevic21.app.ispis.FormaterZaIspise;
+import edu.unizg.foi.uzdiz.dblazevic21.app.ispis.IspisKonfiguracija;
+import edu.unizg.foi.uzdiz.dblazevic21.app.ispis.StatusFormater;
 import edu.unizg.foi.uzdiz.dblazevic21.app.ispis.TablicaPrinter;
 import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.aranzmani.Aranzmani;
-import edu.unizg.foi.uzdiz.dblazevic21.app.utils.DatumParser;
+import edu.unizg.foi.uzdiz.dblazevic21.app.utils.DatumParserApp;
 
 public class ItakKomanda implements Komanda 
 {
@@ -37,6 +40,9 @@ public class ItakKomanda implements Komanda
 
         if (izrezano.equalsIgnoreCase("ITAK"))
         {
+        	TablicaPrinter.ispisUnosa(unos);
+            System.out.println("Popis turističkih aranžmana");
+            System.out.println();
             ispisiAranzmane(null, null);
             return;
         }
@@ -46,11 +52,11 @@ public class ItakKomanda implements Komanda
         
         if (m.matches()) 
         {
-            String odStr = DatumParser.normalizirajDatum(m.group(1));
-            String doStr = DatumParser.normalizirajDatum(m.group(2));
+            String odStr = DatumParserApp.normalizirajDatum(m.group(1));
+            String doStr = DatumParserApp.normalizirajDatum(m.group(2));
 
-            LocalDate od = DatumParser.parseDatumZaKomandu(odStr);
-            LocalDate dO = DatumParser.parseDatumZaKomandu(doStr);
+            LocalDate od = DatumParserApp.parseDatumZaKomandu(odStr);
+            LocalDate dO = DatumParserApp.parseDatumZaKomandu(doStr);
 
             if (od == null || dO == null)
             {
@@ -62,12 +68,28 @@ public class ItakKomanda implements Komanda
                 System.out.println("Greška: završni datum je prije početnog.");
                 return;
             }
+            
+
+            azurirajStatusAranzmana();
+            
+            TablicaPrinter.ispisUnosa(unos);
+            System.out.println("Popis turističkih aranžmana");
+            System.out.println();
             ispisiAranzmane(od, dO);
             return;
         }
 
         System.out.println("Nepoznata komanda. Upotrijebite: ITAK [od do]");
     }
+
+    public void azurirajStatusAranzmana()
+    {
+    	for (Aranzmani a : aranzmani.values())
+    	{
+    	    a.rekalkulirajStatus();
+    	}
+    }
+
 
     private void ispisiAranzmane(LocalDate od, LocalDate dO) 
     {
@@ -82,23 +104,40 @@ public class ItakKomanda implements Komanda
                     || a.getPocetniDatum().isBefore(od)
                     || a.getPocetniDatum().isAfter(dO));
         }
+        
+        if (IspisKonfiguracija.jeObrnutoKronoloski()) 
+        {
+            Collections.reverse(lista);
+        }
 
-        int[] w = {7, 35, 14, 14, 12, 16, 10, 18, 18};
+        int[] w = {7, 35, 14, 14, 12, 16, 10, 18, 18, 18};
+        boolean[] desno = {
+                true,
+                false,
+                false,
+                false,
+                false,
+                false,
+                true, 
+                true, 
+                true,
+                false
+        };
 
         TablicaPrinter.printajSeperatorTabliceMulti(w);
-        TablicaPrinter.printajRedTabliceMulti(w,
+        TablicaPrinter.printajRedTabliceMultiAlign(w, desno,
                 "Oznaka", "Naziv", "Početni datum", "Završni datum",
-                "Kretanje", "Povratak", "Cijena", "Min br. putnika", "Maks br. putnika"
+                "Kretanje", "Povratak", "Cijena", "Min br. putnika", "Maks br. putnika", "Status"
         );
         TablicaPrinter.printajSeperatorTabliceMulti(w);
 
-        for (Aranzmani a : lista) 
+        for (Aranzmani a : lista)
         {
             if (a == null) 
-            {
-                continue;
-            }
-            TablicaPrinter.printajRedTabliceMulti(w,
+        	{
+        		continue;
+        	}
+            TablicaPrinter.printajRedTabliceMultiAlign(w, desno,
                     String.valueOf(a.getOznaka()),
                     FormaterZaIspise.izrezi(a.getNaziv(), 35),
                     FormaterZaIspise.fmtDatum(a.getPocetniDatum()),
@@ -107,7 +146,9 @@ public class ItakKomanda implements Komanda
                     FormaterZaIspise.fmtVrijeme(a.getVrijemePovratka()),
                     FormaterZaIspise.fmtCijena(a.getCijena()),
                     String.valueOf(a.getMinBrojPutnika()),
-                    String.valueOf(a.getMaksBrojPutnika()));
+                    String.valueOf(a.getMaksBrojPutnika()),
+                    StatusFormater.statusOznakaAranzmana(a.getStatus())
+                    );
         }
         TablicaPrinter.printajSeperatorTabliceMulti(w);
     }

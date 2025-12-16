@@ -7,7 +7,7 @@ import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeFormatterBuilder;
 import java.util.Locale;
 
-public class DatumParser
+public class DatumParserApp
 {
 	public static String normalizirajDatum(String s)
     {
@@ -44,39 +44,10 @@ public class DatumParser
     
     public static LocalDateTime normalizirajDatumIVrijeme(String datum, String vrijeme) 
     {
-        try 
-        {
-            String d = (datum == null) ? "" : datum.trim();
-            d = d.replaceAll("\\s+", "");
-            d = d.replace('-', '.').replace('/', '.');
-            d = d.replaceAll("\\.+$", "");
-
-            DateTimeFormatter fleksibilniDatum = new DateTimeFormatterBuilder()
-                    .parseLenient()
-                    .appendPattern("[d.M.yyyy][dd.MM.yyyy]")
-                    .toFormatter(Locale.ROOT);
-
-            LocalDate parsiranDatum = LocalDate.parse(d, fleksibilniDatum);
-
-            String v = (vrijeme == null) ? "" : vrijeme.trim();
-            if (v.matches("\\d{1,2}:\\d{1,2}")) 
-            {
-                v += ":00";
-            }
-
-            DateTimeFormatter fleksibilnoVrijeme = new DateTimeFormatterBuilder()
-                    .parseLenient()
-                    .appendPattern("[H:mm:ss][HH:mm:ss][H:mm][HH:mm]")
-                    .toFormatter(Locale.ROOT);
-
-            LocalTime parsiranoVrijeme = LocalTime.parse(v, fleksibilnoVrijeme);
-
-            return LocalDateTime.of(parsiranDatum, parsiranoVrijeme);
-        }
-        catch (Exception e) 
-        {
-            return null;
-        }
+        String d = (datum == null) ? "" : datum.trim();
+        String v = (vrijeme == null) ? "" : vrijeme.trim();
+        String combined = (d + " " + v).trim();
+        return CsvParserApp.uDatumVrijeme(combined);
     }
 
     public static LocalDateTime parseDatumIVrijeme(String datum, String vrijeme)
