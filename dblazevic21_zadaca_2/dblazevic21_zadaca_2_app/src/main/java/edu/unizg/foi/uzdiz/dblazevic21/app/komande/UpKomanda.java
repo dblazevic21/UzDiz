@@ -6,6 +6,7 @@ import java.util.Map;
 import edu.unizg.foi.uzdiz.dblazevic21.app.csv.CsvZaAranzmane;
 import edu.unizg.foi.uzdiz.dblazevic21.app.csv.CsvZaRezervacije;
 import edu.unizg.foi.uzdiz.dblazevic21.app.ispis.IspisiGreskuApp;
+import edu.unizg.foi.uzdiz.dblazevic21.app.ispis.TablicaPrinter;
 import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.aranzmani.Aranzmani;
 import edu.unizg.foi.uzdiz.dblazevic21.lib.facade.TuristickaFacade;
 
@@ -28,10 +29,16 @@ public class UpKomanda implements Komanda
     public void izvrsi(String unos)
     {
         TuristickaFacade facade = TuristickaFacade.getInstance();
-        String odrezan = (unos == null) ? "" : unos.trim();
+        provjeriUnos(unos, facade);
+    }
+
+	public void provjeriUnos(String unos, TuristickaFacade facade) 
+	{
+		String odrezan = (unos == null) ? "" : unos.trim();
 
         if (odrezan.isEmpty())
         {
+        	TablicaPrinter.ispisUnosa(unos);
             int rb = facade.getBrojGresaka();
             IspisiGreskuApp.ispisiGresku(
                 rb,
@@ -50,6 +57,7 @@ public class UpKomanda implements Komanda
 
         if (odrezan.isEmpty())
         {
+        	TablicaPrinter.ispisUnosa(unos);
             int rb = facade.getBrojGresaka();
             IspisiGreskuApp.ispisiGresku(
                 rb,
@@ -64,6 +72,7 @@ public class UpKomanda implements Komanda
         String[] dijelovi = odrezan.split("\\s+", 2);
         if (dijelovi.length < 2)
         {
+        	TablicaPrinter.ispisUnosa(unos);
             int rb = facade.getBrojGresaka();
             IspisiGreskuApp.ispisiGresku(
                 rb,
@@ -85,14 +94,14 @@ public class UpKomanda implements Komanda
                 rb,
                 0,
                 odrezan,
-                List.of("Naziv datoteke je prazan."),
+                List.of("Nema datoteke."),
                 "konzola"
             );
             return;
         }
 
         izvrsiKomandu(tip, nazivDatoteke, unos);
-    }
+	}
 
     public void izvrsiKomandu(String tip, String nazivDatoteke, String unos)
     {
