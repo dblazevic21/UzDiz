@@ -1,0 +1,53 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <modelVersion>4.0.0</modelVersion>
+  <groupId>edu.unizg.foi.uzdiz.dblazevic21</groupId>
+  <artifactId>dblazevic21_zadaca_3</artifactId>
+  <version>2.0.0</version>
+  <packaging>pom</packaging>
+  <name>dblazevic21_zadaca_3</name>
+  <description>Turistička agencija - Zadaća 3</description>
+  
+  <modules>
+		<module>dblazevic21_zadaca_3_lib</module>
+		<module>dblazevic21_zadaca_3_app</module>
+  </modules>
+  
+   <properties>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <java.version>21</java.version>
+        <maven.compiler.source>${java.version}</maven.compiler.source>
+        <maven.compiler.target>${java.version}</maven.compiler.target>
+        <maven.compiler.release>${java.version}</maven.compiler.release>
+        <maven.jar.version>3.4.2</maven.jar.version>
+        <maven.clean.version>3.4.1</maven.clean.version>
+        <maven.compiler.version>3.14.0</maven.compiler.version>
+    </properties>
+    
+    
+  	<build>
+  	
+  		<finalName>${project.artifactId}</finalName>
+  	
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>${maven.compiler.version}</version>
+                <configuration>
+                    <source>${java.version}</source>
+                    <target>${java.version}</target>
+                    <release>${java.version}</release>
+                    <encoding>UTF-8</encoding>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-clean-plugin</artifactId>
+                <version>${maven.clean.version}</version>
+            </plugin>
+        </plugins>
+    </build>
+  
+  
+</project>

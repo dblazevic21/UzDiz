@@ -1,0 +1,3 @@
+java -jar /home/NWTiS_4/dblazevic21/dblazevic21_zadaca_2/dblazevic21_zadaca_2_app/target/dblazevic21_zadaca_2_app.jar --ta DZ_2_aranzmani.csv --rta DZ_2_rezervacije_1.csv DZ_2_rezervacije_2.csv DZ_2_rezervacije.csv
+
+DRTA Damir Klarić 3 7.10.2025 10:27:41

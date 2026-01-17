@@ -27,7 +27,11 @@ public interface AranzmaniBuilder
 	
 	public AranzmaniBuilder setProgram(String program);
 	public AranzmaniBuilder setPocetniDatum(LocalDate pocetniDatum);
+	public AranzmaniBuilder setNaziv(String naziv);
+	public AranzmaniBuilder setOznaka(int oznaka);
 	public AranzmaniBuilder setZavrsniDatum(LocalDate zavrsniDatum);
+	public AranzmaniBuilder setVrijemeKretanja(LocalTime vrijemeKretanja);
+	public AranzmaniBuilder setVrijemePovratka(LocalTime vrijemePovratka);
 	public AranzmaniBuilder setCijena(float cijena);
 	public AranzmaniBuilder setMinBrojPutnika(int minBrojPutnika);
 	public AranzmaniBuilder setMaksBrojPutnika(int maksBrojPutnika);

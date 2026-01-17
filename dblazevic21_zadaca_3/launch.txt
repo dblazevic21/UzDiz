@@ -1,0 +1,1 @@
+java -jar /home/NWTiS_4/dblazevic21/dblazevic21_zadaca_3/dblazevic21_zadaca_3_app/target/dblazevic21_zadaca_3_app.jar
