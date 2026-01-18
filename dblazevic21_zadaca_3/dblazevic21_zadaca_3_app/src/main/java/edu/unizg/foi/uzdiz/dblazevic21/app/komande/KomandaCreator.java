@@ -3,13 +3,21 @@ package edu.unizg.foi.uzdiz.dblazevic21.app.komande;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
+import edu.unizg.foi.uzdiz.dblazevic21.app.cor.CleanupHandlerCoR;
+import edu.unizg.foi.uzdiz.dblazevic21.app.cor.ExecuteHandlerCoR;
+import edu.unizg.foi.uzdiz.dblazevic21.app.cor.ExtractOznakaHandlerCoR;
+import edu.unizg.foi.uzdiz.dblazevic21.app.cor.HandlerZaCoR;
+import edu.unizg.foi.uzdiz.dblazevic21.app.cor.KomandaContext;
+import edu.unizg.foi.uzdiz.dblazevic21.app.cor.SnapshotHandlerCoR;
 import edu.unizg.foi.uzdiz.dblazevic21.app.memento.AranzmanCaretaker;
 import edu.unizg.foi.uzdiz.dblazevic21.app.modeli.aranzmani.Aranzmani;
 
 public abstract class KomandaCreator 
 {
-
+	private static final Set<String> PER_ARANZMAN = Set.of("DRTA", "ORTA", "OTA", "PTAR", "UPTAR", "VSTAR");
+	
     protected final Map<Integer, Aranzmani> aranzmani;
     protected final AranzmanCaretaker caretaker;
     protected final List<Komanda> registriraneKomande = new ArrayList<>();
@@ -31,7 +39,7 @@ public abstract class KomandaCreator
     protected abstract void registrirajKomande();
 
     public void izvrsiKomandu(String unos) 
-    {
+    {    	
         if (unos == null || unos.isBlank()) 
         {
             System.out.println("Prazan unos komande.");
@@ -49,7 +57,30 @@ public abstract class KomandaCreator
             return;
         }
         
-        komanda.izvrsi(trimmed);
+        if (PER_ARANZMAN.contains(naziv) && caretaker != null)
+    	{
+    		KomandaContext context = new KomandaContext(
+    				trimmed,
+    				naziv,
+    				komanda,
+    				aranzmani,
+    				caretaker
+			);
+    		
+    		HandlerZaCoR extractOznakaHandler = new ExtractOznakaHandlerCoR();
+    		HandlerZaCoR snapshotHandler = new SnapshotHandlerCoR();
+    		HandlerZaCoR executeHandler = new ExecuteHandlerCoR();
+    		HandlerZaCoR cleanupHandler = new CleanupHandlerCoR();
+    		
+    		extractOznakaHandler.setSljedeci(snapshotHandler);
+    		snapshotHandler.setSljedeci(executeHandler);
+    		executeHandler.setSljedeci(cleanupHandler);
+    		
+    		extractOznakaHandler.handle(context);
+    		return;
+    	}
+        
+    	komanda.izvrsi(trimmed);
     }
     
     protected void ispisiDostupneKomande()

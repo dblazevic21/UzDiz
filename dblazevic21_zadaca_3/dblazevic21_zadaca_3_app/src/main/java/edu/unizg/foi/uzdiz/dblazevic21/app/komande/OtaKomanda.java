@@ -42,6 +42,8 @@ public class OtaKomanda implements Komanda
             return;
         }
 
+        TablicaPrinter.ispisUnosa(unos);
+        
         int oznaka = Integer.parseInt(m.group(1));
         Aranzmani aranzman = aranzmani.get(oznaka);
         if (aranzman == null)
