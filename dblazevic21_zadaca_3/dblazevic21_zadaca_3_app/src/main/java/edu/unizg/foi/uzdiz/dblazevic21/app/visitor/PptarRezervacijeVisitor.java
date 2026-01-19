@@ -14,7 +14,7 @@ public class PptarRezervacijeVisitor implements TuristickiVisitor
 
     public PptarRezervacijeVisitor(String trazeno)
     {
-        this.trazeno = trazeno.toLowerCase();
+        this.trazeno = trazeno;
     }
 
     @Override
@@ -26,8 +26,8 @@ public class PptarRezervacijeVisitor implements TuristickiVisitor
     @Override
     public void visit(Rezervacija r) 
     {
-        String ime = r.getIme() == null ? "" : r.getIme().toLowerCase();
-        String prezime = r.getPrezime() == null ? "" : r.getPrezime().toLowerCase();
+        String ime = r.getIme() == null ? "" : r.getIme();
+        String prezime = r.getPrezime() == null ? "" : r.getPrezime();
 
         if (ime.contains(trazeno) || prezime.contains(trazeno))
         {

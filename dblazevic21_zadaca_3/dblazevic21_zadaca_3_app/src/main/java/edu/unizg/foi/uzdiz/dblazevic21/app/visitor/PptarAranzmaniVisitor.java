@@ -14,14 +14,14 @@ public class PptarAranzmaniVisitor implements TuristickiVisitor
 
     public PptarAranzmaniVisitor(String trazeno)
     {
-        this.trazeno = trazeno.toLowerCase();
+        this.trazeno = trazeno;
     }
 
     @Override
     public void visit(Aranzmani a) 
     {
-        String naziv = a.getNaziv() == null ? "" : a.getNaziv().toLowerCase();
-        String program = a.getProgram() == null ? "" : a.getProgram().toLowerCase();
+        String naziv = a.getNaziv() == null ? "" : a.getNaziv();
+        String program = a.getProgram() == null ? "" : a.getProgram();
 
         if (naziv.contains(trazeno) || program.contains(trazeno)) 
         {
