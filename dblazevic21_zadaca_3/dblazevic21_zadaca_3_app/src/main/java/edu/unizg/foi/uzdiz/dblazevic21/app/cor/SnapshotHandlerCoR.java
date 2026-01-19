@@ -9,6 +9,12 @@ public class SnapshotHandlerCoR extends BaseHandlerCoR
 	{
 		Aranzmani aranzman = context.aranzmani.get(context.oznakaAranzmana);
 		
+		if (context.komanda != null && "VSTAR".equalsIgnoreCase(context.komanda.getNaziv())) 
+		{
+		    sljedeci(context);
+		    return;
+		}
+		
 		if (aranzman == null)
 		{
 			System.out.println("Aranžman s oznakom " + context.oznakaAranzmana + " ne postoji.");

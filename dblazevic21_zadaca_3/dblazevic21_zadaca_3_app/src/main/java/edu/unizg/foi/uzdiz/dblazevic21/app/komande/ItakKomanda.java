@@ -41,6 +41,8 @@ public class ItakKomanda implements Komanda
 
         if (izrezano.equalsIgnoreCase("ITAK"))
         {
+        	Rezervacije.getInstance().azurirajStatuseRezervacija(aranzmani);
+        	
         	TablicaPrinter.ispisUnosa(unos);
             System.out.println("Popis turističkih aranžmana");
             System.out.println();
@@ -70,7 +72,6 @@ public class ItakKomanda implements Komanda
                 return;
             }
             
-
             Rezervacije.getInstance().azurirajStatuseRezervacija(aranzmani);
             
             TablicaPrinter.ispisUnosa(unos);
